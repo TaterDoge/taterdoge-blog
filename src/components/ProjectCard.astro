@@ -1,0 +1,220 @@
+---
+import Icon from "@/components/Icon.astro";
+
+interface Props {
+  project: {
+    name: string;
+    description: string;
+    techStack: string[];
+    cover: string;
+    github: string;
+    demo: string;
+    status: string;
+  };
+  variant?: "home" | "page";
+}
+
+const { project, variant = "home" } = Astro.props;
+const hasDemo = Boolean(project.demo && project.demo !== "#");
+const hasGithub = Boolean(project.github && project.github !== "#");
+const targetHref = hasDemo ? project.demo : hasGithub ? project.github : "/projects";
+const isExternal = (href: string) => href.startsWith("http");
+---
+
+<article class:list={["project-card", `project-card-${variant}`]}>
+  <a
+    class="project-hitbox"
+    href={targetHref}
+    target={isExternal(targetHref) ? "_blank" : undefined}
+    rel={isExternal(targetHref) ? "noreferrer" : undefined}
+    aria-label={`打开项目：${project.name}`}
+  ></a>
+
+  <a
+    class="project-media"
+    href={targetHref}
+    target={isExternal(targetHref) ? "_blank" : undefined}
+    rel={isExternal(targetHref) ? "noreferrer" : undefined}
+    aria-label={`查看项目：${project.name}`}
+    tabindex="-1"
+  >
+    <img src="/images/image-placeholder.svg" data-media-src={project.cover} alt={`${project.name} 项目截图`} loading="lazy" />
+  </a>
+
+  <div class="content">
+    <div class="topline">
+      <span class="status">{project.status}</span>
+      <span class="actions">
+        {
+          hasDemo && (
+            <a href={project.demo} target={isExternal(project.demo) ? "_blank" : undefined} rel={isExternal(project.demo) ? "noreferrer" : undefined} aria-label={`${project.name} 演示地址`}>
+              <Icon name="ExternalLink" size={16} />
+            </a>
+          )
+        }
+        {
+          hasGithub && (
+            <a href={project.github} target="_blank" rel="noreferrer" aria-label={`${project.name} GitHub 仓库`}>
+              <Icon name="Github" size={16} />
+            </a>
+          )
+        }
+      </span>
+    </div>
+
+    <h3>
+      <a href={targetHref} target={isExternal(targetHref) ? "_blank" : undefined} rel={isExternal(targetHref) ? "noreferrer" : undefined} tabindex="-1">
+        {project.name}
+      </a>
+    </h3>
+    <p>{project.description}</p>
+    <span class="stack">
+      {project.techStack.map((item) => <span>{item}</span>)}
+    </span>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 136px minmax(0, 1fr);
+    gap: 16px;
+    border-bottom: 1px solid var(--border-soft);
+    padding: 14px 5px;
+    transition:
+      background 180ms ease-out,
+      color 180ms ease-out,
+      transform 180ms ease-out,
+      border-color 180ms ease-out;
+  }
+
+  .project-hitbox {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    border-radius: 6px;
+  }
+
+  .project-card-home:hover {
+    color: var(--blue);
+    transform: translateX(2px);
+  }
+
+  .project-card-page:hover {
+    background: color-mix(in srgb, var(--blue) 7%, transparent);
+    color: var(--ink);
+  }
+
+  .project-media {
+    display: block;
+    min-width: 0;
+  }
+
+  .project-media :global(.media-shell) {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  img {
+    width: 100%;
+    aspect-ratio: 1;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--paper-soft);
+  }
+
+  .content {
+    display: block;
+    min-width: 0;
+  }
+
+  .topline,
+  .actions,
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topline {
+    justify-content: space-between;
+  }
+
+  .status {
+    color: var(--orange);
+    font-size: 0.76rem;
+    font-weight: 900;
+  }
+
+  h3 {
+    margin: 4px 0 7px;
+    font-size: 1.08rem;
+    line-height: 1.35;
+  }
+
+  h3 a {
+    transition: color 180ms ease-out;
+  }
+
+  h3 a:hover,
+  .project-media:hover + .content h3 a {
+    color: var(--blue);
+  }
+
+  p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .stack {
+    margin-top: 12px;
+  }
+
+  .stack span {
+    border: 1px solid var(--tag-border);
+    border-radius: 5px;
+    background: var(--note-blue-bg);
+    padding: 2px 7px;
+    color: var(--tag-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .actions a {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--ink);
+    transition:
+      border-color 180ms ease-out,
+      background 180ms ease-out,
+      color 180ms ease-out;
+  }
+
+  .actions a:hover {
+    border-color: var(--tag-border);
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  @media (max-width: 620px) {
+    .project-card {
+      grid-template-columns: 92px minmax(0, 1fr);
+    }
+  }
+</style>

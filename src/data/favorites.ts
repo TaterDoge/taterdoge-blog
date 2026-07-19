@@ -1,0 +1,42 @@
+export const favorites = [
+  {
+    title: "Elysia",
+    description: "Bun 上的类型友好 Web 框架，路由、插件、端到端类型文档",
+    url: "https://elysiajs.com/",
+    category: "技术文档",
+    icon: "Zap",
+    featured: false,
+  },
+  {
+    title: "Drizzle ORM",
+    description: "类型安全 SQL ORM，schema、query 和迁移文档常查",
+    url: "https://orm.drizzle.team/",
+    category: "技术文档",
+    icon: "Database",
+    featured: false,
+  },
+  {
+    title: "Excalidraw",
+    description: "快速画手绘风架构图和草图，脑图救急很好用",
+    url: "https://excalidraw.com/",
+    category: "设计工具",
+    icon: "PencilRuler",
+    featured: true,
+  },
+  {
+    title: "Vercel",
+    description: "个人项目部署、预览和服务端函数，点几下就上线",
+    url: "https://vercel.com/",
+    category: "部署服务",
+    icon: "Triangle",
+    featured: false,
+  },
+  {
+    title: "GitHub",
+    description: "代码仓库、Issues、Discussions 和开源协作基地",
+    url: "https://github.com/",
+    category: "开发工具",
+    icon: "Github",
+    featured: true,
+  },
+];

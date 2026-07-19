@@ -1,0 +1,458 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import { hasPrivateAccess } from "@/lib/private-access";
+
+export const prerender = false;
+
+Astro.response.headers.set("Cache-Control", "private, no-store");
+Astro.response.headers.set("Vary", "Cookie");
+
+const canViewPrivate = hasPrivateAccess(Astro.cookies);
+const notes = (await getCollection("notes")).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const visibleNotes = notes.filter((note) => note.data.visibility !== "private" || canViewPrivate);
+const formatMomentTime = (date: Date) =>
+  date.toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+---
+
+<BaseLayout title="零星碎念" description="更轻量的日常记录、想法和朋友圈式笔记">
+  <div class="page-shell page">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Moments</p>
+        <h1>零星碎念</h1>
+        <p>这里不是博客目录，更像随手发的小动态：纯文字、图片、图文混排都贴成一条条便签</p>
+      </div>
+      <aside class="intro-note">
+        <span>想到什么就贴上来</span>
+        <a class="private-publish" href="/admin/publish?type=note" data-private-action hidden>
+          <Icon name="PencilLine" size={16} /> 发布碎念
+        </a>
+      </aside>
+    </section>
+
+    <section class="notes-stream" aria-label="碎念列表">
+      {visibleNotes.map((note, index) => {
+        const text = note.body.trim();
+        const images = note.data.images ?? [];
+        const visibleImages = images.slice(0, 9);
+        const imageCount = visibleImages.length;
+        const isPrivate = note.data.visibility === "private";
+
+        return (
+          <article
+            class:list={[
+              "moment",
+              `tone-${(index % 4) + 1}`,
+              { "image-only": images.length > 0 && !text, "private-note": isPrivate, "is-visible": isPrivate },
+            ]}
+          >
+            <div class="moment-meta">
+              <time datetime={note.data.pubDate.toISOString()}>{formatMomentTime(note.data.pubDate)}</time>
+              <span><Icon name={note.data.visibility === "private" ? "Lock" : "Globe2"} size={14} /> {note.data.mood ?? "记录"}</span>
+            </div>
+            <h2 class="moment-title">{note.data.title}</h2>
+            {images.length > 0 && (
+              <div class:list={["image-grid", `count-${imageCount}`]}>
+                {visibleImages.map((image, imageIndex) => (
+                  <img
+                    src="/images/image-placeholder.svg"
+                    data-media-src={image}
+                    alt={`${note.data.title} 图片 ${imageIndex + 1}`}
+                    loading="lazy"
+                    data-note-image
+                    data-media-min-placeholder="180"
+                  />
+                ))}
+              </div>
+            )}
+            {text && <p class="moment-text">{text}</p>}
+            <div class="moment-foot">
+              <div>
+                {note.data.tags.slice(0, 3).map((tag) => <span>#{tag}</span>)}
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </section>
+
+    <div class="note-lightbox" data-note-lightbox hidden>
+      <button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="关闭大图"></button>
+      <figure>
+        <button class="lightbox-close" type="button" data-lightbox-close aria-label="关闭大图">
+          <Icon name="X" size={20} />
+        </button>
+        <img src="/images/image-placeholder.svg" alt="" data-lightbox-image data-no-media-shell="true" />
+        <figcaption data-lightbox-caption></figcaption>
+      </figure>
+    </div>
+
+    <script>
+      function initNoteLightbox() {
+        const lightbox = document.querySelector("[data-note-lightbox]");
+        const lightboxImage = document.querySelector("[data-lightbox-image]");
+        const caption = document.querySelector("[data-lightbox-caption]");
+        if (!(lightbox instanceof HTMLElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+        if (lightbox.parentElement !== document.body) document.body.appendChild(lightbox);
+
+        const open = (image) => {
+          if (!(image instanceof HTMLImageElement)) return;
+          lightboxImage.dataset.mediaState = "loading";
+          lightboxImage.onload = () => {
+            window.__marchenRevealImage?.(lightboxImage);
+          };
+          lightboxImage.onerror = () => {
+            lightboxImage.dataset.mediaState = "error";
+          };
+          lightboxImage.src = image.dataset.mediaSrc || image.currentSrc || image.src;
+          lightboxImage.alt = image.alt;
+          if (caption instanceof HTMLElement) caption.textContent = image.alt;
+          lightbox.hidden = false;
+          document.documentElement.classList.add("lightbox-open");
+        };
+
+        const close = () => {
+          lightbox.hidden = true;
+          document.documentElement.classList.remove("lightbox-open");
+        };
+
+        document.querySelectorAll("[data-note-image]").forEach((image) => {
+          if (!(image instanceof HTMLImageElement) || image.dataset.lightboxReady === "true") return;
+          image.dataset.lightboxReady = "true";
+          image.tabIndex = 0;
+          image.setAttribute("role", "button");
+          image.setAttribute("aria-label", `${image.alt}，点击查看大图`);
+          image.addEventListener("click", () => open(image));
+          image.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              open(image);
+            }
+          });
+        });
+
+        if (lightbox.dataset.ready !== "true") {
+          lightbox.dataset.ready = "true";
+          lightbox.querySelectorAll("[data-lightbox-close]").forEach((button) => {
+            button.addEventListener("click", close);
+          });
+          document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !lightbox.hidden) close();
+          });
+        }
+      }
+
+      initNoteLightbox();
+      document.addEventListener("astro:page-load", initNoteLightbox);
+      document.addEventListener("astro:after-swap", initNoteLightbox);
+    </script>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: 26px;
+    padding-bottom: 20px;
+  }
+
+  .notes-stream {
+    display: grid;
+    width: min(760px, 100%);
+    margin: 0 auto;
+    gap: 22px;
+  }
+
+  .moment {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.72) inset,
+      0 10px 22px var(--shadow-soft);
+    animation: moment-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .moment:nth-child(2n) {
+    transform: rotate(0.6deg);
+  }
+
+  .moment:nth-child(3n) {
+    transform: rotate(-0.5deg);
+  }
+
+  .tone-2 {
+    background: var(--note-blue-bg);
+  }
+
+  .tone-3 {
+    background: var(--note-quiet-bg);
+  }
+
+  .tone-4 {
+    background: var(--note-orange-bg);
+  }
+
+  .moment::before {
+    position: absolute;
+    top: -10px;
+    left: 34px;
+    width: 76px;
+    height: 18px;
+    background: var(--tape-bg);
+    box-shadow: 0 1px 0 var(--tape-shadow) inset;
+    content: "";
+    transform: rotate(-4deg);
+  }
+
+  .moment::after {
+    position: absolute;
+    inset: 8px;
+    border: 1px dashed color-mix(in srgb, var(--border-strong) 62%, transparent);
+    border-radius: 6px;
+    pointer-events: none;
+    content: "";
+  }
+
+  @keyframes moment-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) rotate(0);
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .private-note {
+    display: none;
+  }
+
+  .private-note.is-visible {
+    display: block;
+  }
+
+  .moment-meta,
+  .moment-meta span,
+  .moment-foot,
+  .moment-foot div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .moment-meta {
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .moment-title {
+    position: relative;
+    margin: 10px 0 18px;
+    padding-bottom: 12px;
+    color: var(--ink);
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.1;
+  }
+
+  .moment-title::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: min(130px, 36%);
+    height: 2px;
+    background: var(--orange);
+    content: "";
+    transform: rotate(-1deg);
+  }
+
+  .image-grid {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 14px;
+  }
+
+  .image-grid.count-1 {
+    grid-template-columns: 1fr;
+  }
+
+  .image-grid.count-2,
+  .image-grid.count-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .image-grid.count-3 {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+
+  .image-grid.count-5,
+  .image-grid.count-6,
+  .image-grid.count-7,
+  .image-grid.count-8,
+  .image-grid.count-9 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .image-grid.count-3 img:first-child {
+    grid-row: span 2;
+  }
+
+  .image-grid.count-3 :global(.media-shell:first-child) {
+    grid-row: span 2;
+  }
+
+  .image-grid :global(.media-shell) {
+    width: 100%;
+    min-height: 132px;
+    aspect-ratio: 1;
+    border-radius: 6px;
+  }
+
+  .image-grid img {
+    width: 100%;
+    aspect-ratio: 1;
+    height: auto;
+    min-height: 132px;
+    border-radius: 6px;
+    object-fit: cover;
+    cursor: zoom-in;
+  }
+
+  .image-grid.count-1 img {
+    aspect-ratio: 4 / 3;
+    max-height: 360px;
+  }
+
+  .image-grid.count-1 :global(.media-shell) {
+    aspect-ratio: 4 / 3;
+    max-height: 360px;
+  }
+
+  .moment-text {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.98rem;
+    line-height: 1.78;
+    white-space: pre-wrap;
+  }
+
+  .moment-foot {
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+  }
+
+  .moment-foot span {
+    color: var(--blue);
+    font-size: 0.72rem;
+    font-weight: 900;
+  }
+
+  @media (max-width: 560px) {
+    .notes-stream {
+      width: 100%;
+    }
+
+    .moment {
+      padding: 16px;
+    }
+  }
+
+  .note-lightbox[hidden] {
+    display: none;
+  }
+
+  .note-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 140;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+  }
+
+  .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: var(--nav-backdrop-bg);
+    backdrop-filter: blur(10px);
+  }
+
+  .note-lightbox figure {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 10px;
+    width: min(920px, 100%);
+    margin: 0;
+    overflow: visible;
+  }
+
+  .note-lightbox :global(.media-shell) {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .note-lightbox img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    max-height: min(78vh, 760px);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--surface);
+    object-fit: contain;
+    box-shadow: 0 22px 58px var(--shadow-pop);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    z-index: 3;
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface-strong);
+    color: var(--ink);
+    box-shadow: 0 10px 24px var(--shadow-pop);
+  }
+
+  .note-lightbox figcaption {
+    color: var(--on-accent);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  :global(html.lightbox-open) {
+    overflow: hidden;
+  }
+</style>

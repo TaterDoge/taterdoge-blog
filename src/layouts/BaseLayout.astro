@@ -1,0 +1,343 @@
+---
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import MusicPlayer from "@/components/MusicPlayer.astro";
+import { ClientRouter } from "astro:transitions";
+import { siteConfig } from "@/data/site";
+import "@fontsource/caveat/400.css";
+import "@fontsource/caveat/700.css";
+import "@/styles/theme.css";
+import "@/styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+} = Astro.props;
+const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.name}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="preload" href="/images/image-placeholder.svg" as="image" />
+    <link rel="preload" href="/fonts/MiSansVF.ttf" as="font" type="font/ttf" crossorigin />
+    <script is:inline>
+      (() => {
+        const storageKey = "marchen_theme";
+        const readTheme = () => {
+          const stored = localStorage.getItem(storageKey);
+          if (stored === "light" || stored === "dark") return stored;
+          return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        };
+        const applyTheme = (root = document.documentElement) => {
+          root.dataset.theme = readTheme();
+        };
+
+        window.__marchenApplyTheme = applyTheme;
+        applyTheme();
+
+        if (!window.__marchenThemeSwapBound) {
+          document.addEventListener("astro:before-swap", (event) => {
+            applyTheme(event.newDocument.documentElement);
+          });
+          document.addEventListener("astro:after-swap", () => applyTheme());
+          window.__marchenThemeSwapBound = true;
+        }
+      })();
+    </script>
+    <script is:inline>
+      (() => {
+        const syncBodyFont = (body = document.body) => {
+          if (!body) return;
+          body.style.fontFamily = "var(--font-sans)";
+          body.style.fontWeight = "500";
+        };
+
+        const loadMarchenFont = () => {
+          syncBodyFont();
+          if (!document.fonts?.load) return;
+          Promise.allSettled([
+            document.fonts.load('500 16px "Marchen Sans"'),
+            document.fonts.load('800 16px "Marchen Sans"'),
+            document.fonts.load('900 16px "Marchen Sans"'),
+          ]).then(() => {
+            document.documentElement.dataset.fontReady = "true";
+            document.documentElement.style.setProperty("--font-refresh", Date.now().toString());
+            requestAnimationFrame(() => {
+              document.documentElement.style.removeProperty("--font-refresh");
+            });
+          });
+        };
+
+        loadMarchenFont();
+        document.addEventListener("astro:before-swap", (event) => {
+          syncBodyFont(event.newDocument.body);
+        });
+        document.addEventListener("astro:after-swap", loadMarchenFont);
+        document.addEventListener("astro:page-load", loadMarchenFont);
+      })();
+    </script>
+    <ClientRouter />
+    <script is:inline>
+      const marchenPlaceholderSrc = "/images/image-placeholder.svg";
+
+      function normalizeMarchenImageUrl(source) {
+        if (!source) return "";
+        try {
+          return new URL(source, window.location.href).href;
+        } catch {
+          return source;
+        }
+      }
+
+      function isMarchenImageSource(image, source) {
+        const expected = normalizeMarchenImageUrl(source);
+        return [image.currentSrc, image.src].some((item) => normalizeMarchenImageUrl(item) === expected);
+      }
+
+      function requestMarchenImageSource(image) {
+        const source = image.dataset.mediaSrc;
+        if (!source || image.dataset.noMediaShell === "true") return;
+        if (image.dataset.mediaRequested === "true" || image.dataset.mediaRequested === "pending") return;
+
+        image.dataset.mediaRequested = "pending";
+        const delay = Number.parseInt(image.dataset.mediaLoadDelay ?? "90", 10);
+        window.setTimeout(() => {
+          if (image.dataset.mediaRequested === "true") return;
+          image.dataset.mediaRequested = "true";
+          image.src = source;
+        }, Math.max(0, Number.isFinite(delay) ? delay : 90));
+      }
+
+      function revealMarchenImage(image) {
+        if (!(image instanceof HTMLImageElement)) return;
+        if (image.naturalWidth <= 0) {
+          image.dataset.mediaState = "error";
+          return;
+        }
+
+        const source = image.dataset.mediaSrc || image.currentSrc || image.src;
+        if (image.dataset.mediaSrc && !isMarchenImageSource(image, source)) return;
+        if (!image.dataset.mediaSrc && isMarchenImageSource(image, marchenPlaceholderSrc)) return;
+        if (image.dataset.mediaLoadedSrc === source && image.dataset.mediaState === "loaded") return;
+        if (image.dataset.mediaPendingSrc === source || image.dataset.mediaRevealingSrc === source) return;
+
+        const reveal = () => {
+          if (!isMarchenImageSource(image, source)) return;
+          delete image.dataset.mediaPendingSrc;
+          image.dataset.mediaRevealingSrc = source;
+          image.dataset.mediaLoadedSrc = source;
+
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            image.dataset.mediaState = "loaded";
+            return;
+          }
+
+          image.dataset.mediaState = "revealing";
+          requestAnimationFrame(() => {
+            window.setTimeout(() => {
+              if (isMarchenImageSource(image, source)) {
+                image.dataset.mediaState = "loaded";
+              }
+            }, 80);
+          });
+        };
+
+        const minPlaceholder = Number.parseInt(image.dataset.mediaMinPlaceholder ?? (image.dataset.mediaSrc ? "140" : "0"), 10);
+        const startedAt = Number.parseFloat(image.dataset.mediaStartedAt ?? "");
+        const elapsed = Number.isFinite(startedAt) ? performance.now() - startedAt : minPlaceholder;
+        const delay = Math.max(0, minPlaceholder - elapsed);
+
+        if (delay > 0) {
+          image.dataset.mediaPendingSrc = source;
+          window.setTimeout(reveal, delay);
+        } else {
+          reveal();
+        }
+      }
+
+      function ensureMarchenImageShell(image) {
+        if (!(image instanceof HTMLImageElement) || image.dataset.noMediaShell === "true") return;
+        const parent = image.parentElement;
+        if (parent?.classList.contains("media-shell")) return;
+
+        const shell = document.createElement("span");
+        shell.className = "media-shell";
+        parent?.insertBefore(shell, image);
+        shell.append(image);
+      }
+
+      function initMarchenImages(root = document) {
+        root.querySelectorAll("img").forEach((image) => {
+          if (!(image instanceof HTMLImageElement)) return;
+          if (!image.hasAttribute("loading")) image.loading = "lazy";
+          image.decoding = "async";
+          if (!image.dataset.mediaState) image.dataset.mediaState = "loading";
+          if (!image.dataset.mediaStartedAt) image.dataset.mediaStartedAt = String(performance.now());
+          ensureMarchenImageShell(image);
+
+          const markLoaded = () => {
+            if (image.dataset.mediaSrc && !isMarchenImageSource(image, image.dataset.mediaSrc)) return;
+            revealMarchenImage(image);
+          };
+
+          if (image.dataset.marchenImageReady === "true") return;
+          image.dataset.marchenImageReady = "true";
+          image.addEventListener("load", markLoaded);
+          image.addEventListener("error", () => {
+            image.dataset.mediaState = "error";
+          });
+
+          if (image.dataset.mediaSrc) {
+            requestMarchenImageSource(image);
+          } else if (image.complete) {
+            markLoaded();
+          }
+        });
+      }
+
+      window.__marchenRevealImage = revealMarchenImage;
+      window.__marchenInitImages = initMarchenImages;
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => initMarchenImages(), { once: true });
+      } else {
+        initMarchenImages();
+      }
+      document.addEventListener("astro:page-load", () => initMarchenImages());
+      document.addEventListener("astro:after-swap", () => initMarchenImages());
+    </script>
+    <script is:inline>
+      function initMarchenDecor() {
+        const decor = document.querySelector(".site-decor");
+        const stage = document.querySelector(".site-main");
+        if (!(decor instanceof HTMLElement) || !(stage instanceof HTMLElement)) return;
+
+        window.__marchenDecorAbort?.abort();
+        const controller = new AbortController();
+        window.__marchenDecorAbort = controller;
+
+        const updateRange = () => {
+          const height = Math.max(stage.scrollHeight, stage.getBoundingClientRect().height);
+          decor.dataset.decorRange = height < 1400 ? "short" : height < 2050 ? "medium" : "full";
+        };
+
+        updateRange();
+        const observer = new ResizeObserver(updateRange);
+        observer.observe(stage);
+        controller.signal.addEventListener("abort", () => observer.disconnect(), { once: true });
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const items = Array.from(decor.querySelectorAll("[data-site-parallax]")).filter((item) => item instanceof HTMLElement);
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const parallaxScale = 0.42;
+        let raf = 0;
+
+        const paint = () => {
+          currentX += (targetX - currentX) * 0.1;
+          currentY += (targetY - currentY) * 0.1;
+
+          items.forEach((item) => {
+            if (!(item instanceof HTMLElement)) return;
+            const depth = Number.parseFloat(item.dataset.siteParallax ?? "6");
+            item.style.setProperty("--px", `${(currentX * depth * parallaxScale).toFixed(2)}px`);
+            item.style.setProperty("--py", `${(currentY * depth * parallaxScale).toFixed(2)}px`);
+          });
+
+          if (Math.abs(targetX - currentX) > 0.002 || Math.abs(targetY - currentY) > 0.002) {
+            raf = window.requestAnimationFrame(paint);
+          } else {
+            raf = 0;
+          }
+        };
+
+        const schedule = () => {
+          if (!raf) raf = window.requestAnimationFrame(paint);
+        };
+
+        stage.addEventListener(
+          "pointermove",
+          (event) => {
+            targetX = (event.clientX / window.innerWidth - 0.5) * 2;
+            targetY = (event.clientY / window.innerHeight - 0.5) * 2;
+            schedule();
+          },
+          { signal: controller.signal }
+        );
+
+        stage.addEventListener(
+          "pointerleave",
+          () => {
+            targetX = 0;
+            targetY = 0;
+            schedule();
+          },
+          { signal: controller.signal }
+        );
+      }
+
+      initMarchenDecor();
+      document.addEventListener("astro:page-load", initMarchenDecor);
+      document.addEventListener("astro:after-swap", initMarchenDecor);
+    </script>
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <Header />
+    <main class="site-main">
+      <div class="site-decor" aria-hidden="true">
+        <svg class="site-decor-lines" viewBox="0 0 1440 2000" preserveAspectRatio="none">
+          <path class="site-decor-line left-main" d="M118 96 C168 104 188 140 170 182 C152 224 92 218 76 270 C54 342 144 348 140 424 C136 506 68 520 78 604 C88 686 164 688 136 774 C110 856 54 878 78 956 C104 1034 174 1022 150 1110 C126 1200 52 1218 86 1310 C116 1394 184 1398 146 1494 C112 1580 52 1622 92 1714 C124 1788 166 1818 134 1914" />
+          <path class="site-decor-line right-main" d="M1318 144 C1262 172 1248 226 1284 270 C1320 314 1370 318 1342 390 C1312 466 1252 454 1246 536 C1240 620 1324 644 1304 734 C1286 820 1238 844 1264 922 C1292 1006 1362 1010 1328 1104 C1298 1190 1234 1212 1266 1300 C1298 1392 1360 1406 1328 1504 C1298 1590 1240 1628 1282 1712 C1316 1780 1342 1830 1306 1904" />
+        </svg>
+
+        <span class="site-decor-item site-decor-braces" data-site-parallax="8">
+          <img src="/images/decorative_element/sprite0.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-code-card" data-site-parallax="6">
+          <img src="/images/decorative_element/sprite1.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-cup" data-site-parallax="9">
+          <img src="/images/decorative_element/sprite2.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-plant" data-site-parallax="7">
+          <img src="/images/decorative_element/sprite3.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-books" data-site-parallax="5">
+          <img src="/images/decorative_element/sprite4.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-phone" data-site-parallax="6">
+          <img src="/images/decorative_element/sprite5.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-window" data-site-parallax="8">
+          <img src="/images/decorative_element/sprite6.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-keyboard" data-site-parallax="5">
+          <img src="/images/decorative_element/sprite7.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+        <span class="site-decor-item site-decor-coffee" data-site-parallax="10">
+          <img src="/images/decorative_element/sprite8.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
+        </span>
+      </div>
+      <slot />
+      <Footer />
+    </main>
+    <MusicPlayer />
+  </body>
+</html>

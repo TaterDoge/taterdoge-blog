@@ -1,0 +1,7 @@
+<svg width="960" height="540" viewBox="0 0 960 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="540" rx="36" fill="#FFF7ED"/>
+  <path d="M480 82l198 356H282L480 82z" fill="#1B2B3A"/>
+  <path d="M480 176l102 183H378l102-183z" fill="#FDFBF7"/>
+  <path d="M342 424c80 34 195 37 277 0" stroke="#F97316" stroke-width="10" stroke-linecap="round"/>
+  <text x="336" y="492" fill="#1B2B3A" font-family="Arial" font-size="36" font-weight="700">Astro Blog Route</text>
+</svg>

@@ -1,0 +1,459 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import { hasPrivateAccess } from "@/lib/private-access";
+
+export const prerender = false;
+
+Astro.response.headers.set("Cache-Control", "private, no-store");
+Astro.response.headers.set("Vary", "Cookie");
+
+const canPublish = hasPrivateAccess(Astro.cookies);
+const typeParam = Astro.url.searchParams.get("type");
+const initialType = typeParam === "note" || typeParam === "project" ? typeParam : "blog";
+
+if (!canPublish) {
+  Astro.response.status = 404;
+}
+---
+
+<BaseLayout title={canPublish ? "发布内容" : "页面未找到"} description={canPublish ? "发布文章和碎念到 GitHub 内容仓库" : "这个页面暂时找不到"}>
+  <div class="page-shell page">
+    {
+      canPublish ? (
+        <>
+          <section class="page-intro">
+            <div>
+              <p class="eyebrow">Publish</p>
+              <h1>发布内容</h1>
+              <p>内容会写入 GitHub 仓库里的 Markdown 文件，提交后由 Vercel 自动重新部署</p>
+            </div>
+            <aside class="intro-note">写完先确认类型和可见性</aside>
+          </section>
+
+          <section class="publish-panel" data-publish-app data-initial-type={initialType}>
+            <div class="publish-tabs" role="tablist" aria-label="发布类型">
+              <button class:list={["publish-tab", initialType === "blog" && "is-active"]} type="button" data-type-button="blog">
+                <Icon name="BookOpen" size={17} /> 文章
+              </button>
+              <button class:list={["publish-tab", initialType === "note" && "is-active"]} type="button" data-type-button="note">
+                <Icon name="Images" size={17} /> 碎念
+              </button>
+              <button class:list={["publish-tab", initialType === "project" && "is-active"]} type="button" data-type-button="project">
+                <Icon name="Rocket" size={17} /> 项目
+              </button>
+            </div>
+
+            <form data-publish-form>
+              <input type="hidden" name="type" value={initialType} data-publish-type />
+
+              <div class="form-grid two">
+                <label>
+                  <span>标题</span>
+                  <input name="title" required placeholder="给这条内容起个名字" />
+                </label>
+                <label data-content-fields>
+                  <span>文件名 slug</span>
+                  <input name="slug" placeholder="留空会自动生成" />
+                </label>
+              </div>
+
+              <div class="form-grid two" data-description-fields>
+                <label>
+                  <span>描述</span>
+                  <input name="description" data-description-required placeholder="文章摘要或项目介绍，列表页会展示" />
+                </label>
+                <label>
+                  <span>分类</span>
+                  <input name="category" data-description-required placeholder="学习笔记 / 项目日志 / 前端实验" />
+                </label>
+              </div>
+
+              <div class="form-grid two" data-project-fields hidden>
+                <label>
+                  <span>GitHub 链接</span>
+                  <input name="github" data-project-required placeholder="https://github.com/marchen-orz/project" />
+                </label>
+                <label>
+                  <span>演示地址</span>
+                  <input name="demo" placeholder="没有就留空" />
+                </label>
+              </div>
+
+              <div class="form-grid two" data-project-fields hidden>
+                <label>
+                  <span>技术栈</span>
+                  <input name="techStack" placeholder="React, TypeScript, Astro" />
+                </label>
+                <label>
+                  <span>状态</span>
+                  <input name="status" placeholder="维护中 / 已发布" />
+                </label>
+              </div>
+
+              <div class="form-grid two" data-note-fields hidden>
+                <label>
+                  <span>心情</span>
+                  <input name="mood" placeholder="记录 / 整理 / 日常" />
+                </label>
+                <label>
+                  <span>图片 URL</span>
+                  <input name="images" placeholder="多个图片用逗号分隔" />
+                </label>
+              </div>
+
+              <div class="form-grid two">
+                <label>
+                  <span>标签</span>
+                  <input name="tags" placeholder="多个标签用逗号分隔" />
+                </label>
+                <label data-content-fields>
+                  <span>可见性</span>
+                  <select name="visibility">
+                    <option value="public">公开</option>
+                    <option value="private">私有</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-grid two" data-blog-fields>
+                <label>
+                  <span>封面 URL</span>
+                  <input name="cover" placeholder="可选，文章卡片封面" />
+                </label>
+                <div class="check-row">
+                  <label>
+                    <input name="draft" type="checkbox" />
+                    <span>保存为草稿</span>
+                  </label>
+                  <label>
+                    <input name="syncToKb" type="checkbox" />
+                    <span>同步到知识库</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-grid two" data-project-fields hidden>
+                <label>
+                  <span>封面 URL</span>
+                  <input name="cover" placeholder="没有则使用默认项目图" />
+                </label>
+                <div class="check-row">
+                  <label>
+                    <input name="featured" type="checkbox" />
+                    <span>首页精选</span>
+                  </label>
+                </div>
+              </div>
+
+              <label data-content-fields>
+                <span>正文 Markdown</span>
+                <textarea name="body" required placeholder="正文支持 Markdown。碎念可以直接写短句，文章可以写完整段落。"></textarea>
+              </label>
+
+              <div class="publish-actions">
+                <button class="button" type="submit">
+                  <Icon name="Send" size={17} /> 发布
+                </button>
+                <output data-publish-status>等待填写内容</output>
+              </div>
+            </form>
+          </section>
+        </>
+      ) : (
+        <section class="not-found">
+          <span class="tape" aria-hidden="true"></span>
+          <Icon name="FileQuestion" size={42} />
+          <p class="eyebrow">404</p>
+          <h1>页面未找到</h1>
+          <p>你访问的页面不存在，或者暂时还没开放</p>
+          <a class="button" href="/"><Icon name="ArrowLeft" size={18} /> 返回首页</a>
+        </section>
+      )
+    }
+
+    <script>
+      function initPublishForm() {
+        const app = document.querySelector("[data-publish-app]");
+        if (!(app instanceof HTMLElement) || app.dataset.ready === "true") return;
+        app.dataset.ready = "true";
+
+        const form = app.querySelector("[data-publish-form]");
+        const typeInput = app.querySelector("[data-publish-type]");
+        const status = app.querySelector("[data-publish-status]");
+        const tabs = Array.from(app.querySelectorAll("[data-type-button]"));
+        const setStatus = (message, state = "idle") => {
+          if (!(status instanceof HTMLOutputElement)) return;
+          status.value = message;
+          status.dataset.state = state;
+        };
+
+        const setType = (type) => {
+          if (!(typeInput instanceof HTMLInputElement)) return;
+          typeInput.value = type;
+          tabs.forEach((tab) => {
+            if (!(tab instanceof HTMLElement)) return;
+            tab.classList.toggle("is-active", tab.dataset.typeButton === type);
+          });
+          const setGroupState = (selector, visible) => {
+            app.querySelectorAll(selector).forEach((field) => {
+              if (!(field instanceof HTMLElement)) return;
+              field.hidden = !visible;
+              field.querySelectorAll("input, select, textarea").forEach((input) => {
+                if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement || input instanceof HTMLTextAreaElement) {
+                  input.disabled = !visible;
+                }
+              });
+            });
+          };
+
+          setGroupState("[data-blog-fields]", type === "blog");
+          setGroupState("[data-note-fields]", type === "note");
+          setGroupState("[data-project-fields]", type === "project");
+          setGroupState("[data-content-fields]", type !== "project");
+          setGroupState("[data-description-fields]", type !== "note");
+
+          app.querySelectorAll("[data-description-required]").forEach((input) => {
+            if (input instanceof HTMLInputElement) input.required = type === "blog" || type === "project";
+          });
+          app.querySelectorAll("[data-project-required]").forEach((input) => {
+            if (input instanceof HTMLInputElement) input.required = type === "project";
+          });
+        };
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            if (tab instanceof HTMLElement) setType(tab.dataset.typeButton ?? "blog");
+          });
+        });
+
+        setType(app.dataset.initialType === "note" || app.dataset.initialType === "project" ? app.dataset.initialType : "blog");
+
+        form?.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!(form instanceof HTMLFormElement)) return;
+          const data = new FormData(form);
+          const type = String(data.get("type") || "blog");
+          const payload = {
+            type,
+            title: String(data.get("title") || ""),
+            slug: String(data.get("slug") || ""),
+            description: String(data.get("description") || ""),
+            category: String(data.get("category") || ""),
+            mood: String(data.get("mood") || ""),
+            techStack: String(data.get("techStack") || ""),
+            tags: String(data.get("tags") || ""),
+            visibility: String(data.get("visibility") || "public"),
+            draft: data.get("draft") === "on",
+            cover: String(data.get("cover") || ""),
+            syncToKb: data.get("syncToKb") === "on",
+            images: String(data.get("images") || ""),
+            github: String(data.get("github") || ""),
+            demo: String(data.get("demo") || ""),
+            status: String(data.get("status") || ""),
+            featured: data.get("featured") === "on",
+            body: String(data.get("body") || ""),
+          };
+
+          setStatus("正在发布...", "loading");
+          const submitButton = form.querySelector("button[type='submit']");
+          if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
+
+          try {
+            const response = await fetch("/api/admin/publish", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+            if (!response.ok || !result?.ok) throw new Error(result?.error || "发布失败");
+            setStatus(`已提交：${result.path}`, "ok");
+            form.reset();
+            setType(type);
+          } catch (error) {
+            setStatus(error instanceof Error ? error.message : "发布失败", "error");
+          } finally {
+            if (submitButton instanceof HTMLButtonElement) submitButton.disabled = false;
+          }
+        });
+      }
+
+      initPublishForm();
+      document.addEventListener("astro:page-load", initPublishForm);
+    </script>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: 24px;
+  }
+
+  .publish-panel {
+    display: grid;
+    gap: 18px;
+    width: min(980px, 100%);
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .publish-tabs {
+    display: inline-flex;
+    width: fit-content;
+    justify-self: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 10px;
+  }
+
+  .publish-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--tag-border);
+    border-radius: 6px;
+    background: var(--tag-bg);
+    padding: 7px 12px;
+    color: var(--tag-text);
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .publish-tab.is-active {
+    border-color: var(--blue);
+    background: var(--blue);
+    color: var(--on-accent);
+  }
+
+  form {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .form-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .form-grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  label {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+    color: var(--ink);
+    font-weight: 900;
+  }
+
+  label span {
+    font-size: 0.84rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 10px 11px;
+    outline: 0;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+  }
+
+  textarea {
+    min-height: 320px;
+    resize: vertical;
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    line-height: 1.7;
+  }
+
+  .check-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+  }
+
+  .check-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 39px;
+  }
+
+  .check-row input {
+    width: auto;
+  }
+
+  .publish-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding-top: 4px;
+  }
+
+  .publish-actions .button {
+    min-width: 118px;
+    min-height: 42px;
+    padding: 8px 18px;
+  }
+
+  .publish-actions button:disabled {
+    opacity: 0.62;
+    cursor: wait;
+  }
+
+  output {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  output[data-state="ok"] {
+    color: var(--blue);
+  }
+
+  output[data-state="error"] {
+    color: var(--status-error);
+  }
+
+  .not-found {
+    display: grid;
+    position: relative;
+    min-height: min(520px, 62vh);
+    place-items: center;
+    align-content: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .not-found h1,
+  .not-found p {
+    margin: 0;
+  }
+
+  .not-found p:last-of-type {
+    color: var(--muted);
+  }
+
+  @media (max-width: 720px) {
+    .form-grid.two {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

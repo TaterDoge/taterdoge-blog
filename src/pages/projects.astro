@@ -1,0 +1,192 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import ProjectCard from "@/components/ProjectCard.astro";
+import { projects } from "@/data/projects";
+import { siteConfig } from "@/data/site";
+
+const techTags = Array.from(new Set(projects.flatMap((p) => p.tags ?? [])));
+const categoryCount = Array.from(new Set(projects.map((p) => p.category))).length;
+---
+
+<BaseLayout title="项目" description={`${siteConfig.name} 的项目、实验和有趣的小东西`}>
+  <div class="page-shell page">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Projects</p>
+        <h1>项目</h1>
+        <p>从想法到成品的过程都放在这里，有做好的、有还在磨的，每一步都是认真的</p>
+      </div>
+      <aside class="intro-note">
+        <span>想到就动手试试</span>
+        <div class="private-action-row">
+          <a class="private-publish" href="/admin/publish?type=project" data-private-action hidden>
+            <Icon name="PencilLine" size={16} /> 新增项目
+          </a>
+          <a class="private-publish" href="/admin/manage?tab=projects" data-private-action hidden>
+            <Icon name="ListOrdered" size={16} /> 排序项目
+          </a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="project-layout">
+      <div class="project-list">
+        {projects.map((project) => <ProjectCard project={project} variant="page" />)}
+      </div>
+
+      <aside class="project-rail">
+        <div class="rail-card">
+          <h3><Icon name="BarChart3" size={16} /> 项目概览</h3>
+          <dl>
+            <div><dt>总数</dt><dd>{projects.length}</dd></div>
+            <div><dt>分类</dt><dd>{categoryCount}</dd></div>
+            <div><dt>维护中</dt><dd>{projects.filter((p) => p.status === "维护中").length}</dd></div>
+          </dl>
+        </div>
+
+        <div class="rail-card">
+          <h3><Icon name="Tags" size={16} /> 技术标签</h3>
+          <div class="tag-cloud">
+            {techTags.slice(0, 12).map((tag) => <span>{tag}</span>)}
+          </div>
+        </div>
+
+        <div class="rail-quote">
+          <span class="tape" aria-hidden="true"></span>
+          <p>比起完美的方案，我更喜欢一个能跑通的原型</p>
+        </div>
+      </aside>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: 24px;
+  }
+
+  .private-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .private-action-row :global(.private-publish) {
+    margin: 0;
+  }
+
+  .project-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 28px;
+    align-items: start;
+    padding-bottom: 5px;
+  }
+
+  .project-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 26px;
+  }
+
+  .project-rail {
+    position: sticky;
+    top: 94px;
+    display: grid;
+    gap: 20px;
+  }
+
+  .rail-card {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .rail-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+  }
+
+  dl {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+  }
+
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  dt, dd {
+    margin: 0;
+  }
+
+  dd {
+    color: var(--blue);
+    font-weight: 900;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .tag-cloud span {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 8px;
+    color: var(--ink-2);
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
+  .rail-quote {
+    position: relative;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--note-bg);
+    padding: 22px 18px;
+    transform: rotate(-1deg);
+  }
+
+  .rail-quote p {
+    margin: 0;
+    color: var(--ink-2);
+    font-family: var(--font-note);
+    font-size: 1.02rem;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 980px) {
+    .project-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .project-rail {
+      position: static;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 860px) {
+    .project-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .project-rail {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

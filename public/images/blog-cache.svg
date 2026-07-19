@@ -1,0 +1,14 @@
+<svg width="960" height="540" viewBox="0 0 960 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="540" rx="36" fill="#FDFBF7"/>
+  <path d="M0 72h960M0 144h960M0 216h960M0 288h960M0 360h960M0 432h960M0 504h960M96 0v540M192 0v540M288 0v540M384 0v540M480 0v540M576 0v540M672 0v540M768 0v540M864 0v540" stroke="#E8DED0" stroke-width="1"/>
+  <rect x="118" y="198" width="150" height="96" rx="14" fill="#fff" stroke="#1B2B3A" stroke-width="5"/>
+  <rect x="405" y="188" width="150" height="116" rx="16" fill="#FFE8BE" stroke="#1B2B3A" stroke-width="5"/>
+  <path d="M692 193h118v111H692z" fill="#fff" stroke="#1B2B3A" stroke-width="5"/>
+  <path d="M268 246h112M555 246h112" stroke="#1B2B3A" stroke-width="6" stroke-linecap="round"/>
+  <path d="M365 226l20 20-20 20M652 226l20 20-20 20" stroke="#1B2B3A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="154" y="255" fill="#1B2B3A" font-family="Arial" font-size="25" font-weight="700">Browser</text>
+  <text x="442" y="255" fill="#1B2B3A" font-family="Arial" font-size="25" font-weight="700">Redis</text>
+  <text x="717" y="255" fill="#1B2B3A" font-family="Arial" font-size="25" font-weight="700">Database</text>
+  <path d="M330 390c94 35 216 31 304-6" stroke="#F97316" stroke-width="8" stroke-linecap="round"/>
+  <text x="315" y="446" fill="#1B2B3A" font-family="Arial" font-size="30" font-weight="700">Right data, right layer.</text>
+</svg>

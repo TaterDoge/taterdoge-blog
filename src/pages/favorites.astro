@@ -1,0 +1,59 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import ToolFavoriteCard from "@/components/ToolFavoriteCard.astro";
+import { favorites } from "@/data/favorites";
+import { siteConfig } from "@/data/site";
+
+const categories = Array.from(new Set(favorites.map((item) => item.category)));
+---
+
+<BaseLayout title="收藏" description={`${siteConfig.name} 收藏的好用工具、灵感来源和常去的地方`}>
+  <div class="page-shell page">
+    <section class="page-intro">
+      <div>
+        <p class="eyebrow">Favorites</p>
+        <h1>收藏</h1>
+        <p>技术文档、设计灵感和常用网站都收进来，像口袋清单一样随手翻</p>
+      </div>
+      <aside class="intro-note">
+        <span>用过觉得顺手，就先留下</span>
+        <a class="private-publish" href="/admin/manage?tab=favorites" data-private-action hidden>
+          <Icon name="BookmarkPlus" size={16} /> 管理收藏
+        </a>
+      </aside>
+    </section>
+
+    {categories.map((category) => (
+      <section>
+        <div class="section-header">
+          <h2 class="section-title">{category}</h2>
+        </div>
+        <div class="favorite-list">
+          {favorites.filter((item) => item.category === category).map((item) => (
+            <ToolFavoriteCard title={item.title} description={item.description} href={item.url} icon={item.icon} label={item.category} />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: 32px;
+  }
+
+  .favorite-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 24px;
+  }
+
+  @media (max-width: 720px) {
+    .favorite-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

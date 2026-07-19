@@ -1,0 +1,109 @@
+---
+import Icon from "@/components/Icon.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  icon: string;
+  label?: string;
+}
+
+const { title, description, href, icon, label } = Astro.props;
+---
+
+<a class="mini-card" href={href}>
+  <span class="mini-icon"><Icon name={icon} size={21} /></span>
+  <span class="copy">
+    <span class="heading">
+      <strong>{title}</strong>
+      {label && <small>{label}</small>}
+    </span>
+    <em>{description}</em>
+  </span>
+</a>
+
+<style>
+  .mini-card {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 11px;
+    min-height: 78px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 12px;
+    box-shadow: none;
+    transition: background 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out, transform 180ms ease-out;
+    strong{
+      transition: color 180ms ease-out;
+    }
+  }
+
+  .mini-card:hover {
+    border-color: var(--line-blue);
+    background: var(--surface-soft);
+    color: var(--blue);
+    strong {
+      color: var(--blue);
+    }
+  }
+
+  .mini-icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--tag-border);
+    border-radius: 6px;
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  .copy,
+  strong,
+  em {
+    display: block;
+    min-width: 0;
+    font-style: normal;
+  }
+
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  strong {
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 0.98rem;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: var(--orange-soft);
+    padding: 1px 7px;
+    color: var(--orange);
+    font-size: 0.68rem;
+    font-weight: 900;
+  }
+
+  em {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.83rem;
+    line-height: 1.52;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+</style>

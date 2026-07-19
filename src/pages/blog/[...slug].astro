@@ -1,0 +1,500 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import ArticleCard from "@/components/ArticleCard.astro";
+import { siteConfig } from "@/data/site";
+import { getReadingMinutes } from "@/lib/reading-time";
+
+export async function getStaticPaths() {
+  const posts = (await getCollection("blog")).filter((post) => !post.data.draft && post.data.visibility === "public");
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const allPosts = (await getCollection("blog"))
+  .filter((entry) => !entry.data.draft && entry.data.visibility === "public")
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentIndex = allPosts.findIndex((entry) => entry.id === post.id);
+const nextPosts = allPosts.filter((entry) => entry.id !== post.id).slice(0, 3);
+const readingMinutes = getReadingMinutes(post.body);
+const tocTree: Array<{ slug: string; text: string; children: Array<{ slug: string; text: string }> }> = [];
+let currentTocParent: (typeof tocTree)[number] | undefined;
+
+headings
+  .filter((heading) => heading.depth === 2 || heading.depth === 3)
+  .forEach((heading) => {
+    if (heading.depth === 2 || !currentTocParent) {
+      currentTocParent = { slug: heading.slug, text: heading.text, children: [] };
+      tocTree.push(currentTocParent);
+      return;
+    }
+
+    currentTocParent.children.push({ slug: heading.slug, text: heading.text });
+  });
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="page-shell article-layout">
+    <main class="article-main">
+      <header class="article-hero">
+        <nav class="crumbs" aria-label="面包屑">
+          <a href="/">首页</a>
+          <span>/</span>
+          <a href="/blog">文章</a>
+          <span>/</span>
+          <b>{post.data.category}</b>
+        </nav>
+        <p class="eyebrow">{post.data.category}</p>
+        <h1>{post.data.title}</h1>
+        <p>{post.data.description}</p>
+        <div class="article-meta">
+          <span><Icon name="UserRound" size={16} /> {siteConfig.name}</span>
+          <time datetime={post.data.pubDate.toISOString()}><Icon name="CalendarDays" size={16} /> {post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+          <span><Icon name="Clock3" size={16} /> {readingMinutes} 分钟</span>
+          {post.data.updatedDate && <span><Icon name="RefreshCw" size={16} /> 更新 {post.data.updatedDate.toLocaleDateString("zh-CN")}</span>}
+        </div>
+        <div class="tag-row">
+          {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
+        </div>
+        {post.data.cover && <img class="cover" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt="" />}
+      </header>
+
+      <section class="prose article-content" data-article-content>
+        <Content />
+      </section>
+
+      <section class="continue">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Continue</p>
+            <h2 class="section-title">继续阅读</h2>
+          </div>
+          <a class="plain-link" href="/blog">全部文章 <Icon name="ArrowRight" size={16} /></a>
+        </div>
+        <div class="related-grid">
+          {nextPosts.map((entry) => (
+            <ArticleCard
+              href={`/blog/${entry.id}`}
+              title={entry.data.title}
+              description={entry.data.description}
+              date={entry.data.pubDate}
+              tags={entry.data.tags}
+              cover={entry.data.cover?.src}
+              readingMinutes={getReadingMinutes(entry.body)}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <aside class="article-sidebar">
+      <nav class="toc" aria-label="文章目录">
+        <h2>文章目录</h2>
+        {tocTree.length > 0 ? (
+          <ol class="toc-list" data-article-toc>
+            {tocTree.map((heading) => (
+              <li class="toc-item depth-2" data-toc-parent data-toc-item data-toc-slug={heading.slug}>
+                <a href={`#${heading.slug}`} data-toc-link data-toc-depth="2">{heading.text}</a>
+                {heading.children.length > 0 && (
+                  <ol class="toc-sublist">
+                    {heading.children.map((child) => (
+                      <li class="toc-item depth-3" data-toc-item data-toc-slug={child.slug}>
+                        <a href={`#${child.slug}`} data-toc-link data-toc-depth="3">{child.text}</a>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p>这篇文章暂时没有目录</p>
+        )}
+      </nav>
+
+      <section class="side-note progress-note">
+        <h2>阅读进度</h2>
+        <span class="progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-reading-progress-track>
+          <i data-reading-progress style="width:0%"></i>
+        </span>
+        <p><span data-reading-progress-text>0%</span> / 预计 {readingMinutes} 分钟读完</p>
+      </section>
+
+      <section class="side-note">
+        <h2>文章信息</h2>
+        <p><Icon name="BookMarked" size={16} /> 第 {currentIndex + 1} 篇公开文章</p>
+        <p><Icon name="Tags" size={16} /> {post.data.tags.length} 个标签</p>
+        <p><Icon name="MessageSquare" size={16} /> 评论区预留</p>
+      </section>
+    </aside>
+  </article>
+
+  <script>
+    let cleanupReadingProgress = () => {};
+    let cleanupArticleToc = () => {};
+
+    function initReadingProgress() {
+      cleanupReadingProgress();
+      const article = document.querySelector("[data-article-content]");
+      const bar = document.querySelector("[data-reading-progress]");
+      const track = document.querySelector("[data-reading-progress-track]");
+      const label = document.querySelector("[data-reading-progress-text]");
+      if (!(article instanceof HTMLElement) || !(bar instanceof HTMLElement)) return;
+
+      let ticking = false;
+      const update = () => {
+        const rect = article.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const articleTop = rect.top + window.scrollY;
+        const articleHeight = article.offsetHeight;
+        const scrollStart = articleTop;
+        const scrollEnd = Math.max(scrollStart + 1, articleTop + articleHeight - viewportHeight);
+        const progress = Math.min(100, Math.max(0, ((window.scrollY - scrollStart) / (scrollEnd - scrollStart)) * 100));
+        const rounded = Math.round(progress);
+        bar.style.width = `${progress}%`;
+        if (track instanceof HTMLElement) track.setAttribute("aria-valuenow", String(rounded));
+        if (label instanceof HTMLElement) label.textContent = `${rounded}%`;
+        ticking = false;
+      };
+      const requestUpdate = () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(update);
+      };
+
+      const controller = new AbortController();
+      update();
+      window.addEventListener("scroll", requestUpdate, { passive: true, signal: controller.signal });
+      window.addEventListener("resize", requestUpdate, { signal: controller.signal });
+      cleanupReadingProgress = () => controller.abort();
+      document.addEventListener("astro:before-swap", () => {
+        cleanupReadingProgress();
+      }, { once: true });
+    }
+
+    function initArticleToc() {
+      cleanupArticleToc();
+      const toc = document.querySelector("[data-article-toc]");
+      if (!(toc instanceof HTMLElement)) return;
+
+      const links = Array.from(toc.querySelectorAll("[data-toc-link]")).filter((link) => link instanceof HTMLAnchorElement);
+      const sections = links
+        .map((link) => {
+          const id = decodeURIComponent(link.hash.slice(1));
+          const section = document.getElementById(id);
+          return section instanceof HTMLElement ? { id, section } : undefined;
+        })
+        .filter((item): item is { id: string; section: HTMLElement } => Boolean(item));
+
+      const setActive = (id) => {
+        toc.querySelectorAll("[data-toc-parent]").forEach((item) => {
+          if (item instanceof HTMLElement) item.dataset.expanded = "false";
+        });
+
+        links.forEach((link) => {
+          const active = decodeURIComponent(link.hash.slice(1)) === id;
+          link.classList.toggle("active", active);
+          if (active) {
+            link.setAttribute("aria-current", "location");
+            const item = link.closest("[data-toc-item]");
+            const parent = item?.matches("[data-toc-parent]") ? item : item?.closest("[data-toc-parent]");
+            if (item instanceof HTMLElement) item.dataset.active = "true";
+            if (parent instanceof HTMLElement) parent.dataset.expanded = "true";
+          } else {
+            link.removeAttribute("aria-current");
+            link.closest("[data-toc-item]")?.removeAttribute("data-active");
+          }
+        });
+      };
+
+      let ticking = false;
+      const update = () => {
+        const offset = 120;
+        let activeId = "";
+
+        for (const item of sections) {
+          const top = item.section.getBoundingClientRect().top;
+          if (top <= offset) activeId = item.id;
+        }
+
+        if (!activeId) {
+          const next = sections.find((item) => {
+            const top = item.section.getBoundingClientRect().top;
+            return top > offset && top < window.innerHeight * 0.58;
+          });
+          activeId = next?.id ?? "";
+        }
+
+        setActive(activeId);
+        ticking = false;
+      };
+
+      const requestUpdate = () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(update);
+      };
+
+      const controller = new AbortController();
+      update();
+      window.addEventListener("scroll", requestUpdate, { passive: true, signal: controller.signal });
+      window.addEventListener("resize", requestUpdate, { signal: controller.signal });
+      cleanupArticleToc = () => controller.abort();
+      document.addEventListener("astro:before-swap", () => {
+        cleanupArticleToc();
+      }, { once: true });
+    }
+
+    initReadingProgress();
+    initArticleToc();
+    document.addEventListener("astro:page-load", initReadingProgress);
+    document.addEventListener("astro:page-load", initArticleToc);
+  </script>
+</BaseLayout>
+
+<style>
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 282px;
+    gap: 34px;
+  }
+
+  .article-main {
+    min-width: 0;
+  }
+
+  .article-hero {
+    padding: 18px 0 24px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .crumbs a {
+    color: var(--blue);
+  }
+
+  h1 {
+    max-width: 850px;
+    margin: 12px 0 14px;
+    font-size: 2.35rem;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .article-hero > p:not(.eyebrow) {
+    max-width: 760px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .article-meta,
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .article-meta span,
+  .article-meta time {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 800;
+  }
+
+  .cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--paper-soft);
+    object-fit: contain;
+  }
+
+  .article-hero :global(.media-shell) {
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 8px;
+  }
+
+  .article-hero :global(.media-shell) .cover {
+    margin-top: 0;
+  }
+
+  .article-content {
+    padding: 10px 0 0;
+    max-width: 780px;
+  }
+
+  .article-sidebar {
+    position: sticky;
+    top: 94px;
+    display: grid;
+    align-content: start;
+    gap: 18px;
+    height: max-content;
+    padding-top: 18px;
+  }
+
+  .toc,
+  .side-note {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .toc h2,
+  .side-note h2 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+  }
+
+  .toc-list,
+  .toc-sublist {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc-list {
+    gap: 4px;
+  }
+
+  .toc-sublist {
+    display: none;
+    gap: 2px;
+    margin: 4px 0 2px;
+    padding-left: 14px;
+  }
+
+  .toc-item[data-expanded="true"] > .toc-sublist {
+    display: grid;
+  }
+
+  .toc-item {
+    min-width: 0;
+  }
+
+  .toc a {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 5px;
+    padding: 5px 7px 5px 12px;
+    color: var(--ink-2);
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    transition:
+      background 180ms ease-out,
+      color 180ms ease-out,
+      padding-left 180ms ease-out;
+  }
+
+  .toc a::before {
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    width: 3px;
+    height: 0;
+    border-radius: 999px;
+    background: var(--blue);
+    content: "";
+    opacity: 0;
+    transform: translateY(-50%);
+    transition:
+      height 180ms ease-out,
+      opacity 180ms ease-out;
+  }
+
+  .toc a:hover,
+  .toc a.active {
+    background: var(--blue-soft);
+    color: var(--blue);
+    padding-left: 15px;
+  }
+
+  .toc a.active::before {
+    height: 18px;
+    opacity: 1;
+  }
+
+  .toc .depth-3 a {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 750;
+  }
+
+  .side-note p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 9px 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .progress {
+    display: block;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--surface-soft);
+  }
+
+  .progress i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--blue);
+  }
+
+  .continue {
+    margin-top: 32px;
+  }
+
+  .related-grid {
+    display: grid;
+  }
+
+  @media (max-width: 980px) {
+    .article-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .article-sidebar {
+      position: static;
+      order: -1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding-top: 0;
+    }
+  }
+
+  @media (max-width: 680px) {
+    h1 {
+      font-size: 1.9rem;
+    }
+
+    .article-sidebar {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

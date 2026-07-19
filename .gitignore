@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+*.local
+.env
+.env.*
+!.env.example
+*.log
+*-screenshot.png

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="图片加载中">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#e9f1ff"/>
+      <stop offset="0.55" stop-color="#fffef9"/>
+      <stop offset="1" stop-color="#fff0df"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#a9c7ff" stroke-opacity=".35" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" rx="28" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#grid)" opacity=".7"/>
+  <g fill="none" stroke="#2563eb" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".82">
+    <rect x="210" y="172" width="380" height="256" rx="24"/>
+    <path d="m242 392 106-108 82 82 48-48 80 74"/>
+    <circle cx="470" cy="242" r="30"/>
+  </g>
+  <path d="M292 470h216" stroke="#ff7a30" stroke-width="12" stroke-linecap="round"/>
+</svg>

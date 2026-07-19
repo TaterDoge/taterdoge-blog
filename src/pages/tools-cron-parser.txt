@@ -1,0 +1,265 @@
+// Cron Parser Implementation
+// This is the JavaScript implementation for the cron parser tool
+
+const cronFields = {
+  minute: stage.querySelector("[data-cron-field='minute']"),
+  hour: stage.querySelector("[data-cron-field='hour']"),
+  day: stage.querySelector("[data-cron-field='day']"),
+  month: stage.querySelector("[data-cron-field='month']"),
+  weekday: stage.querySelector("[data-cron-field='weekday']")
+};
+const cronDescription = stage.querySelector("[data-cron-description]");
+const cronTimes = stage.querySelector("[data-cron-times]");
+
+// 解析 cron 字段为数值数组
+const parseCronField = (field, min, max) => {
+  const values = [];
+
+  if (field === "*") {
+    for (let i = min; i <= max; i++) values.push(i);
+    return values;
+  }
+
+  // 处理逗号分隔的多项
+  const parts = field.split(",");
+  for (const part of parts) {
+    // 处理范围 (如 1-5)
+    if (part.includes("-")) {
+      const [start, end] = part.split("-").map(Number);
+      if (!isNaN(start) && !isNaN(end)) {
+        for (let i = Math.max(min, start); i <= Math.min(max, end); i++) {
+          values.push(i);
+        }
+      }
+    }
+    // 处理步长 (如 */5 或 1-10/2)
+    else if (part.includes("/")) {
+      const [base, step] = part.split("/");
+      const stepNum = Number(step);
+      if (stepNum > 0) {
+        let start = min;
+        let end = max;
+        if (base !== "*") {
+          const baseNum = Number(base);
+          if (!isNaN(baseNum)) {
+            if (base.includes("-")) {
+              const [s, e] = base.split("-").map(Number);
+              start = Math.max(min, s);
+              end = Math.min(max, e);
+            } else {
+              start = baseNum;
+              end = max;
+            }
+          }
+        }
+        for (let i = start; i <= end; i += stepNum) {
+          if (i >= min && i <= max) values.push(i);
+        }
+      }
+    }
+    // 单个数值
+    else {
+      const num = Number(part.trim());
+      if (!isNaN(num) && num >= min && num <= max) {
+        values.push(num);
+      }
+    }
+  }
+
+  return [...new Set(values)].sort((a, b) => a - b);
+};
+
+// 生成中文描述
+const generateDescription = (parts) => {
+  const { minute, hour, day, month, weekday } = parts;
+  let desc = "";
+
+  // 处理分钟
+  if (minute === "*") desc += "每分钟";
+  else if (minute.startsWith("*/")) desc += `每 ${minute.slice(2)} 分钟`;
+  else desc += `第 ${minute} 分钟`;
+
+  // 处理小时
+  if (hour === "*") desc += "每小时";
+  else if (hour.startsWith("*/")) desc += `每 ${hour.slice(2)} 小时`;
+  else if (hour.includes("-")) desc += ` ${hour.replace("-", "到")} 点`;
+  else desc += ` ${hour} 点`;
+
+  // 处理日期
+  if (day !== "*") {
+    if (day.includes("-")) desc += `每月 ${day.replace("-", "到")} 日`;
+    else if (day.includes("/")) desc += `每月 ${day} 日`;
+    else desc += `每月 ${day} 日`;
+  }
+
+  // 处理月份
+  if (month !== "*") {
+    const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+    if (month.includes("-")) {
+      const [start, end] = month.split("-");
+      desc += `${monthNames[parseInt(start) - 1]}到${monthNames[parseInt(end) - 1]}`;
+    } else if (month.includes(",")) {
+      const months = month.split(",").map(m => monthNames[parseInt(m) - 1]);
+      desc += months.join("、");
+    } else {
+      desc += monthNames[parseInt(month) - 1];
+    }
+  }
+
+  // 处理星期
+  if (weekday !== "*") {
+    const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    if (weekday.includes("-")) {
+      const [start, end] = weekday.split("-");
+      desc += `${weekdayNames[parseInt(start)]}到${weekdayNames[parseInt(end)]}`;
+    } else if (weekday.includes(",")) {
+      const days = weekday.split(",").map(w => weekdayNames[parseInt(w)]);
+      desc += days.join("、");
+    } else if (!isNaN(parseInt(weekday))) {
+      desc += weekdayNames[parseInt(weekday)];
+    }
+  }
+
+  return desc || "执行";
+};
+
+// 计算下次执行时间
+const getNextExecutions = (parts, count = 5) => {
+  const minutes = parseCronField(parts.minute, 0, 59);
+  const hours = parseCronField(parts.hour, 0, 23);
+  const days = parseCronField(parts.day, 1, 31);
+  const months = parseCronField(parts.month, 1, 12);
+  const weekdays = parseCronField(parts.weekday, 0, 6);
+
+  const executions = [];
+  const now = new Date();
+  let current = new Date(now.getTime() + 60000); // 从下一分钟开始
+
+  const maxIterations = 100000; // 防止无限循环
+  let iterations = 0;
+
+  while (executions.length < count && iterations < maxIterations) {
+    iterations++;
+
+    const month = current.getMonth() + 1;
+    const day = current.getDate();
+    const weekday = current.getDay();
+    const hour = current.getHours();
+    const minute = current.getMinutes();
+
+    // 检查月份
+    if (!months.includes(month)) {
+      current.setMonth(current.getMonth() + 1);
+      current.setDate(1);
+      current.setHours(0, 0, 0, 0);
+      continue;
+    }
+
+    // 检查日期和星期
+    const dayMatches = days.includes(day);
+    const weekdayMatches = weekdays.includes(weekday);
+
+    if ((dayMatches || weekdayMatches) && hours.includes(hour) && minutes.includes(minute)) {
+      executions.push(new Date(current));
+    }
+
+    // 前进一分钟
+    current.setMinutes(current.getMinutes() + 1);
+  }
+
+  return executions;
+};
+
+const parseCron = () => {
+  if (!(cronFields.minute instanceof HTMLInputElement) ||
+      !(cronFields.hour instanceof HTMLInputElement) ||
+      !(cronFields.day instanceof HTMLInputElement) ||
+      !(cronFields.month instanceof HTMLInputElement) ||
+      !(cronFields.weekday instanceof HTMLInputElement) ||
+      !(cronDescription instanceof HTMLOutputElement) ||
+      !(cronTimes instanceof HTMLElement)) return;
+
+  const parts = {
+    minute: cronFields.minute.value.trim() || "*",
+    hour: cronFields.hour.value.trim() || "*",
+    day: cronFields.day.value.trim() || "*",
+    month: cronFields.month.value.trim() || "*",
+    weekday: cronFields.weekday.value.trim() || "*"
+  };
+
+  try {
+    // 生成描述
+    const description = generateDescription(parts);
+    cronDescription.value = description;
+    cronDescription.dataset.state = "ok";
+
+    // 计算执行时间
+    const executions = getNextExecutions(parts, 5);
+    cronTimes.innerHTML = executions.map(date => {
+      const formatted = date.toLocaleString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      return `<div class="time-item">${formatted}</div>`;
+    }).join("");
+
+  } catch (error) {
+    cronDescription.value = error instanceof Error ? error.message : "解析失败";
+    cronDescription.dataset.state = "error";
+    cronTimes.innerHTML = '<div class="time-item">解析失败</div>';
+  }
+};
+
+// 绑定事件
+stage.querySelector("[data-cron-parse]")?.addEventListener("click", parseCron);
+
+// 模板按钮
+stage.querySelectorAll("[data-cron-template]").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (!(button instanceof HTMLElement)) return;
+    const template = button.dataset.cronTemplate ?? "* * * * *";
+    const parts = template.split(" ");
+    if (parts.length === 5) {
+      if (cronFields.minute instanceof HTMLInputElement) cronFields.minute.value = parts[0];
+      if (cronFields.hour instanceof HTMLInputElement) cronFields.hour.value = parts[1];
+      if (cronFields.day instanceof HTMLInputElement) cronFields.day.value = parts[2];
+      if (cronFields.month instanceof HTMLInputElement) cronFields.month.value = parts[3];
+      if (cronFields.weekday instanceof HTMLInputElement) cronFields.weekday.value = parts[4];
+      parseCron();
+    }
+  });
+});
+
+// 复制按钮
+stage.querySelector("[data-cron-copy]")?.addEventListener("click", async () => {
+  if (!(cronTimes instanceof HTMLElement)) return;
+  const times = Array.from(cronTimes.querySelectorAll(".time-item"))
+    .map(item => item.textContent || "")
+    .filter(text => text && text !== "等待计算" && text !== "解析失败")
+    .join("\n");
+
+  if (times) {
+    await navigator.clipboard?.writeText(times);
+    const button = stage.querySelector("[data-cron-copy]");
+    if (button instanceof HTMLElement) {
+      const originalText = button.textContent;
+      button.textContent = "已复制";
+      setTimeout(() => button.textContent = originalText, 1200);
+    }
+  }
+});
+
+// 实时解析
+Object.values(cronFields).forEach(field => {
+  field?.addEventListener("input", () => {
+    // 防抖
+    if (field.dataset.debounce) {
+      clearTimeout(parseInt(field.dataset.debounce));
+    }
+    field.dataset.debounce = String(setTimeout(parseCron, 500));
+  });
+});

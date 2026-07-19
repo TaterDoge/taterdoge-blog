@@ -1,0 +1,21 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" rx="36" fill="#F8FBFF"/>
+  <path d="M0 0H640V640H0V0Z" fill="url(#grid)"/>
+  <rect x="112" y="126" width="416" height="328" rx="22" fill="#FFFFFF" stroke="#B9CDF3" stroke-width="4"/>
+  <rect x="112" y="126" width="416" height="72" rx="22" fill="#EEF5FF"/>
+  <path d="M112 198H528" stroke="#B9CDF3" stroke-width="4"/>
+  <circle cx="150" cy="162" r="10" fill="#75A7FF"/>
+  <circle cx="182" cy="162" r="10" fill="#C7F0DF"/>
+  <circle cx="214" cy="162" r="10" fill="#FFD74F"/>
+  <path d="M212 302L270 244L316 290L350 256L430 336" stroke="#2F6FE4" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="402" cy="244" r="30" fill="#EDF4FF" stroke="#75A7FF" stroke-width="10"/>
+  <path d="M216 390H424" stroke="#FF7A2F" stroke-width="8" stroke-linecap="round"/>
+  <path d="M248 426H392" stroke="#B9CDF3" stroke-width="8" stroke-linecap="round"/>
+  <path d="M172 502L206 536L172 570" stroke="#75A7FF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+  <path d="M468 502L434 536L468 570" stroke="#75A7FF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" stroke="#2F6FE4" stroke-opacity=".055" stroke-width="2"/>
+    </pattern>
+  </defs>
+</svg>

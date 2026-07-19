@@ -1,0 +1,167 @@
+---
+import Icon from "@/components/Icon.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  date: Date;
+  tags?: string[];
+  cover?: string;
+  readingMinutes?: number;
+  featured?: boolean;
+}
+
+const { href, title, description, date, tags = [], cover, readingMinutes = 1, featured = false } = Astro.props;
+const dateLabel = date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+---
+
+<a class:list={["article-card", { featured }]} href={href} aria-label={`阅读：${title}`}>
+  <span class="cover-link">
+    <img src="/images/image-placeholder.svg" data-media-src={cover} alt="" loading="lazy" />
+  </span>
+  <div class="article-body">
+    <div class="meta-line">
+      <time datetime={date.toISOString()}>{dateLabel}</time>
+      <span><Icon name="Clock3" size={14} /> {readingMinutes} 分钟</span>
+    </div>
+    <h3>{title}</h3>
+    <p>{description}</p>
+    <div class="bottom-line">
+      <div class="tags">
+        {tags.slice(0, 3).map((tag) => <span class="tag">#{tag}</span>)}
+      </div>
+      <span class="read-link">阅读全文 <Icon name="ArrowRight" size={15} /></span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .article-card {
+    display: grid;
+    grid-template-columns: 124px minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border-soft);
+    padding: 14px 5px;
+    transition: background 180ms ease-out, color 180ms ease-out, transform 180ms ease-out;
+  }
+
+  .article-card:first-child {
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .article-card:hover {
+    color: var(--blue);
+    transform: translateX(2px);
+  }
+
+  .cover-link {
+    display: block;
+    min-width: 0;
+  }
+
+  .cover-link :global(.media-shell) {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .article-card.featured {
+    grid-template-columns: 184px minmax(0, 1fr);
+  }
+
+  img {
+    width: 100%;
+    height: 92px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--paper-soft);
+  }
+
+  .featured img {
+    height: 132px;
+  }
+
+  .article-body {
+    display: grid;
+    align-content: center;
+    min-width: 0;
+    color: var(--ink);
+  }
+
+  .meta-line,
+  .meta-line span,
+  .bottom-line,
+  .tags,
+  .read-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .meta-line {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  h3 {
+    margin: 4px 0 5px;
+    color: var(--ink);
+    font-size: 1.08rem;
+    line-height: 1.38;
+    letter-spacing: 0;
+  }
+
+  .featured h3 {
+    font-size: 1.2rem;
+  }
+
+  p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .bottom-line {
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .read-link {
+    color: var(--blue);
+    font-size: 0.82rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 620px) {
+    .article-card,
+    .article-card.featured {
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    img,
+    .featured img {
+      height: 78px;
+    }
+
+    .tags {
+      display: none;
+    }
+
+    h3,
+    .featured h3 {
+      font-size: 1rem;
+    }
+  }
+</style>

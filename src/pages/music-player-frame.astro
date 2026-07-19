@@ -1,0 +1,422 @@
+---
+import { siteConfig } from "@/data/site";
+
+const music = siteConfig.music;
+const hasPlaylist = Boolean(music.playlistId && !music.playlistId.startsWith("YOUR_"));
+const playlistUrl = music.metingApi
+  .replace(":server", "tencent")
+  .replace(":type", "playlist")
+  .replace(":id", encodeURIComponent(music.playlistId))
+  .replace(":r", String(Date.now()));
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/vendor/aplayer/APlayer.min.css" />
+    <script is:inline src="/vendor/aplayer/APlayer.min.js"></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17213a;
+        --muted: #667089;
+        --border: #d8e1f1;
+        --border-soft: #edf2f9;
+        --surface: rgba(255, 255, 255, 0.92);
+        --orange: #ff7a2f;
+        --orange-soft: #fff0dc;
+        --player-body-height: 84px;
+        --player-list-height: 168px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: transparent;
+        color: var(--ink);
+        font-family:
+          "Marchen Sans",
+          "MiSans",
+          "Microsoft YaHei",
+          system-ui,
+          sans-serif;
+      }
+
+      body {
+        display: block;
+      }
+
+      .frame-empty,
+      #player {
+        width: 100%;
+        min-height: 100%;
+      }
+
+      .frame-empty {
+        display: grid;
+        align-content: center;
+        gap: 4px;
+        border-radius: 7px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .frame-empty strong {
+        color: var(--ink);
+        font-size: 15px;
+      }
+
+      .aplayer {
+        width: 100% !important;
+        min-height: var(--player-body-height);
+        height: auto;
+        margin: 0;
+        border-radius: 7px;
+        background: transparent;
+        box-shadow: none;
+        color: var(--ink);
+        font-family: inherit;
+        overflow: hidden;
+      }
+
+      .aplayer .aplayer-body {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: var(--player-body-height);
+        min-height: 0;
+        background: transparent;
+        overflow: hidden;
+      }
+
+      .aplayer .aplayer-pic,
+      .aplayer.aplayer-withlrc .aplayer-pic {
+        float: left;
+        width: 84px !important;
+        height: 84px !important;
+        border-radius: 6px;
+      }
+
+      .aplayer .aplayer-info,
+      .aplayer.aplayer-withlrc .aplayer-info {
+        height: 84px !important;
+        min-width: 0;
+        margin-left: 84px !important;
+        border-bottom: 0;
+        padding: 8px 8px 0 10px;
+        overflow: hidden;
+      }
+
+      .aplayer .aplayer-info .aplayer-music {
+        width: calc(100% - 4px);
+        min-width: 0;
+        height: 20px;
+        margin: 0 0 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .aplayer .aplayer-title {
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .aplayer .aplayer-author {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .aplayer .aplayer-info .aplayer-controller {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        margin-top: -3px;
+      }
+
+      .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap {
+        min-width: 0;
+      }
+
+      .aplayer .aplayer-info .aplayer-controller .aplayer-time {
+        flex: 0 0 auto;
+        color: var(--ink);
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar,
+      .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-loaded,
+      .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar .aplayer-played {
+        height: 3px;
+      }
+
+      .aplayer .aplayer-info .aplayer-controller .aplayer-bar-wrap .aplayer-bar {
+        background: var(--border);
+      }
+
+      .aplayer .aplayer-lrc {
+        position: absolute;
+        top: 34px;
+        right: 8px;
+        left: 94px;
+        z-index: 2;
+        display: block !important;
+        width: auto !important;
+        height: 24px;
+        margin: 0 !important;
+        clear: none;
+        overflow: hidden;
+        text-align: left !important;
+      }
+
+      .aplayer .aplayer-lrc::before,
+      .aplayer .aplayer-lrc::after {
+        display: none;
+      }
+
+      .aplayer .aplayer-lrc .aplayer-lrc-contents,
+      .aplayer .aplayer-lrc p {
+        width: 100% !important;
+        margin-right: auto !important;
+        margin-left: 0 !important;
+        text-align: left !important;
+      }
+
+      .aplayer .aplayer-lrc p {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 16px !important;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        color: var(--orange);
+        font-weight: 900;
+      }
+
+      .aplayer .aplayer-lrc .marchen-lrc-empty {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 1;
+      }
+
+      .aplayer .aplayer-lrc.is-empty .aplayer-lrc-contents {
+        display: none;
+      }
+
+      .aplayer .aplayer-lrc.is-empty .marchen-lrc-empty {
+        display: block;
+      }
+
+      .aplayer .aplayer-list {
+        display: block !important;
+        max-height: var(--player-list-height);
+        border-top: 1px solid var(--border-soft);
+        background: rgba(255, 255, 255, 0.68);
+        overflow: hidden;
+        transition: max-height 220ms ease-out, border-color 220ms ease-out;
+      }
+
+      .aplayer .aplayer-list.aplayer-list-hide {
+        max-height: 0 !important;
+        border-top-color: transparent;
+      }
+
+      .aplayer .aplayer-list ol {
+        max-height: var(--player-list-height);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 122, 47, 0.45) transparent;
+      }
+
+      .aplayer .aplayer-list ol::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .aplayer .aplayer-list ol::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .aplayer .aplayer-list ol::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 999px;
+        background: rgba(255, 122, 47, 0.45);
+        background-clip: content-box;
+      }
+
+      .aplayer .aplayer-list ol li {
+        height: 32px;
+        border-top: 1px solid var(--border-soft);
+        color: var(--ink);
+        line-height: 32px;
+      }
+
+      .aplayer .aplayer-list ol li:hover,
+      .aplayer .aplayer-list ol li.aplayer-list-light {
+        background: var(--orange-soft);
+      }
+
+      .aplayer .aplayer-list ol li .aplayer-list-index,
+      .aplayer .aplayer-list ol li .aplayer-list-author {
+        color: var(--muted);
+      }
+
+      .aplayer .aplayer-notice {
+        background: var(--orange-soft);
+        color: var(--ink);
+      }
+
+      @media (max-width: 760px) {
+        :root {
+          --player-body-height: 76px;
+        }
+
+        .aplayer .aplayer-pic,
+        .aplayer.aplayer-withlrc .aplayer-pic {
+          width: 76px !important;
+          height: 76px !important;
+        }
+
+        .aplayer .aplayer-info,
+        .aplayer.aplayer-withlrc .aplayer-info {
+          height: 76px !important;
+          margin-left: 76px !important;
+          padding-top: 7px;
+        }
+
+        .aplayer .aplayer-lrc {
+          top: 32px;
+          right: 7px;
+          left: 86px;
+          height: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body data-has-playlist={hasPlaylist ? "true" : "false"} data-playlist-url={hasPlaylist ? playlistUrl : ""}>
+    {hasPlaylist ? <div id="player"></div> : <div class="frame-empty"><strong>播放器已就绪</strong><span>配置歌单 ID 后自动加载</span></div>}
+
+    <script>
+      (() => {
+        const body = document.body;
+        if (body.dataset.hasPlaylist !== "true" || !body.dataset.playlistUrl || !window.APlayer) return;
+
+        const playerHost = document.querySelector("#player");
+        if (!playerHost) return;
+
+        const normalizeAudio = (items) => {
+          if (!Array.isArray(items)) return [];
+          return items
+            .map((item) => ({
+              name: item.name || item.title || "Audio name",
+              artist: item.artist || item.author || "Audio artist",
+              url: item.url,
+              cover: item.cover || item.pic,
+              lrc: item.lrc || item.lyric || "",
+              type: item.type || "auto",
+            }))
+            .filter((item) => item.url);
+        };
+
+        const syncLyricFallback = () => {
+          const lrc = playerHost.querySelector(".aplayer-lrc");
+          if (!(lrc instanceof HTMLElement)) return;
+
+          let hint = lrc.querySelector(".marchen-lrc-empty");
+          if (!hint) {
+            hint = document.createElement("p");
+            hint.className = "marchen-lrc-empty";
+            hint.textContent = "这是一首纯音乐哦~";
+            lrc.append(hint);
+          }
+
+          const lines = Array.from(lrc.querySelectorAll("p:not(.marchen-lrc-empty)"));
+          const hasText = lines.some((line) => {
+            const text = line.textContent?.trim() ?? "";
+            return text && !/^(loading|加载中|暂无歌词|no lyric|not available)$/i.test(text);
+          });
+          lrc.classList.toggle("is-empty", !hasText);
+        };
+
+        const postPlaylistState = () => {
+          const list = playerHost.querySelector(".aplayer-list");
+          const expanded = list instanceof HTMLElement && !list.classList.contains("aplayer-list-hide");
+
+          body.dataset.playlistExpanded = expanded ? "true" : "false";
+          window.parent?.postMessage(
+            {
+              type: "marchen-music-playlist",
+              expanded,
+            },
+            window.location.origin
+          );
+        };
+
+        const syncPlaylistStateSoon = () => {
+          window.requestAnimationFrame(postPlaylistState);
+        };
+
+        fetch(body.dataset.playlistUrl, { credentials: "same-origin" })
+          .then((response) => (response.ok ? response.json() : []))
+          .then((items) => {
+            const audio = normalizeAudio(items);
+            if (!audio.length) {
+              playerHost.innerHTML = '<div class="frame-empty"><strong>歌单加载失败</strong><span>稍后刷新重试</span></div>';
+              return;
+            }
+
+            const player = new window.APlayer({
+              container: playerHost,
+              audio,
+              autoplay: false,
+              mutex: true,
+              lrcType: 3,
+              loop: "all",
+              order: "list",
+              preload: "metadata",
+              theme: "#ff7a2f",
+            });
+
+            player.on("listshow", syncPlaylistStateSoon);
+            player.on("listhide", syncPlaylistStateSoon);
+            player.list?.hide?.();
+            postPlaylistState();
+            window.setTimeout(postPlaylistState, 80);
+
+            const tryPlay = () => {
+              player.audio?.play?.().catch(() => {});
+              window.removeEventListener("pointerdown", tryPlay, true);
+              window.removeEventListener("keydown", tryPlay, true);
+            };
+
+            window.addEventListener("pointerdown", tryPlay, true);
+            window.addEventListener("keydown", tryPlay, true);
+            syncLyricFallback();
+            window.setTimeout(syncLyricFallback, 800);
+            window.setTimeout(syncLyricFallback, 2400);
+            new MutationObserver(syncLyricFallback).observe(playerHost, { childList: true, subtree: true, characterData: true });
+          })
+          .catch(() => {
+            playerHost.innerHTML = '<div class="frame-empty"><strong>歌单加载失败</strong><span>稍后刷新重试</span></div>';
+          });
+      })();
+    </script>
+  </body>
+</html>
