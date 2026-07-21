@@ -7,7 +7,9 @@ import { siteConfig } from "@/data/site";
 import { getReadingMinutes } from "@/lib/reading-time";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("blog")).filter((post) => !post.data.draft && post.data.visibility === "public");
+  const posts = (await getCollection("blog"))
+    .filter((entry) => !entry.data.draft && entry.data.visibility === "public")
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
@@ -17,7 +19,11 @@ const allPosts = (await getCollection("blog"))
   .filter((entry) => !entry.data.draft && entry.data.visibility === "public")
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const currentIndex = allPosts.findIndex((entry) => entry.id === post.id);
-const nextPosts = allPosts.filter((entry) => entry.id !== post.id).slice(0, 3);
+const others = allPosts.filter((entry) => entry.id !== post.id);
+const relatedPosts = [
+  ...others.filter((entry) => entry.data.category === post.data.category),
+  ...others.filter((entry) => entry.data.category !== post.data.category),
+].slice(0, 3);
 const readingMinutes = getReadingMinutes(post.body);
 const tocTree: Array<{ slug: string; text: string; children: Array<{ slug: string; text: string }> }> = [];
 let currentTocParent: (typeof tocTree)[number] | undefined;
@@ -58,7 +64,7 @@ headings
         <div class="tag-row">
           {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
         </div>
-        {post.data.cover && <img class="cover" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt="" />}
+        {post.data.cover && <img class="cover" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt={`${post.data.title} 封面`} />}
       </header>
 
       <section class="prose article-content" data-article-content>
@@ -74,7 +80,7 @@ headings
           <a class="plain-link" href="/blog">全部文章 <Icon name="ArrowRight" size={16} /></a>
         </div>
         <div class="related-grid">
-          {nextPosts.map((entry) => (
+          {relatedPosts.map((entry) => (
             <ArticleCard
               href={`/blog/${entry.id}`}
               title={entry.data.title}
@@ -131,9 +137,175 @@ headings
     </aside>
   </article>
 
+  <div hidden data-article-lightbox-icons>
+    <span data-lightbox-icon="previous"><Icon name="ChevronLeft" class="pswp__icn" /></span>
+    <span data-lightbox-icon="next"><Icon name="ChevronRight" class="pswp__icn" /></span>
+    <span data-lightbox-icon="zoom-out"><Icon name="ZoomOut" class="pswp__icn" /></span>
+    <span data-lightbox-icon="zoom-in"><Icon name="ZoomIn" class="pswp__icn" /></span>
+    <span data-lightbox-icon="close"><Icon name="X" class="pswp__icn" /></span>
+  </div>
+
   <script>
+    import PhotoSwipeLightbox from "photoswipe/lightbox";
+    import "photoswipe/style.css";
+
     let cleanupReadingProgress = () => {};
     let cleanupArticleToc = () => {};
+    let cleanupArticleLightbox = () => {};
+    const lightboxSizeCache = new WeakMap();
+
+    function resolveLightboxImage(image) {
+      const cached = lightboxSizeCache.get(image);
+      if (cached) return Promise.resolve(cached);
+
+      const src = image.dataset.mediaSrc || image.currentSrc || image.src;
+      const msrc = image.currentSrc || image.src;
+      const showingReal = !image.dataset.mediaSrc || image.src === src || image.currentSrc === src;
+
+      if (image.complete && image.naturalWidth > 0 && showingReal) {
+        const data = { src, msrc, w: image.naturalWidth, h: image.naturalHeight, alt: image.alt };
+        lightboxSizeCache.set(image, data);
+        return Promise.resolve(data);
+      }
+
+      return new Promise((resolve) => {
+        const probe = new Image();
+        probe.onload = () => {
+          const data = {
+            src,
+            msrc,
+            w: probe.naturalWidth || window.innerWidth,
+            h: probe.naturalHeight || window.innerHeight,
+            alt: image.alt,
+          };
+          lightboxSizeCache.set(image, data);
+          resolve(data);
+        };
+        probe.onerror = () => {
+          const data = {
+            src,
+            msrc,
+            w: image.naturalWidth || window.innerWidth,
+            h: image.naturalHeight || window.innerHeight,
+            alt: image.alt,
+          };
+          resolve(data);
+        };
+        probe.src = src;
+      });
+    }
+
+    function initArticleLightbox() {
+      cleanupArticleLightbox();
+      const article = document.querySelector(".article-main");
+      if (!(article instanceof HTMLElement)) return;
+
+      const imageSelector = ".article-hero .cover, [data-article-content] img";
+      const images = Array.from(article.querySelectorAll(imageSelector)).filter((image) => image instanceof HTMLImageElement);
+      if (images.length === 0) return;
+
+      const getIcon = (name) => document.querySelector(`[data-lightbox-icon="${name}"] svg`)?.outerHTML;
+      const lightbox = new PhotoSwipeLightbox({
+        gallery: article,
+        children: imageSelector,
+        pswpModule: () => import("photoswipe"),
+        wheelToZoom: true,
+        arrowPrev: true,
+        arrowNext: true,
+        arrowPrevSVG: getIcon("previous"),
+        arrowNextSVG: getIcon("next"),
+        closeSVG: getIcon("close"),
+        zoom: false,
+        initialZoomLevel: (zoomLevel) => {
+          const { elementSize, panAreaSize } = zoomLevel;
+          if (!elementSize || !panAreaSize) return zoomLevel.fit;
+          return Math.min(
+            (panAreaSize.x * 0.82) / elementSize.x,
+            (panAreaSize.y * 0.82) / elementSize.y,
+          );
+        },
+        secondaryZoomLevel: (zoomLevel) => Math.max(1, zoomLevel.initial * 1.75),
+        maxZoomLevel: (zoomLevel) => zoomLevel.initial * 4,
+        imageClickAction: "close",
+        tapAction: "close",
+        doubleTapAction: "zoom",
+      });
+
+      lightbox.on("uiRegister", () => {
+        const ui = lightbox.pswp?.ui;
+        if (!ui) return;
+
+        ui.registerElement({
+          name: "zoomOut",
+          order: 8,
+          isButton: true,
+          title: "缩小",
+          html: getIcon("zoom-out"),
+          onClick: (_event, _element, pswp) => {
+            const slide = pswp.currSlide;
+            if (slide) slide.zoomTo(slide.currZoomLevel / 1.25, undefined, 200);
+          },
+        });
+
+        ui.registerElement({
+          name: "zoomIn",
+          order: 9,
+          isButton: true,
+          title: "放大",
+          html: getIcon("zoom-in"),
+          onClick: (_event, _element, pswp) => {
+            const slide = pswp.currSlide;
+            if (slide) slide.zoomTo(slide.currZoomLevel * 1.25, undefined, 200);
+          },
+        });
+      });
+
+      lightbox.addFilter("domItemData", (itemData, element) => {
+        if (element instanceof HTMLImageElement) {
+          const cached = lightboxSizeCache.get(element);
+          const src = cached?.src || element.dataset.mediaSrc || element.currentSrc || element.src;
+          itemData.src = src;
+          itemData.msrc = element.currentSrc || element.src;
+          itemData.w = cached?.w || element.naturalWidth || window.innerWidth;
+          itemData.h = cached?.h || element.naturalHeight || window.innerHeight;
+          itemData.alt = element.alt;
+        }
+        return itemData;
+      });
+
+      const openAt = async (index) => {
+        const image = images[index];
+        if (!image) return;
+        await resolveLightboxImage(image);
+        lightbox.loadAndOpen(index);
+      };
+
+      const controller = new AbortController();
+      images.forEach((image, index) => {
+        image.tabIndex = 0;
+        image.setAttribute("role", "button");
+        image.setAttribute("aria-label", image.alt ? `${image.alt}，点击查看大图` : "点击查看大图");
+        void resolveLightboxImage(image);
+        image.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          void openAt(index);
+        }, { signal: controller.signal });
+        image.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            void openAt(index);
+          }
+        }, { signal: controller.signal });
+      });
+
+      lightbox.init();
+      cleanupArticleLightbox = () => {
+        controller.abort();
+        lightbox.destroy();
+      };
+      document.addEventListener("astro:before-swap", cleanupArticleLightbox, { once: true });
+    }
 
     function initReadingProgress() {
       cleanupReadingProgress();
@@ -169,9 +341,7 @@ headings
       window.addEventListener("scroll", requestUpdate, { passive: true, signal: controller.signal });
       window.addEventListener("resize", requestUpdate, { signal: controller.signal });
       cleanupReadingProgress = () => controller.abort();
-      document.addEventListener("astro:before-swap", () => {
-        cleanupReadingProgress();
-      }, { once: true });
+      document.addEventListener("astro:before-swap", cleanupReadingProgress, { once: true });
     }
 
     function initArticleToc() {
@@ -186,7 +356,7 @@ headings
           const section = document.getElementById(id);
           return section instanceof HTMLElement ? { id, section } : undefined;
         })
-        .filter((item): item is { id: string; section: HTMLElement } => Boolean(item));
+        .filter((item) => Boolean(item));
 
       const setActive = (id) => {
         toc.querySelectorAll("[data-toc-parent]").forEach((item) => {
@@ -242,15 +412,15 @@ headings
       window.addEventListener("scroll", requestUpdate, { passive: true, signal: controller.signal });
       window.addEventListener("resize", requestUpdate, { signal: controller.signal });
       cleanupArticleToc = () => controller.abort();
-      document.addEventListener("astro:before-swap", () => {
-        cleanupArticleToc();
-      }, { once: true });
+      document.addEventListener("astro:before-swap", cleanupArticleToc, { once: true });
     }
 
     initReadingProgress();
     initArticleToc();
+    initArticleLightbox();
     document.addEventListener("astro:page-load", initReadingProgress);
     document.addEventListener("astro:page-load", initArticleToc);
+    document.addEventListener("astro:page-load", initArticleLightbox);
   </script>
 </BaseLayout>
 
@@ -341,6 +511,11 @@ headings
   .article-content {
     padding: 10px 0 0;
     max-width: 780px;
+  }
+
+  .article-hero .cover,
+  .article-content :global(img) {
+    cursor: zoom-in;
   }
 
   .article-sidebar {
