@@ -16,152 +16,51 @@ const { href, title, description, date, tags = [], cover, readingMinutes = 1, fe
 const dateLabel = date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
 ---
 
-<a class:list={["article-card", { featured }]} href={href} aria-label={`阅读：${title}`}>
-  <span class="cover-link">
-    <img src="/images/image-placeholder.svg" data-media-src={cover} alt="" loading="lazy" />
+<a
+  class:list={[
+    "grid items-stretch gap-4 border-b border-border-soft px-1 py-3.5 text-inherit transition-[background,color,transform] duration-fast ease-out first:border-t first:border-t-border-soft hover:translate-x-0.5 hover:text-blue max-sm:grid-cols-[92px_minmax(0,1fr)] max-sm:gap-3",
+    featured ? "grid-cols-[184px_minmax(0,1fr)]" : "grid-cols-[124px_minmax(0,1fr)]",
+  ]}
+  href={href}
+  aria-label={`阅读：${title}`}
+>
+  <span class="block min-w-0 [&_.media-shell]:w-full [&_.media-shell]:rounded-md">
+    <span class="media-shell">
+      <img
+        class:list={[
+          "w-full rounded-md border border-border object-cover bg-paper-soft max-sm:h-[78px]",
+          featured ? "h-[132px]" : "h-[92px]",
+        ]}
+        src="/images/image-placeholder.svg"
+        data-media-src={cover}
+        alt=""
+        loading="lazy"
+      />
+    </span>
   </span>
-  <div class="article-body">
-    <div class="meta-line">
+  <div class="grid min-w-0 content-center text-ink">
+    <div class="flex flex-wrap items-center gap-2 text-xs font-extrabold text-muted">
       <time datetime={date.toISOString()}>{dateLabel}</time>
-      <span><Icon name="Clock3" size={14} /> {readingMinutes} 分钟</span>
+      <span class="inline-flex items-center gap-2">
+        <Icon name="Clock3" size={14} /> {readingMinutes} 分钟
+      </span>
     </div>
-    <h3>{title}</h3>
-    <p>{description}</p>
-    <div class="bottom-line">
-      <div class="tags">
+    <h3
+      class:list={[
+        "mt-1 mb-1 leading-snug tracking-normal text-ink max-sm:text-base",
+        featured ? "text-xl" : "text-base",
+      ]}
+    >
+      {title}
+    </h3>
+    <p class="m-0 line-clamp-2 text-sm leading-relaxed text-muted">{description}</p>
+    <div class="bottom-line mt-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2 max-sm:hidden">
         {tags.slice(0, 3).map((tag) => <span class="tag">#{tag}</span>)}
       </div>
-      <span class="read-link">阅读全文 <Icon name="ArrowRight" size={15} /></span>
+      <span class="inline-flex items-center gap-2 whitespace-nowrap text-sm font-black text-blue">
+        阅读全文 <Icon name="ArrowRight" size={15} />
+      </span>
     </div>
   </div>
 </a>
-
-<style>
-  .article-card {
-    display: grid;
-    grid-template-columns: 124px minmax(0, 1fr);
-    gap: 16px;
-    align-items: stretch;
-    border-bottom: 1px solid var(--border-soft);
-    padding: 14px 5px;
-    transition: background 180ms ease-out, color 180ms ease-out, transform 180ms ease-out;
-  }
-
-  .article-card:first-child {
-    border-top: 1px solid var(--border-soft);
-  }
-
-  .article-card:hover {
-    color: var(--blue);
-    transform: translateX(2px);
-  }
-
-  .cover-link {
-    display: block;
-    min-width: 0;
-  }
-
-  .cover-link :global(.media-shell) {
-    width: 100%;
-    border-radius: 6px;
-  }
-
-  .article-card.featured {
-    grid-template-columns: 184px minmax(0, 1fr);
-  }
-
-  img {
-    width: 100%;
-    height: 92px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    object-fit: cover;
-    background: var(--paper-soft);
-  }
-
-  .featured img {
-    height: 132px;
-  }
-
-  .article-body {
-    display: grid;
-    align-content: center;
-    min-width: 0;
-    color: var(--ink);
-  }
-
-  .meta-line,
-  .meta-line span,
-  .bottom-line,
-  .tags,
-  .read-link {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .meta-line {
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
-
-  h3 {
-    margin: 4px 0 5px;
-    color: var(--ink);
-    font-size: 1.08rem;
-    line-height: 1.38;
-    letter-spacing: 0;
-  }
-
-  .featured h3 {
-    font-size: 1.2rem;
-  }
-
-  p {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.65;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .bottom-line {
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 10px;
-  }
-
-  .read-link {
-    color: var(--blue);
-    font-size: 0.82rem;
-    font-weight: 900;
-    white-space: nowrap;
-  }
-
-  @media (max-width: 620px) {
-    .article-card,
-    .article-card.featured {
-      grid-template-columns: 92px minmax(0, 1fr);
-      gap: 12px;
-    }
-
-    img,
-    .featured img {
-      height: 78px;
-    }
-
-    .tags {
-      display: none;
-    }
-
-    h3,
-    .featured h3 {
-      font-size: 1rem;
-    }
-  }
-</style>

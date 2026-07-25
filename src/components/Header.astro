@@ -17,44 +17,49 @@ const navItems = [
 const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 ---
 
-<header class="site-header" data-site-header>
-  <div class="page-shell header-inner">
-    <a class="brand" href="/" aria-label={`${siteConfig.name} 首页`}>
-      <span class="brand-mark">&lt;/&gt;</span>
-      <span class="brand-copy">
-        <strong>{siteConfig.name}</strong>
-        <small>notes / ideas / daily</small>
+<header
+  class="site-header sticky top-0 z-40 border-b border-border bg-header-bg backdrop-blur-md"
+  data-site-header
+>
+  <div class="page-shell header-inner grid min-h-16 grid-cols-[236px_minmax(0,1fr)_auto] items-center gap-6">
+    <a class="inline-flex min-w-0 items-center gap-2.5" href="/" aria-label={`${siteConfig.name} 首页`}>
+      <span class="brand-mark text-3xl font-black leading-none text-blue">&lt;/&gt;</span>
+      <span class="block min-w-0">
+        <strong class="block min-w-0 font-hand text-2xl font-black leading-none text-ink">{siteConfig.name}</strong>
+        <small class="brand-tagline mt-0.5 block min-w-0 text-2xs font-extrabold leading-tight text-muted">
+          notes / ideas / daily
+        </small>
       </span>
     </a>
 
-    <nav class="nav-links" aria-label="主导航">
+    <nav class="nav-links flex min-w-0 justify-center gap-7" aria-label="主导航" style="--nav-letter-spacing: 0.5em">
       {navItems.map((item) => (
         <a
           href={item.href}
-          class:list={["nav-link", { active: isActive(item.href), "private-link": item.private }]}
+          class:list={["nav-link relative inline-flex items-center justify-center whitespace-nowrap py-6 pb-5 text-center text-sm font-black text-nav-text transition-colors duration-500", { active: isActive(item.href), "private-link": item.private }]}
           data-private-link={item.private ? "true" : undefined}
         >
-          <span class="nav-label">{item.label}</span>
+          <span class="inline-block tracking-[var(--nav-letter-spacing)] -mr-[var(--nav-letter-spacing)]">{item.label}</span>
         </a>
       ))}
     </nav>
 
-    <div class="header-actions">
-      <button class="nav-toggle" type="button" data-nav-toggle aria-label="打开导航" aria-expanded="false">
-        <span class="nav-icon open"><Icon name="Menu" size={20} /></span>
-        <span class="nav-icon close"><Icon name="X" size={20} /></span>
+    <div class="header-actions inline-flex items-center justify-end gap-2">
+      <button class="nav-toggle grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-nav-toggle aria-label="打开导航" aria-expanded="false">
+        <span class="nav-icon open col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Menu" size={20} /></span>
+        <span class="nav-icon close col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="X" size={20} /></span>
       </button>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换夜间模式" title="切换夜间模式">
-        <span class="theme-icon light"><Icon name="Sun" size={19} /></span>
-        <span class="theme-icon dark"><Icon name="Moon" size={19} /></span>
+      <button class="theme-toggle relative grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-theme-toggle aria-label="切换夜间模式" title="切换夜间模式">
+        <span class="theme-icon light col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Sun" size={19} /></span>
+        <span class="theme-icon dark col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Moon" size={19} /></span>
       </button>
-      <a href="/blog#search" aria-label="搜索">
+      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="/blog#search" aria-label="搜索">
         <Icon name="Search" size={20} />
       </a>
-      <a href="/rss.xml" aria-label="RSS">
+      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="/rss.xml" aria-label="RSS">
         <Icon name="Rss" size={20} />
       </a>
-      <a href="https://github.com/marchen-orz" aria-label="GitHub">
+      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="https://github.com/marchen-orz" aria-label="GitHub">
         <Icon name="Github" size={20} />
       </a>
     </div>
@@ -150,266 +155,3 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.st
   }
 </script>
 
-<style>
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    border-bottom: 1px solid var(--border);
-    background: var(--header-bg);
-    backdrop-filter: blur(18px);
-  }
-
-  .header-inner {
-    display: grid;
-    grid-template-columns: 236px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 22px;
-    min-height: 70px;
-  }
-
-  .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 11px;
-    min-width: 0;
-  }
-
-  .brand-mark {
-    color: var(--blue);
-    font-size: 2rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .brand-copy,
-  .brand-copy strong,
-  .brand-copy small {
-    display: block;
-    min-width: 0;
-  }
-
-  .brand-copy strong {
-    color: var(--ink);
-    font-family: var(--font-hand);
-    font-size: 1.45rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .brand-copy small {
-    margin-top: 2px;
-    color: var(--muted);
-    font-size: 0.72rem;
-    font-weight: 800;
-    line-height: 1.2;
-  }
-
-  .nav-links {
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    min-width: 0;
-    --nav-letter-spacing: 0.5em;
-  }
-
-  .nav-link {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 0 20px;
-    color: var(--nav-text);
-    font-size: 0.88rem;
-    font-weight: 900;
-    white-space: nowrap;
-    text-align: center; 
-    transition: color 500ms ease-out;
-  }
-
-  .nav-label {
-    display: inline-block;
-    letter-spacing: var(--nav-letter-spacing);
-    margin-right: calc(-1 * var(--nav-letter-spacing));
-  }
-
-  .nav-link::after {
-    position: absolute;
-    right: 0;
-    bottom: 14px;
-    left: 0;
-    height: 2px;
-    background: var(--blue);
-    content: "";
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .nav-link:hover,
-  .nav-link.active {
-    color: var(--blue);
-  }
-
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    transform: scaleX(1);
-  }
-
-  .private-link {
-    display: none;
-  }
-
-  .private-link.is-visible {
-    display: inline-flex;
-  }
-
-  .header-actions {
-    display: inline-flex;
-    align-items: center;
-    justify-content: end;
-    gap: 8px;
-  }
-
-  .header-actions a,
-  .theme-toggle,
-  .nav-toggle {
-    display: grid;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: 0;
-    border-radius: 5px;
-    background: transparent;
-    color: var(--ink);
-    transition: background 180ms ease-out, color 180ms ease-out;
-  }
-
-  .header-actions a:hover,
-  .theme-toggle:hover,
-  .nav-toggle:hover {
-    background: var(--orange-soft);
-    color: var(--orange);
-  }
-
-  .theme-toggle {
-    position: relative;
-  }
-
-  .theme-icon,
-  .nav-icon {
-    grid-column: 1;
-    grid-row: 1;
-    display: grid;
-    place-items: center;
-    transition: opacity 160ms ease-out, transform 180ms ease-out;
-  }
-
-  .theme-icon.dark,
-  :global(html[data-theme="dark"]) .theme-icon.light {
-    opacity: 0;
-    transform: scale(0.75) rotate(-20deg);
-  }
-
-  :global(html[data-theme="dark"]) .theme-icon.dark {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-
-  .nav-toggle,
-  .nav-backdrop {
-    display: none;
-  }
-
-  .nav-icon.close,
-  :global(html.nav-open) .nav-icon.open {
-    opacity: 0;
-    transform: scale(0.78) rotate(-18deg);
-  }
-
-  :global(html.nav-open) .nav-icon.close {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-
-  @media (max-width: 980px) {
-    .header-inner {
-      grid-template-columns: 1fr auto;
-      padding-block: 8px;
-    }
-
-    .nav-links {
-      position: fixed;
-      top: 0;
-      right: 0;
-      z-index: 45;
-      display: grid;
-      width: min(320px, calc(100vw - 42px));
-      height: 100dvh;
-      align-content: start;
-      gap: 0;
-      border-left: 1px solid var(--border);
-      background: var(--surface-strong);
-      box-shadow: -18px 0 48px var(--shadow-pop);
-      padding: 82px 24px 24px;
-      transform: translateX(105%);
-      transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
-      --nav-letter-spacing: 0.5em;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      border-bottom: 1px solid var(--border-soft);
-      padding: 15px 2px;
-      font-size: 1rem;
-    }
-
-    .nav-link::after {
-      right: 0;
-      bottom: -1px;
-    }
-
-    .nav-toggle {
-      display: grid;
-      position: relative;
-      z-index: 50;
-    }
-
-    .nav-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 44;
-      border: 0;
-      background: var(--nav-backdrop-bg);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 220ms ease-out;
-    }
-
-    :global(html.nav-open) .nav-links {
-      transform: translateX(0);
-    }
-
-    :global(html.nav-open) .nav-backdrop {
-      display: block;
-      opacity: 1;
-      pointer-events: auto;
-    }
-  }
-
-  @media (max-width: 560px) {
-    .brand-copy small {
-      display: none;
-    }
-
-    .brand-mark {
-      font-size: 1.65rem;
-    }
-
-    .header-actions {
-      gap: 2px;
-    }
-  }
-</style>

@@ -4,36 +4,36 @@ import Icon from "@/components/Icon.astro";
 ---
 
 <BaseLayout title="404 · 迷路了" description="这个页面好像不见了">
-  <div class="page-shell not-found-page">
-    <section class="lost-card">
+  <div class="page-shell not-found-page grid min-h-[70vh] items-center py-8">
+    <section class="lost-card relative overflow-hidden rounded-lg border border-border-strong bg-surface px-10 pb-9 pt-12">
       <div class="tape top-left" aria-hidden="true"></div>
       <div class="tape top-right" aria-hidden="true"></div>
 
-      <div class="lost-visual">
-        <span class="lost-num" aria-hidden="true">
+      <div class="relative mb-2 flex items-center justify-center">
+        <span class="lost-num inline-flex select-none items-baseline gap-0.5 font-black leading-[0.88] tracking-tighter text-ink" aria-hidden="true">
           <b>4</b><em>0</em><b>4</b>
         </span>
-        <div class="compass" aria-hidden="true">
+        <div class="compass absolute top-[-8px] flex size-16 items-center justify-center rounded-full border-[1.5px] border-dashed border-border-strong text-blue" aria-hidden="true">
           <Icon name="Compass" size={48} strokeWidth={1.6} />
         </div>
       </div>
 
-      <div class="lost-body">
+      <div class="mb-5 text-center">
         <p class="eyebrow">Page Not Found</p>
-        <h1>这个页面走丢了</h1>
-        <p class="lead">
-          它可能被风吹走了，也可能躲到了某个角落里。<br />
+        <h1 class="my-2 text-2xl leading-tight tracking-normal max-sm:text-xl">这个页面走丢了</h1>
+        <p class="mx-auto max-w-md text-sm leading-relaxed text-muted">
+          它可能被风吹走了，也可能躲到了某个角落里。<br class="max-sm:hidden" />
           不过没关系，你可以从下面这些地方重新出发。
         </p>
       </div>
 
-      <div class="lost-clues" aria-hidden="true">
-        <code>errno 404 · page_missing</code>
-        <code>hint: try the links below ↓</code>
+      <div class="lost-clues mb-7 flex flex-wrap justify-center gap-2" aria-hidden="true">
+        <code class="inline-flex rounded bg-note-quiet-bg px-2.5 py-0.5 text-sm text-ink-2">errno 404 · page_missing</code>
+        <code class="inline-flex rounded bg-note-quiet-bg px-2.5 py-0.5 text-sm text-ink-2">hint: try the links below ↓</code>
       </div>
 
-      <nav class="lost-nav" aria-label="404 快速导航">
-        <a class="button" href="/">
+      <nav class="mb-6 flex flex-wrap justify-center gap-2.5 max-sm:gap-2" aria-label="404 快速导航">
+        <a class="button px-4" href="/">
           <Icon name="House" size={18} /> 回首页
         </a>
         <a class="nav-chip" href="/blog">
@@ -50,236 +50,11 @@ import Icon from "@/components/Icon.astro";
         </a>
       </nav>
 
-      <p class="lost-footer">
+      <p class="m-0 flex items-center justify-center gap-1.5 border-t border-dashed border-border-soft pt-4 text-center text-sm text-muted">
         <Icon name="Frown" size={14} /> 如果你觉得这不应该发生，
-        <a href="/">回首页</a> 告诉我一声。
+        <a class="font-bold text-blue underline decoration-link-underline underline-offset-2" href="/">回首页</a> 告诉我一声。
       </p>
     </section>
   </div>
 </BaseLayout>
 
-<style>
-  .not-found-page {
-    display: grid;
-    min-height: 70vh;
-    align-items: center;
-    padding-block: 32px;
-  }
-
-  .lost-card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    box-shadow: 0 20px 48px var(--shadow-soft);
-    padding: 48px 40px 36px;
-  }
-
-  /* tape decorations */
-  .tape {
-    position: absolute;
-    top: -10px;
-    z-index: 2;
-    width: 72px;
-    height: 18px;
-    background: var(--tape-bg);
-    box-shadow: 0 1px 0 var(--tape-shadow) inset;
-  }
-
-  .tape.top-left {
-    left: 28px;
-    transform: rotate(-4deg);
-  }
-
-  .tape.top-right {
-    right: 32px;
-    transform: rotate(3deg);
-    background: var(--tape-blue-bg);
-  }
-
-  /* hero visual */
-  .lost-visual {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    margin-bottom: 8px;
-  }
-
-  .lost-num {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 2px;
-    font-size: clamp(6rem, 18vw, 11rem);
-    font-weight: 900;
-    line-height: 0.88;
-    letter-spacing: -0.04em;
-    color: var(--ink);
-    user-select: none;
-  }
-
-  .lost-num em {
-    font-style: normal;
-    color: var(--orange);
-    animation: lost-bounce 2.4s ease-in-out infinite;
-  }
-
-  .compass {
-    position: absolute;
-    right: max(12px, calc(100% / 2 - 280px));
-    top: -8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    border: 1.5px dashed var(--border-strong);
-    border-radius: 50%;
-    color: var(--blue);
-    animation: compass-spin 8s linear infinite;
-  }
-
-  @keyframes compass-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes lost-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-
-  /* body */
-  .lost-body {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .lost-body h1 {
-    margin: 8px 0 10px;
-    font-size: 1.65rem;
-    line-height: 1.2;
-    letter-spacing: 0;
-  }
-
-  .lost-body .lead {
-    max-width: 440px;
-    margin: 0 auto;
-    color: var(--muted);
-    font-size: 0.95rem;
-    line-height: 1.72;
-  }
-
-  /* clues */
-  .lost-clues {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 28px;
-  }
-
-  .lost-clues code {
-    display: inline-flex;
-    padding: 3px 10px;
-    border-radius: 4px;
-    background: var(--note-quiet-bg);
-    color: var(--ink-2);
-    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-    font-size: 0.82rem;
-  }
-
-  /* nav */
-  .lost-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-
-  .nav-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    min-height: 38px;
-    border: 1px solid var(--tag-border);
-    border-radius: 6px;
-    background: var(--tag-bg);
-    padding: 0 14px;
-    color: var(--tag-text);
-    font-weight: 900;
-    font-size: 0.88rem;
-    transition: background 160ms ease, transform 160ms ease, border-color 160ms ease;
-  }
-
-  .nav-chip:hover {
-    background: var(--note-blue-bg);
-    border-color: var(--blue);
-    color: var(--blue);
-    transform: translateY(-2px);
-  }
-
-  .button {
-    padding: 0 18px;
-  }
-
-  /* footer */
-  .lost-footer {
-    margin: 0;
-    padding-top: 16px;
-    border-top: 1px dashed var(--border-soft);
-    color: var(--muted);
-    font-size: 0.84rem;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .lost-footer a {
-    color: var(--blue);
-    font-weight: 700;
-    text-decoration: underline;
-    text-decoration-color: var(--link-underline);
-    text-underline-offset: 3px;
-  }
-
-  @media (max-width: 620px) {
-    .lost-card {
-      padding: 40px 20px 28px;
-    }
-
-    .tape.top-left {
-      left: 16px;
-      width: 56px;
-    }
-
-    .tape.top-right {
-      right: 18px;
-      width: 56px;
-    }
-
-    .compass {
-      right: 8px;
-      width: 48px;
-      height: 48px;
-    }
-
-    .lost-body h1 {
-      font-size: 1.35rem;
-    }
-
-    .lost-body .lead br {
-      display: none;
-    }
-
-    .lost-nav {
-      gap: 8px;
-    }
-  }
-</style>

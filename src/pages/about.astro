@@ -33,33 +33,37 @@ const timeline = [
 ---
 
 <BaseLayout title="关于" description={`关于 ${siteConfig.name} 和正在折腾的各种有趣小东西`}>
-  <div class="page-shell about">
+  <div class="page-shell grid gap-10">
     <!-- Hero: 居中布局，头像 + 名字 + 一句话 -->
-    <section class="about-hero">
-      <div class="hero-avatar">
-        <img src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={siteConfig.name} />
+    <section class="flex flex-col items-center border-b border-border-soft px-0 pb-9 pt-12 text-center">
+      <div class="mb-5 size-36 overflow-hidden rounded-full border-[3px] border-border-strong shadow-soft-card">
+        <img class="size-full object-cover" src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={siteConfig.name} />
       </div>
-      <h1>{siteConfig.name}</h1>
-      <p class="hero-sub">Full-stack / AI app / tiny tools</p>
-      <p class="hero-bio">一个喜欢把想法从界面、接口、数据到上线都跑通的人，这个站是折腾记录、工具收藏和碎碎念的大本营</p>
+      <h1 class="m-0 text-5xl leading-tight text-ink">{siteConfig.name}</h1>
+      <p class="m-0 mt-2 text-base font-extrabold tracking-wide text-muted">Full-stack / AI app / tiny tools</p>
+      <p class="mx-auto mt-4 max-w-narrow text-base leading-loose text-muted">一个喜欢把想法从界面、接口、数据到上线都跑通的人，这个站是折腾记录、工具收藏和碎碎念的大本营</p>
     </section>
 
     <!-- 技术坐标：三列卡片 -->
-    <section class="about-section">
-      <div class="section-heading">
+    <section class="grid gap-4 border-b border-border-soft pb-7">
+      <div>
         <p class="eyebrow">What I Build</p>
-        <h2>技术坐标</h2>
+        <h2 class="mt-1.5 mb-0 text-xl leading-tight">技术坐标</h2>
       </div>
-      <div class="skill-map">
+      <div class="grid grid-cols-1 gap-4 min-lg:grid-cols-3">
         {skillGroups.map((group) => (
-          <article>
-            <div class="skill-title">
-              <span><Icon name={group.icon} size={20} /></span>
-              <h3>{group.title}</h3>
+          <article class="grid content-start gap-3 border-t-2 border-blue pt-3.5">
+            <div class="flex items-center gap-2.5">
+              <span class="grid size-9 place-items-center rounded-md border border-tag-border bg-blue-soft text-blue">
+                <Icon name={group.icon} size={20} />
+              </span>
+              <h3 class="m-0 text-base">{group.title}</h3>
             </div>
-            <p>{group.text}</p>
-            <div class="skill-tags">
-              {group.tags.map((tag) => <span>{tag}</span>)}
+            <p class="m-0 text-sm leading-relaxed text-muted">{group.text}</p>
+            <div class="flex flex-wrap gap-2">
+              {group.tags.map((tag) => (
+                <span class="rounded-md border border-border px-2 py-1 text-xs font-extrabold text-ink-2">{tag}</span>
+              ))}
             </div>
           </article>
         ))}
@@ -67,18 +71,20 @@ const timeline = [
     </section>
 
     <!-- 时间线 -->
-    <section class="about-section">
-      <div class="section-heading">
+    <section class="grid gap-4 border-b border-border-soft pb-7">
+      <div>
         <p class="eyebrow">Journey</p>
-        <h2>折腾路线</h2>
+        <h2 class="mt-1.5 mb-0 text-xl leading-tight">折腾路线</h2>
       </div>
-      <ol class="timeline">
+      <ol class="ml-3.5 grid list-none gap-0 border-l-2 border-border p-0 m-0">
         {timeline.map((item) => (
-          <li>
-            <div class="tl-dot"><Icon name={item.icon} size={16} /></div>
-            <div class="tl-body">
-              <span class="tl-label">{item.label}</span>
-              <p>{item.text}</p>
+          <li class="relative grid grid-cols-[36px_minmax(0,1fr)] gap-3.5 py-4">
+            <div class="relative left-[-17px] grid size-8 place-items-center rounded-full border-2 border-blue bg-surface text-blue">
+              <Icon name={item.icon} size={16} />
+            </div>
+            <div class="pt-1">
+              <span class="mb-1 inline-block text-sm font-black tracking-wide text-blue">{item.label}</span>
+              <p class="m-0 text-sm leading-relaxed text-muted">{item.text}</p>
             </div>
           </li>
         ))}
@@ -86,306 +92,41 @@ const timeline = [
     </section>
 
     <!-- 当前关注 + 便签 -->
-    <section class="about-section split">
+    <section class="grid items-start gap-8 border-b border-border-soft pb-7 max-lg:grid-cols-1 min-lg:grid-cols-[minmax(0,1fr)_330px]">
       <div>
-        <div class="section-heading">
+        <div>
           <p class="eyebrow">Current Focus</p>
-          <h2>最近在关心</h2>
+          <h2 class="mt-1.5 mb-0 text-xl leading-tight">最近在关心</h2>
         </div>
-        <ul class="focus-list">
-          <li><b>AI 工作流</b><span>把知识库、自动化和工具调用拼成真正能省时间的流程</span></li>
-          <li><b>前端体验</b><span>界面不只是能用，还要清楚、顺手、有自己的气质</span></li>
-          <li><b>后端与数据</b><span>接口、鉴权、数据库设计和性能优化都要一起考虑</span></li>
+        <ul class="mt-3.5 grid list-none gap-3.5 p-0 m-0">
+          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+            <b class="text-ink">AI 工作流</b><span class="text-muted">把知识库、自动化和工具调用拼成真正能省时间的流程</span>
+          </li>
+          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+            <b class="text-ink">前端体验</b><span class="text-muted">界面不只是能用，还要清楚、顺手、有自己的气质</span>
+          </li>
+          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+            <b class="text-ink">后端与数据</b><span class="text-muted">接口、鉴权、数据库设计和性能优化都要一起考虑</span>
+          </li>
         </ul>
       </div>
-      <div class="quote-note">
+      <div class="relative -rotate-[1.2deg] rounded-lg border border-border-strong bg-note-bg p-5.5">
         <span class="tape" aria-hidden="true"></span>
-        <p>比起完美的方案，我更喜欢一个能跑通的原型：先让核心成立，再慢慢把细节磨亮</p>
+        <p class="m-0 font-note text-lg leading-loose text-ink-2">比起完美的方案，我更喜欢一个能跑通的原型：先让核心成立，再慢慢把细节磨亮</p>
       </div>
     </section>
 
     <!-- 联系方式 -->
-    <section class="connect">
-      <h2><Icon name="Send" size={20} /> 找到我</h2>
-      <div>
+    <section class="grid gap-3">
+      <h2 class="m-0 flex items-center gap-2 text-base"><Icon name="Send" size={20} /> 找到我</h2>
+      <div class="flex flex-wrap gap-2">
         {siteConfig.socials.map((item) => (
-          <a href={item.href}><Icon name={item.icon} size={20} /> <span>{item.name}</span></a>
+          <a class="inline-flex items-center gap-2 border-b border-border py-2 font-black text-ink-2" href={item.href}>
+            <Icon name={item.icon} size={20} /> <span>{item.name}</span>
+          </a>
         ))}
       </div>
     </section>
   </div>
 </BaseLayout>
 
-<style>
-  .about {
-    display: grid;
-    gap: 38px;
-  }
-
-  /* ── Hero：居中布局 ── */
-  .about-hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 48px 0 36px;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .hero-avatar {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid var(--border-strong);
-    box-shadow: 0 8px 28px var(--shadow-soft);
-    margin-bottom: 20px;
-  }
-
-  .hero-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 2.6rem;
-    line-height: 1.1;
-    color: var(--ink);
-  }
-
-  .hero-sub {
-    margin: 8px 0 0;
-    color: var(--muted);
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-  }
-
-  .hero-bio {
-    max-width: 520px;
-    margin: 18px auto 0;
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.82;
-  }
-
-  /* ── Section 通用 ── */
-  .about-section {
-    display: grid;
-    gap: 18px;
-    padding-bottom: 28px;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .section-heading h2,
-  .about-section h2 {
-    margin: 6px 0 0;
-    font-size: 1.45rem;
-    line-height: 1.2;
-  }
-
-  /* ── 技术坐标 ── */
-  .skill-map {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-  }
-
-  .skill-map article {
-    display: grid;
-    align-content: start;
-    gap: 12px;
-    border-top: 2px solid var(--blue);
-    padding-top: 14px;
-  }
-
-  .skill-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .skill-title span {
-    display: grid;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border: 1px solid var(--tag-border);
-    border-radius: 6px;
-    background: var(--blue-soft);
-    color: var(--blue);
-  }
-
-  h3 {
-    margin: 0;
-    font-size: 1.05rem;
-  }
-
-  .skill-map p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.92rem;
-    line-height: 1.72;
-  }
-
-  .skill-tags,
-  .connect div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .skill-tags span {
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 4px 8px;
-    color: var(--ink-2);
-    font-size: 0.76rem;
-    font-weight: 800;
-  }
-
-  /* ── 时间线 ── */
-  .timeline {
-    display: grid;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border-left: 2px solid var(--border);
-    margin-left: 14px;
-  }
-
-  .timeline li {
-    display: grid;
-    grid-template-columns: 36px minmax(0, 1fr);
-    gap: 14px;
-    padding: 16px 0;
-    position: relative;
-  }
-
-  .tl-dot {
-    display: grid;
-    width: 32px;
-    height: 32px;
-    place-items: center;
-    border: 2px solid var(--blue);
-    border-radius: 50%;
-    background: var(--surface);
-    color: var(--blue);
-    position: relative;
-    left: -17px;
-  }
-
-  .tl-body {
-    padding-top: 4px;
-  }
-
-  .tl-label {
-    display: inline-block;
-    margin-bottom: 4px;
-    color: var(--blue);
-    font-size: 0.82rem;
-    font-weight: 900;
-    letter-spacing: 0.02em;
-  }
-
-  .tl-body p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.94rem;
-    line-height: 1.72;
-  }
-
-  /* ── Split：关注 + 便签 ── */
-  .split {
-    grid-template-columns: minmax(0, 1fr) 330px;
-    gap: 34px;
-    align-items: start;
-  }
-
-  .focus-list {
-    display: grid;
-    gap: 14px;
-    margin: 14px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .focus-list li {
-    display: grid;
-    grid-template-columns: 108px minmax(0, 1fr);
-    gap: 16px;
-    padding: 12px 0;
-    border-top: 1px solid var(--border-soft);
-  }
-
-  .focus-list b {
-    color: var(--ink);
-  }
-
-  .focus-list span {
-    color: var(--muted);
-  }
-
-  .quote-note {
-    position: relative;
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    background: var(--note-bg);
-    padding: 22px;
-    transform: rotate(-1.2deg);
-  }
-
-  .quote-note p {
-    margin: 0;
-    color: var(--ink-2);
-    font-family: var(--font-note);
-    font-size: 1.16rem;
-    line-height: 1.88;
-  }
-
-  /* ── 联系方式 ── */
-  .connect {
-    display: grid;
-    gap: 12px;
-  }
-
-  .connect h2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    font-size: 1.05rem;
-  }
-
-  .connect a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid var(--border);
-    padding: 8px 0;
-    color: var(--ink-2);
-    font-weight: 900;
-  }
-
-  /* ── 响应式 ── */
-  @media (max-width: 920px) {
-    .split,
-    .skill-map {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 560px) {
-    .focus-list li {
-      grid-template-columns: 1fr;
-      gap: 4px;
-    }
-
-    .timeline li {
-      grid-template-columns: 36px minmax(0, 1fr);
-    }
-  }
-</style>

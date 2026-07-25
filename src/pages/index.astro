@@ -42,68 +42,68 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
 ---
 
 <BaseLayout title={siteConfig.title} description={siteConfig.description}>
-  <div class="page-shell home">
-    <section class="home-hero">
-      <aside class="profile-panel">
-        <span class="blue-tape" aria-hidden="true"></span>
-        <img src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={`${siteConfig.name} 的头像插画`} />
-        <h2>{siteConfig.name}</h2>
-        <p>攒灵感、收藏好东西、折腾有趣的小项目，把生活过成自己喜欢的样子</p>
-        <div class="profile-links">
+  <div class="page-shell relative z-10 grid gap-10">
+    <section class="grid grid-cols-1 items-stretch gap-6 overflow-visible min-lg:grid-cols-[236px_minmax(0,1fr)]">
+      <aside class="relative flex h-full flex-col overflow-visible rounded-lg border border-border-strong bg-surface px-4 pb-4 pt-5.5 shadow-soft-card transition-[box-shadow,transform,border-color] duration-200 hover:border-line-blue hover:shadow-pop-card max-lg:grid max-lg:grid-cols-[112px_minmax(0,1fr)] max-lg:items-center max-lg:gap-x-4 max-sm:grid-cols-1 max-sm:text-center [&_.media-shell]:mx-auto [&_.media-shell]:mb-3 [&_.media-shell]:size-28 [&_.media-shell]:rounded-full max-lg:[&_.media-shell]:row-span-3 max-lg:[&_.media-shell]:m-0 max-sm:[&_.media-shell]:mx-auto max-sm:[&_.media-shell]:mb-3">
+        <span class="absolute top-[-12px] left-[22px] z-20 h-5 w-[62px] -rotate-[9deg] bg-tape-blue-bg" aria-hidden="true"></span>
+        <img class="mx-auto mb-3 block size-28 rounded-full object-cover max-lg:row-span-3 max-lg:m-0 max-sm:mx-auto max-sm:mb-3" src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={`${siteConfig.name} 的头像插画`} />
+        <h2 class="m-0 text-center font-hand text-3xl leading-none tracking-normal">{siteConfig.name}</h2>
+        <p class="mt-4 mb-auto text-sm leading-relaxed text-muted">攒灵感、收藏好东西、折腾有趣的小项目，把生活过成自己喜欢的样子</p>
+        <div class="grid grid-cols-2 gap-2 max-lg:col-span-full">
           {siteConfig.socials.slice(0, 4).map((item) => (
-            <a href={item.href} aria-label={item.name}><Icon name={item.icon} size={18} /><span>{item.name}</span></a>
+            <a class="inline-flex items-center justify-center gap-1.5 rounded-md border border-border px-1 py-1.5 text-xs font-extrabold text-ink" href={item.href} aria-label={item.name}><Icon name={item.icon} size={18} /><span>{item.name}</span></a>
           ))}
         </div>
-        <dl>
-          <div><dt>文章</dt><dd>{posts.length}</dd></div>
-          <div><dt>项目</dt><dd>{projects.length}</dd></div>
-          <div><dt>工具</dt><dd>{tools.length}</dd></div>
+        <dl class="mt-4 mb-0 grid grid-cols-3 gap-2 max-lg:col-span-full">
+          <div><dt class="m-0 text-center text-2xs font-extrabold text-muted">文章</dt><dd class="m-0 text-center text-base font-black text-blue">{posts.length}</dd></div>
+          <div><dt class="m-0 text-center text-2xs font-extrabold text-muted">项目</dt><dd class="m-0 text-center text-base font-black text-blue">{projects.length}</dd></div>
+          <div><dt class="m-0 text-center text-2xs font-extrabold text-muted">工具</dt><dd class="m-0 text-center text-base font-black text-blue">{tools.length}</dd></div>
         </dl>
       </aside>
 
-      <div class="hero-board">
-        <div class="hero-copy">
+      <div class="relative grid min-h-[330px] grid-cols-1 gap-6 overflow-visible rounded-lg border border-border-strong bg-[linear-gradient(var(--page-grid-x)_1px,transparent_1px),linear-gradient(90deg,var(--page-grid-y)_1px,transparent_1px),var(--surface)] bg-[length:30px_30px,30px_30px,auto] px-8 pb-6 pt-8 shadow-soft-lift transition-[box-shadow,transform,border-color] duration-200 before:absolute before:right-[26px] before:top-[-14px] before:z-20 before:h-7 before:w-24 before:rotate-[3deg] before:border before:border-border before:bg-[repeating-linear-gradient(-45deg,transparent_0_7px,rgba(37,99,235,0.12)_7px_9px),var(--tape-blue-bg)] before:content-[''] hover:border-line-blue hover:shadow-pop-lift min-lg:grid-cols-[minmax(0,1fr)_270px] min-lg:grid-rows-[1fr_auto] min-lg:gap-x-7 max-sm:px-5 max-sm:pb-5.5 max-sm:pt-7">
+        <div class="relative z-10 max-w-xl">
           <p class="eyebrow">Personal Site</p>
-          <h1 data-typewriter-title aria-label={heroAriaLabel}>
-            <span class="hero-name">
-              <span id="big-title" data-typewriter-part data-typewriter-text={siteConfig.name}>{siteConfig.name}</span>{titleSuffix && <span class="title-suffix" data-typewriter-part data-typewriter-text={titleSuffix}>{titleSuffix}</span>}
+          <h1 class="relative my-3 grid gap-1.5 text-[clamp(2.2rem,3vw,3.35rem)] leading-tight tracking-normal max-sm:text-4xl" data-typewriter-title aria-label={heroAriaLabel}>
+            <span class="font-hand text-[0.92em] font-normal leading-tight text-blue">
+              <span id="big-title" class="mr-1 min-h-[1.2em] text-[1.48em] font-normal after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text={siteConfig.name}>{siteConfig.name}</span>{titleSuffix && <span class="min-h-[1.2em] after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text={titleSuffix}>{titleSuffix}</span>}
             </span>
-            <span data-typewriter-part data-typewriter-text="把灵感变成可以翻阅的日常">把灵感变成可以翻阅的日常</span>
+            <span class="min-h-[1.2em] text-[0.68em] font-black after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text="把灵感变成可以翻阅的日常">把灵感变成可以翻阅的日常</span>
           </h1>
-          <p class="lead">灵感碎片、有趣的项目和顺手的小工具都收在这里，清爽一点，少年气一点，也真的好用</p>
-          <div class="hero-actions">
-            <a class="button" href="/blog"><Icon name="BookOpen" size={18} /> 看文章</a>
-            <a class="button secondary" href="/notes"><Icon name="Images" size={18} /> 看碎念</a>
+          <p class="m-0 max-w-prose text-base text-muted">灵感碎片、有趣的项目和顺手的小工具都收在这里，清爽一点，少年气一点，也真的好用</p>
+          <div class="mt-5 flex flex-wrap gap-2.5">
+            <a class="button px-4" href="/blog"><Icon name="BookOpen" size={18} /> 看文章</a>
+            <a class="button border-tag-border bg-blue-soft px-4 text-blue hover:border-blue hover:bg-[#d4e4ff] hover:text-blue" href="/notes"><Icon name="Images" size={18} /> 看碎念</a>
           </div>
         </div>
-        <aside class="quote-note">
-          <span>stay curious</span>
-          <p>每一天都值得被认真记录下来</p>
+        <aside class="relative z-10 w-full rotate-[2.2deg] self-start border border-border-strong bg-surface-strong px-5 py-4 shadow-pop-card before:absolute before:top-[-10px] before:left-[26px] before:h-[18px] before:w-16 before:-rotate-[6deg] before:bg-tape-bg before:shadow-[0_1px_0_var(--tape-shadow)_inset] before:content-[''] min-lg:col-start-2 min-lg:row-start-1 max-lg:mt-5.5 max-lg:max-w-xs">
+          <span class="block font-hand text-xl font-black text-orange">stay curious</span>
+          <p class="mt-1.5 mb-0 font-note text-base text-ink-2">每一天都值得被认真记录下来</p>
         </aside>
-        <div class="hero-decor-cluster" aria-hidden="true">
-          <span class="decor-tape"></span>
-          <div class="decor-terminal">
-            <i></i>
-            <i></i>
-            <i></i>
-            <b></b>
-            <b></b>
-            <b></b>
+        <div class="relative z-10 my-1 mb-4 h-[138px] w-full justify-self-center self-end min-lg:col-start-2 min-lg:row-start-1 max-lg:hidden" aria-hidden="true">
+          <span class="absolute top-3 left-[42px] z-40 h-4 w-[76px] -rotate-[5deg] bg-tape-blue-bg opacity-90 shadow-[0_1px_0_var(--tape-shadow)_inset]"></span>
+          <div class="absolute top-5.5 left-0.5 h-24 w-[156px] -rotate-[2deg] rounded-lg border border-border-strong bg-surface-strong p-[15px_14px] shadow-soft-lift before:absolute before:top-2.5 before:left-[13px] before:size-[7px] before:rounded-full before:bg-orange before:shadow-[14px_0_0_var(--yellow),28px_0_0_var(--mint)] before:content-['']">
+            <i class="mt-2.5 block h-[7px] w-[76%] rounded-full bg-[color-mix(in_srgb,var(--blue)_20%,transparent)]"></i>
+            <i class="mt-2.5 block h-[7px] w-[56%] rounded-full bg-[color-mix(in_srgb,var(--blue)_20%,transparent)]"></i>
+            <i class="mt-2.5 block h-[7px] w-[68%] rounded-full bg-[color-mix(in_srgb,var(--blue)_20%,transparent)]"></i>
+            <b class="absolute bottom-3 left-[18px] size-2 rounded-full bg-blue opacity-75"></b>
+            <b class="absolute bottom-3 left-[34px] size-2 rounded-full bg-blue opacity-45"></b>
+            <b class="absolute bottom-3 left-[50px] size-2 rounded-full bg-blue opacity-30"></b>
           </div>
-          <div class="decor-card">
-            <span><Icon name="Sparkles" size={18} strokeWidth={2.4} /></span>
-            <i></i>
-            <i></i>
-            <i></i>
+          <div class="absolute top-[34px] right-0 h-[86px] w-32 rotate-[5deg] overflow-hidden rounded-lg border border-border-strong bg-surface-strong p-[13px_12px] shadow-soft-lift">
+            <span class="grid size-8 place-items-center rounded-lg border border-tag-border bg-blue-soft text-blue"><Icon name="Sparkles" size={18} strokeWidth={2.4} /></span>
+            <i class="mt-2 block h-1.5 w-16 rounded-full bg-border-soft"></i>
+            <i class="mt-2 block h-1.5 w-12 rounded-full bg-border-soft"></i>
+            <i class="mt-2 block h-1.5 w-[54px] rounded-full bg-[color-mix(in_srgb,var(--blue)_18%,transparent)]"></i>
           </div>
-          <div class="decor-pencil">
-            <span></span>
+          <div class="absolute bottom-1 left-[94px] h-[15px] w-[132px] -rotate-[7deg] rounded-full border border-[color-mix(in_srgb,var(--line-blue)_70%,transparent)] bg-[linear-gradient(90deg,#d9e8ff_0_14px,#f8fbff_14px_22px,#c7dcff_22px_100%),var(--blue-soft)] shadow-soft-lift before:absolute before:top-1/2 before:left-[-16px] before:h-0 before:w-0 before:-translate-y-1/2 before:border-y-8 before:border-y-transparent before:border-r-[19px] before:border-r-[#b8cff8] before:content-[''] after:absolute after:top-1/2 after:left-[-20px] after:h-[5px] after:w-1.5 after:-translate-y-1/2 after:rounded-l-full after:bg-[#6f94d8] after:content-['']">
+            <span class="absolute top-0.5 right-3 h-[11px] w-0.5 bg-[rgba(23,35,59,0.22)] shadow-[7px_0_0_rgba(23,35,59,0.16),-92px_0_0_rgba(47,111,228,0.18),-84px_0_0_rgba(47,111,228,0.12)]"></span>
           </div>
         </div>
-        <div class="update-track" aria-label="近期更新">
+        <div class="relative z-10 col-span-full grid grid-cols-1 gap-4 min-sm:grid-cols-3 max-lg:mt-6" aria-label="近期更新">
           {nowItems.map((item, index) => (
-            <span style={`--i:${index + 1}`}>
-              <b>5.{12 - index}</b>
+            <span class="relative animate-track-in border-t-2 border-blue pt-2.5 text-sm font-extrabold text-muted [animation-delay:calc(var(--i)*80ms)]" style={`--i:${index + 1}`}>
+              <b class="block text-ink">5.{12 - index}</b>
               {item}
             </span>
           ))}
@@ -111,8 +111,8 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
       </div>
     </section>
 
-    <section class="home-layout">
-      <main class="main-feed">
+    <section class="grid grid-cols-1 items-start gap-7 min-lg:grid-cols-[minmax(0,1fr)_292px]">
+      <main class="grid min-w-0 gap-10">
         <section>
           <div class="section-header">
             <div>
@@ -121,7 +121,7 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
             </div>
             <a class="plain-link" href="/blog">查看全部 <Icon name="ArrowRight" size={16} /></a>
           </div>
-          <div class="post-list">
+          <div class="grid">
             {posts.map((post, index) => (
               <ArticleCard
                 href={`/blog/${post.id}`}
@@ -137,7 +137,7 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
           </div>
         </section>
 
-        <section class="project-now-section">
+        <section>
           <div class="section-header">
             <div>
               <p class="eyebrow">Projects</p>
@@ -145,80 +145,80 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
             </div>
             <a class="plain-link" href="/projects">全部项目 <Icon name="ArrowRight" size={16} /></a>
           </div>
-          <div class="project-list">
+          <div class="grid">
             {featuredProjects.map((project) => <ProjectCard project={project} />)}
           </div>
         </section>
       </main>
 
-      <aside class="home-rail">
-        <section class="rail-block memo yellow">
-          <h2>今日一句</h2>
-          <p data-daily-quote>{todayQuote}</p>
+      <aside class="grid gap-5">
+        <section class="rounded-md border border-border-strong bg-note-bg p-4 -rotate-[1.1deg]">
+          <h2 class="m-0 text-base">今日一句</h2>
+          <p class="mt-2 mb-0 font-note text-base text-ink-2" data-daily-quote>{todayQuote}</p>
         </section>
 
-        <section class="rail-block">
-          <div class="rail-heading">
-            <h2>最近碎念</h2>
-            <a href="/notes">全部</a>
+        <section class="border-b border-border-soft py-4">
+          <div class="mb-2 flex items-center justify-between gap-3">
+            <h2 class="m-0 text-base">最近碎念</h2>
+            <a class="text-xs font-black text-blue" href="/notes">全部</a>
           </div>
-          <div class="note-links">
+          <div class="grid">
             {notes.map((note) => (
-              <a href="/notes">
-                <time datetime={note.data.pubDate.toISOString()}>{formatNoteTime(note.data.pubDate)}</time>
+              <a class="grid grid-cols-[86px_1fr] gap-2.5 border-b border-dashed border-border py-2 text-sm font-extrabold text-ink" href="/notes">
+                <time class="text-xs text-orange" datetime={note.data.pubDate.toISOString()}>{formatNoteTime(note.data.pubDate)}</time>
                 <span>{note.data.title}</span>
               </a>
             ))}
           </div>
         </section>
 
-        <section class="rail-block">
-          <div class="rail-heading">
-            <h2>常用工具</h2>
-            <a href="/tools#tool-index">更多</a>
+        <section class="border-b border-border-soft py-4">
+          <div class="mb-2 flex items-center justify-between gap-3">
+            <h2 class="m-0 text-base">常用工具</h2>
+            <a class="text-xs font-black text-blue" href="/tools#tool-index">更多</a>
           </div>
-          <div class="rail-list">
+          <div class="grid">
             {featuredTools.slice(0, 3).map((tool) => (
               <ToolFavoriteCard title={tool.name} description={tool.description} href={tool.href} icon={tool.icon} label={tool.category} />
             ))}
           </div>
         </section>
 
-        <section class="learning-card" aria-label="现在在学">
-          <Icon class="paperclip" name="Paperclip" size={42} strokeWidth={2.1} />
-          <div class="learning-head">
-            <h3>现在在学 / Now</h3>
+        <section class="relative overflow-hidden rounded-lg border border-border bg-surface px-4 pb-4 pt-5 shadow-soft-card transition-[box-shadow,transform,border-color] duration-200 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(var(--page-grid-x)_1px,transparent_1px),linear-gradient(90deg,var(--page-grid-y)_1px,transparent_1px)] before:bg-[length:28px_28px] before:opacity-[0.52] before:content-[''] hover:border-line-blue hover:shadow-pop-card" aria-label="现在在学">
+          <Icon class="absolute top-2 right-3 z-10 rotate-[-10deg] text-line-blue" name="Paperclip" size={42} strokeWidth={2.1} />
+          <div class="relative z-10 mb-3 border-b border-border-soft pr-11 pb-3">
+            <h3 class="m-0 text-base font-black tracking-normal text-ink">现在在学 / Now</h3>
           </div>
-          <div class="learning-list">
+          <div class="relative z-10 grid">
             {learningItems.map((item) => (
-              <div class="learning-item">
-                <span class:list={["check-box", { done: item.checked }]} aria-hidden="true">
+              <div class="grid grid-cols-[24px_minmax(0,1fr)_42px] items-center gap-x-2 gap-y-2 border-b border-border-soft py-3 max-sm:grid-cols-[24px_minmax(0,1fr)_54px] max-sm:gap-2">
+                <span class:list={[ "grid", "size-5", "place-items-center", "rounded-md", "border-2", "text-blue", item.checked ? "border-line-blue bg-blue-soft" : "border-border bg-surface-strong"]} aria-hidden="true">
                   {item.checked && <Icon name="Check" size={14} strokeWidth={3} />}
                 </span>
-                <strong>{item.name}</strong>
-                <span class="learning-state">{item.status}</span>
-                <div class="learning-progress" aria-label={`${item.name} 进度 ${item.progress}%`}>
-                  <i style={`width:${item.progress}%`}></i>
+                <strong class="text-sm font-black text-ink">{item.name}</strong>
+                <span class="col-start-3 row-start-1 justify-self-end text-xs font-black text-blue max-sm:col-start-2">{item.status}</span>
+                <div class="col-start-2 col-end-3 row-start-2 h-1 overflow-hidden rounded-full bg-border-soft max-sm:col-start-2 max-sm:col-end-3" aria-label={`${item.name} 进度 ${item.progress}%`}>
+                  <i class="block h-full rounded-[inherit] bg-blue" style={`width:${item.progress}%`}></i>
                 </div>
-                <em>{item.progress}%</em>
+                <em class="col-start-3 row-start-2 justify-self-end text-xs not-italic font-black text-ink-2 max-sm:col-start-3 max-sm:row-start-2">{item.progress}%</em>
               </div>
             ))}
           </div>
-          <div class="learning-goal">
-            <b>本周目标</b>
-            <span>{weeklyGoal}</span>
+          <div class="relative z-10 mt-4 grid gap-1.5 rounded-lg border border-border-soft bg-surface-soft p-3.5">
+            <b class="text-sm text-ink">本周目标</b>
+            <span class="text-sm font-extrabold leading-relaxed text-ink-2">{weeklyGoal}</span>
           </div>
         </section>
       </aside>
     </section>
 
-    <section class="resource-strip">
+    <section class="border-t border-border-soft pt-5.5">
       <div>
-        <div class="section-header compact">
+        <div class="section-header compact mb-1">
           <h2 class="section-title">常去的地方</h2>
           <a class="plain-link" href="/favorites">全部收藏 <Icon name="ArrowRight" size={16} /></a>
         </div>
-        <div class="resource-list">
+        <div class="grid grid-cols-1 gap-x-6 min-sm:grid-cols-2">
           {featuredFavorites.map((favorite) => (
             <ToolFavoriteCard title={favorite.title} description={favorite.description} href={favorite.url} icon={favorite.icon} label={favorite.category} />
           ))}
@@ -294,901 +294,3 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
     </script>
   </div>
 </BaseLayout>
-
-<style>
-  .home {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: 42px;
-  }
-
-  .home-hero {
-    display: grid;
-    overflow: visible;
-    grid-template-columns: 236px minmax(0, 1fr);
-    gap: 26px;
-    align-items: stretch;
-  }
-
-  .profile-panel {
-    position: relative;
-    overflow: visible;
-    align-self: start;
-    padding: 22px 18px 18px;
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    background: var(--surface);
-    box-shadow: 0 10px 22px var(--shadow-soft);
-    transition: box-shadow 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
-  }
-
-  .profile-panel:hover {
-    border-color: var(--line-blue);
-    box-shadow: 0 16px 34px var(--shadow-pop);
-  }
-
-  .blue-tape {
-    position: absolute;
-    top: -12px;
-    left: 22px;
-    z-index: 2;
-    width: 62px;
-    height: 20px;
-    background: var(--tape-blue-bg);
-    transform: rotate(-9deg);
-  }
-
-  .profile-panel img {
-    width: 112px;
-    height: 112px;
-    display: block;
-    margin: 0 auto 12px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .profile-panel :global(.media-shell) {
-    width: 112px;
-    height: 112px;
-    margin: 0 auto 12px;
-    border-radius: 50%;
-  }
-
-  .profile-panel h2 {
-    margin: 0;
-    text-align: center;
-    font-family: var(--font-hand);
-    font-size: 2.05rem;
-    line-height: 1;
-    letter-spacing: 0;
-  }
-
-  .profile-panel p {
-    margin: 10px 0 14px;
-    color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.7;
-  }
-
-  .profile-links {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 7px;
-  }
-
-  .profile-links a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 6px 4px;
-    color: var(--ink);
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
-
-  dl {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin: 16px 0 0;
-  }
-
-  dt,
-  dd {
-    margin: 0;
-    text-align: center;
-  }
-
-  dt {
-    color: var(--muted);
-    font-size: 0.72rem;
-    font-weight: 800;
-  }
-
-  dd {
-    color: var(--blue);
-    font-size: 1.1rem;
-    font-weight: 900;
-  }
-
-  .hero-board {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 270px;
-    grid-template-rows: 1fr auto;
-    gap: 24px 28px;
-    overflow: visible;
-    min-height: 330px;
-    padding: 34px 34px 24px;
-    border: 1px solid var(--border-strong);
-    border-radius: 8px;
-    background:
-      linear-gradient(var(--page-grid-x) 1px, transparent 1px),
-      linear-gradient(90deg, var(--page-grid-y) 1px, transparent 1px),
-      var(--surface);
-    background-size: 30px 30px, 30px 30px, auto;
-    box-shadow: 0 10px 26px var(--shadow-soft);
-    transition: box-shadow 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
-  }
-
-  .hero-board:hover {
-    border-color: var(--line-blue);
-    box-shadow: 0 18px 42px var(--shadow-pop);
-  }
-
-  .hero-board::before {
-    position: absolute;
-    right: 26px;
-    top: -14px;
-    z-index: 2;
-    width: 96px;
-    height: 28px;
-    border: 1px solid var(--border);
-    background:
-      repeating-linear-gradient(
-        -45deg,
-        transparent 0 7px,
-        rgba(37, 99, 235, 0.12) 7px 9px
-      ),
-      var(--tape-blue-bg);
-    content: "";
-    transform: rotate(3deg);
-  }
-
-  .hero-copy {
-    position: relative;
-    z-index: 1;
-    max-width: 540px;
-  }
-
-  h1 {
-    position: relative;
-    display: grid;
-    gap: 6px;
-    margin: 12px 0 12px;
-    font-size: clamp(2.2rem, 3vw, 3.35rem);
-    line-height: 1.08;
-    letter-spacing: 0;
-  }
-
-  [data-typewriter-part] {
-    min-height: 1.2em;
-  }
-
-  [data-typewriter-part].is-active::after,
-  [data-typewriter-part].is-final::after {
-    display: inline-block;
-    width: 10px;
-    height: 1em;
-    margin-left: 3px;
-    background: var(--orange);
-    content: "";
-    opacity: 1;
-    border-radius: 2px;
-    transition:
-      opacity 260ms ease-out,
-      transform 260ms ease-out,
-      background-color 260ms ease-out;
-    transform: translateY(0);
-    vertical-align: -0.1em;
-    animation: type-caret 1000ms ease-in-out infinite;
-  }
-
-  @keyframes type-caret {
-    0% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    45% {
-      opacity: 1;
-    }
-    72% {
-      opacity: 0.18;
-      transform: translateY(1px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .hero-name {
-    color: var(--blue);
-    font-family: var(--font-hand);
-    font-size: 0.92em;
-    font-weight: 400;
-    line-height: 1.1;
-  }
-
-  #big-title {
-    margin-right: 5px;
-    font-size: 1.48em;
-    font-weight: 400;
-  }
-
-  h1 > span:not(.hero-name) {
-    font-size: 0.68em;
-    font-weight: 900;
-  }
-
-  .lead {
-    max-width: 620px;
-    margin: 0;
-    color: var(--muted);
-    font-size: 1rem;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .button {
-    padding: 0 15px;
-  }
-
-  .button.secondary {
-    border-color: var(--tag-border);
-    background: var(--blue-soft);
-    color: var(--blue);
-  }
-
-  .button.secondary:hover {
-    border-color: var(--blue);
-    background: #d4e4ff;
-    color: var(--blue);
-  }
-
-  .quote-note {
-    position: relative;
-    z-index: 1;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-    width: 100%;
-    padding: 18px 20px;
-    border: 1px solid var(--border-strong);
-    background: var(--surface-strong);
-    box-shadow: 0 14px 28px var(--shadow-pop);
-    transform: rotate(2.2deg);
-  }
-
-  .quote-note::before {
-    position: absolute;
-    top: -10px;
-    left: 26px;
-    width: 64px;
-    height: 18px;
-    background: var(--tape-bg);
-    box-shadow: 0 1px 0 var(--tape-shadow) inset;
-    content: "";
-    transform: rotate(-6deg);
-  }
-
-  .quote-note span {
-    display: block;
-    color: var(--orange);
-    font-family: var(--font-hand);
-    font-size: 1.35rem;
-    font-weight: 900;
-  }
-
-  .quote-note p {
-    margin: 6px 0 0;
-    color: var(--ink-2);
-    font-family: var(--font-note);
-    font-size: 1.05rem;
-  }
-
-  .hero-decor-cluster {
-    position: relative;
-    z-index: 1;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-    justify-self: center;
-    width: 100%;
-    height: 138px;
-    margin: 4px 0 16px;
-  }
-
-  .decor-tape {
-    position: absolute;
-    top: 12px;
-    left: 42px;
-    z-index: 4;
-    width: 76px;
-    height: 16px;
-    background: var(--tape-blue-bg);
-    box-shadow: 0 1px 0 var(--tape-shadow) inset;
-    opacity: 0.92;
-    transform: rotate(-5deg);
-  }
-
-  .decor-terminal,
-  .decor-card,
-  .decor-pencil {
-    position: absolute;
-    border: 1px solid var(--border-strong);
-    background: var(--surface-strong);
-    box-shadow: 0 14px 28px var(--shadow-soft);
-  }
-
-  .decor-terminal {
-    left: 2px;
-    top: 22px;
-    width: 156px;
-    height: 96px;
-    border-radius: 8px;
-    padding: 15px 14px;
-    transform: rotate(-2deg);
-  }
-
-  .decor-terminal::before {
-    position: absolute;
-    top: 10px;
-    left: 13px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--orange);
-    box-shadow:
-      14px 0 0 var(--yellow),
-      28px 0 0 var(--mint);
-    content: "";
-  }
-
-  .decor-terminal i,
-  .decor-terminal b,
-  .decor-card i {
-    display: block;
-    border-radius: 999px;
-  }
-
-  .decor-terminal i {
-    height: 7px;
-    margin-top: 10px;
-    background: color-mix(in srgb, var(--blue) 20%, transparent);
-  }
-
-  .decor-terminal i:nth-of-type(1) {
-    width: 76%;
-  }
-
-  .decor-terminal i:nth-of-type(2) {
-    width: 56%;
-  }
-
-  .decor-terminal i:nth-of-type(3) {
-    width: 68%;
-  }
-
-  .decor-terminal b {
-    position: absolute;
-    bottom: 12px;
-    width: 8px;
-    height: 8px;
-    background: var(--blue);
-    opacity: 0.75;
-  }
-
-  .decor-terminal b:nth-of-type(1) {
-    left: 18px;
-  }
-
-  .decor-terminal b:nth-of-type(2) {
-    left: 34px;
-    opacity: 0.45;
-  }
-
-  .decor-terminal b:nth-of-type(3) {
-    left: 50px;
-    opacity: 0.28;
-  }
-
-  .decor-card {
-    right: 0;
-    top: 34px;
-    width: 128px;
-    height: 86px;
-    overflow: hidden;
-    border-radius: 8px;
-    padding: 13px 12px;
-    transform: rotate(5deg);
-  }
-
-  .decor-card span {
-    display: grid;
-    width: 32px;
-    height: 32px;
-    place-items: center;
-    border: 1px solid var(--tag-border);
-    border-radius: 8px;
-    background: var(--blue-soft);
-    color: var(--blue);
-  }
-
-  .decor-card i {
-    height: 6px;
-    margin-top: 8px;
-    background: var(--border-soft);
-  }
-
-  .decor-card i:nth-of-type(1) {
-    width: 64px;
-  }
-
-  .decor-card i:nth-of-type(2) {
-    width: 48px;
-  }
-
-  .decor-card i:nth-of-type(3) {
-    width: 54px;
-    background: color-mix(in srgb, var(--blue) 18%, transparent);
-  }
-
-  .decor-pencil {
-    left: 94px;
-    bottom: 4px;
-    width: 132px;
-    height: 15px;
-    border-color: color-mix(in srgb, var(--line-blue) 70%, transparent);
-    border-radius: 999px;
-    background:
-      linear-gradient(
-        90deg,
-        #d9e8ff 0 14px,
-        #f8fbff 14px 22px,
-        #c7dcff 22px 100%
-      ),
-      var(--blue-soft);
-    transform: rotate(-7deg);
-  }
-
-  .decor-pencil::before {
-    position: absolute;
-    left: -16px;
-    top: 50%;
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-right: 19px solid #b8cff8;
-    border-bottom: 8px solid transparent;
-    content: "";
-    transform: translateY(-50%);
-  }
-
-  .decor-pencil::after {
-    position: absolute;
-    left: -20px;
-    top: 50%;
-    width: 6px;
-    height: 5px;
-    border-radius: 999px 0 0 999px;
-    background: #6f94d8;
-    content: "";
-    transform: translateY(-50%);
-  }
-
-  .decor-pencil span {
-    position: absolute;
-    right: 12px;
-    top: 2px;
-    width: 2px;
-    height: 11px;
-    background: rgba(23, 35, 59, 0.22);
-    box-shadow:
-      7px 0 0 rgba(23, 35, 59, 0.16),
-      -92px 0 0 rgba(47, 111, 228, 0.18),
-      -84px 0 0 rgba(47, 111, 228, 0.12);
-  }
-
-  .update-track {
-    position: relative;
-    z-index: 1;
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-  }
-
-  .update-track span {
-    position: relative;
-    border-top: 2px solid var(--blue);
-    padding-top: 9px;
-    color: var(--muted);
-    font-size: 0.82rem;
-    font-weight: 800;
-    animation: track-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-    animation-delay: calc(var(--i) * 80ms);
-  }
-
-  .update-track b {
-    display: block;
-    color: var(--ink);
-  }
-
-  @keyframes track-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .home-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 292px;
-    gap: 28px;
-    align-items: start;
-  }
-
-  .main-feed {
-    display: grid;
-    gap: 40px;
-    min-width: 0;
-  }
-
-  .post-list,
-  .project-list {
-    display: grid;
-  }
-
-  .learning-card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    padding: 20px 18px 18px;
-    box-shadow: 0 10px 22px var(--shadow-soft);
-    transition: box-shadow 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
-  }
-
-  .learning-card:hover {
-    border-color: var(--line-blue);
-    box-shadow: 0 16px 34px var(--shadow-pop);
-  }
-
-  .learning-card::before {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(var(--page-grid-x) 1px, transparent 1px),
-      linear-gradient(90deg, var(--page-grid-y) 1px, transparent 1px);
-    background-size: 28px 28px;
-    content: "";
-    opacity: 0.52;
-  }
-
-  .learning-card > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .paperclip {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    z-index: 1;
-    color: var(--line-blue);
-    transform: rotate(-10deg);
-  }
-
-  .learning-head {
-    margin-bottom: 12px;
-    border-bottom: 1px solid var(--border-soft);
-    padding: 0 44px 12px 0;
-  }
-
-  .learning-head h3 {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.08rem;
-    font-weight: 900;
-    letter-spacing: 0;
-  }
-
-  .learning-list {
-    display: grid;
-  }
-
-  .learning-item {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) 42px;
-    gap: 7px 8px;
-    align-items: center;
-    border-bottom: 1px solid var(--border-soft);
-    padding: 12px 0;
-  }
-
-  .check-box {
-    display: grid;
-    width: 20px;
-    height: 20px;
-    place-items: center;
-    border: 2px solid var(--border);
-    border-radius: 5px;
-    color: var(--blue);
-    background: var(--surface-strong);
-  }
-
-  .check-box.done {
-    border-color: var(--line-blue);
-    background: var(--blue-soft);
-  }
-
-  .learning-item strong {
-    color: var(--ink);
-    font-size: 0.88rem;
-    font-weight: 900;
-  }
-
-  .learning-state,
-  .learning-item em {
-    color: var(--blue);
-    font-size: 0.76rem;
-    font-style: normal;
-    font-weight: 900;
-  }
-
-  .learning-state {
-    grid-column: 3;
-    grid-row: 1;
-    justify-self: end;
-  }
-
-  .learning-item em {
-    grid-column: 3;
-    grid-row: 2;
-    justify-self: end;
-    color: var(--ink-2);
-  }
-
-  .learning-progress {
-    grid-column: 2 / 3;
-    grid-row: 2;
-    height: 4px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--border-soft);
-  }
-
-  .learning-progress i {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--blue);
-  }
-
-  .learning-goal {
-    display: grid;
-    gap: 6px;
-    margin-top: 16px;
-    border: 1px solid var(--border-soft);
-    border-radius: 8px;
-    background: var(--surface-soft);
-    padding: 14px;
-  }
-
-  .learning-goal b {
-    color: var(--ink);
-    font-size: 0.9rem;
-  }
-
-  .learning-goal span {
-    color: var(--ink-2);
-    font-size: 0.86rem;
-    font-weight: 800;
-    line-height: 1.7;
-  }
-
-  .home-rail {
-    display: grid;
-    gap: 20px;
-  }
-
-  .rail-block {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .memo {
-    padding: 18px;
-    border: 1px solid var(--border-strong);
-    border-radius: 6px;
-  }
-
-  .memo.yellow {
-    background: var(--note-bg);
-    transform: rotate(-1.1deg);
-  }
-
-  .rail-block h2 {
-    margin: 0;
-    font-size: 1rem;
-  }
-
-  .rail-block p {
-    margin: 8px 0 0;
-    color: var(--ink-2);
-    font-family: var(--font-note);
-    font-size: 1.05rem;
-  }
-
-  .rail-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-
-  .rail-heading a {
-    color: var(--blue);
-    font-size: 0.78rem;
-    font-weight: 900;
-  }
-
-  .note-links {
-    display: grid;
-  }
-
-  .note-links a {
-    display: grid;
-    grid-template-columns: 86px 1fr;
-    gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--border);
-    color: var(--ink);
-    font-size: 0.86rem;
-    font-weight: 800;
-  }
-
-  .note-links time {
-    color: var(--orange);
-    font-size: 0.78rem;
-  }
-
-  .rail-list {
-    display: grid;
-  }
-
-  .resource-strip {
-    border-top: 1px solid var(--border-soft);
-    padding-top: 22px;
-  }
-
-  .section-header.compact {
-    margin-bottom: 4px;
-  }
-
-  .resource-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 22px;
-  }
-
-  @media (max-width: 980px) {
-    .home-hero,
-    .home-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-board {
-      grid-template-columns: 1fr;
-    }
-
-    .profile-panel {
-      display: grid;
-      grid-template-columns: 112px minmax(0, 1fr);
-      gap: 0 16px;
-      align-items: center;
-    }
-
-    .profile-panel img {
-      grid-row: span 3;
-      margin: 0;
-    }
-
-    .profile-panel :global(.media-shell) {
-      grid-row: span 3;
-      margin: 0;
-    }
-
-    .profile-links,
-    dl {
-      grid-column: 1 / -1;
-    }
-
-    .quote-note {
-      width: min(100%, 330px);
-      margin-top: 22px;
-    }
-
-    .hero-decor-cluster {
-      display: none;
-    }
-
-    .update-track {
-      margin-top: 24px;
-    }
-
-  }
-
-  @media (max-width: 640px) {
-    .hero-board {
-      padding: 30px 20px 22px;
-    }
-
-    h1 {
-      font-size: 2.35rem;
-    }
-
-    .profile-panel {
-      grid-template-columns: 1fr;
-      text-align: center;
-    }
-
-    .profile-panel img {
-      margin: 0 auto 12px;
-    }
-
-    .profile-panel :global(.media-shell) {
-      margin: 0 auto 12px;
-    }
-
-    .update-track,
-    .resource-list {
-      grid-template-columns: 1fr;
-    }
-
-    .learning-item {
-      grid-template-columns: 24px minmax(0, 1fr) 54px;
-      gap: 7px;
-    }
-
-    .learning-state {
-      grid-column: 2;
-    }
-
-    .learning-progress {
-      grid-column: 2 / 3;
-    }
-
-    .learning-item em {
-      grid-column: 3;
-      grid-row: 2;
-    }
-  }
-
-</style>

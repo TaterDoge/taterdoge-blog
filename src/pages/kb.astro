@@ -23,7 +23,7 @@ if (!canViewPrivate) {
 >
   {
     canViewPrivate ? (
-      <div class="page-shell page">
+      <div class="page-shell grid gap-6">
         <section class="page-intro">
           <div>
             <p class="eyebrow">Private KB</p>
@@ -33,84 +33,34 @@ if (!canViewPrivate) {
           <aside class="intro-note">私有内容，需要时再开</aside>
         </section>
 
-        <section class="kb-panel">
+        <section class="relative mt-2 border-b border-border-soft py-7">
           <span class="tape" aria-hidden="true"></span>
           <Icon name="BrainCircuit" size={32} />
-          <h2>知识库问答预留</h2>
-          <p>后续这里会接入 <code>/api/kb/ask</code>，由服务端转发到第三方知识库 API，再展示回答和引用来源</p>
-          <form>
-            <label for="question">问题</label>
-            <textarea id="question" placeholder="例如：我之前写过哪些关于 Astro 的内容？"></textarea>
-            <button type="button">API 接入后启用</button>
+          <h2 class="my-3">知识库问答预留</h2>
+          <p class="max-w-content text-muted">
+            后续这里会接入 <code class="rounded-md bg-code-inline-bg px-1.5 py-0.5 text-code-inline-text">/api/kb/ask</code>
+            ，由服务端转发到第三方知识库 API，再展示回答和引用来源
+          </p>
+          <form class="mt-5 grid max-w-content gap-2.5">
+            <label class="font-black" for="question">问题</label>
+            <textarea
+              id="question"
+              class="min-h-44 resize-y rounded-md border border-border bg-surface p-3.5 text-ink"
+              placeholder="例如：我之前写过哪些关于 Astro 的内容？"
+            ></textarea>
+            <button
+              type="button"
+              class="justify-self-start rounded-md border border-tag-border bg-orange-soft px-3.5 py-2.5 font-black text-orange"
+            >
+              API 接入后启用
+            </button>
           </form>
         </section>
       </div>
     ) : (
-      <div class="page-shell page">
+      <div class="page-shell grid gap-6">
         <PrivateNotFound />
       </div>
     )
   }
 </BaseLayout>
-
-<style>
-  .page {
-    display: grid;
-    gap: 24px;
-  }
-
-  .kb-panel {
-    position: relative;
-    margin-top: 8px;
-    padding: 28px 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .kb-panel p {
-    max-width: 760px;
-    color: var(--muted);
-  }
-
-  h2 {
-    margin: 12px 0 8px;
-  }
-
-  code {
-    border-radius: 6px;
-    background: var(--code-inline-bg);
-    padding: 2px 6px;
-    color: var(--code-inline-text);
-  }
-
-  form {
-    display: grid;
-    gap: 10px;
-    max-width: 760px;
-    margin-top: 20px;
-  }
-
-  label {
-    font-weight: 900;
-  }
-
-  textarea {
-    min-height: 170px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface);
-    padding: 14px;
-    color: var(--ink);
-    resize: vertical;
-  }
-
-  button {
-    justify-self: start;
-    border: 1px solid var(--tag-border);
-    border-radius: 6px;
-    background: var(--orange-soft);
-    padding: 9px 14px;
-    color: var(--orange);
-    font-weight: 900;
-  }
-
-</style>

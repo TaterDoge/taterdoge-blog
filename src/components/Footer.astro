@@ -60,29 +60,30 @@ const stats = [
 ];
 ---
 
-<footer id="site-footer" class="site-footer" data-site-footer>
-  <section class="page-shell footer-beliefs" aria-label="站点理念与订阅">
-    <div class="belief-grid">
+<footer id="site-footer" class="site-footer relative z-10 overflow-hidden bg-transparent pt-1 text-ink" data-site-footer>
+  <section class="page-shell relative -translate-y-0.5" aria-label="站点理念与订阅">
+    <div class="belief-grid relative grid grid-cols-4 overflow-hidden rounded-lg border border-border-soft bg-surface-strong shadow-[0_24px_70px_rgba(36,57,95,0.1)]">
       {beliefItems.map((item) => (
-        <article class={`belief-item belief-${item.accent}`}>
-          <div class="belief-icon" aria-hidden="true">
+        <article class={`belief-item belief-${item.accent} relative grid min-h-[196px] min-w-0 justify-items-center gap-3 px-[clamp(18px,3vw,34px)] py-[clamp(22px,3.2vw,40px)] text-center`}>
+          <div class="relative grid h-[50px] w-[74px] place-items-center" aria-hidden="true">
             <Icon name={item.icon} size={38} strokeWidth={1.8} />
-            <span></span>
-            <span></span>
+            <span class="absolute bottom-3 left-1 size-2 rounded-full bg-current opacity-30"></span>
+            <span class="absolute top-2.5 right-1 size-2 rounded-full bg-current opacity-30"></span>
           </div>
-          <h2>{item.title}</h2>
-          <p>{item.description}</p>
-          <i aria-hidden="true"></i>
+          <h2 class="m-0 text-base font-black leading-snug tracking-normal text-ink">{item.title}</h2>
+          <p class="m-0 text-sm leading-loose text-muted">{item.description}</p>
+          <i class="h-0.5 w-7 rounded-full bg-current" aria-hidden="true"></i>
         </article>
       ))}
 
-      <article class="subscribe-panel">
-        <h2>订阅更新</h2>
-        <p>输入邮箱，获取最新文章、项目和思考的更新通知。</p>
-        <form class="subscribe-form" data-footer-subscribe novalidate>
+      <article class="subscribe-panel relative grid min-w-0 content-center gap-3.5 border-l border-border-soft px-[clamp(18px,3vw,34px)] py-[clamp(22px,3.2vw,40px)]">
+        <h2 class="m-0 text-base font-black leading-snug tracking-normal text-ink">订阅更新</h2>
+        <p class="m-0 text-sm leading-loose text-muted">输入邮箱，获取最新文章、项目和思考的更新通知。</p>
+        <form class="subscribe-form grid grid-cols-[minmax(0,1fr)_48px] gap-2" data-footer-subscribe novalidate>
           <label class="sr-only" for="footer-email">订阅邮箱</label>
           <input
             id="footer-email"
+            class="h-11 min-w-0 rounded-lg border border-border bg-surface-strong px-3.5 font-bold text-ink outline-0 transition-[border-color,box-shadow] duration-fast focus:border-blue focus:shadow-[0_0_0_4px_var(--focus-ring)] placeholder:text-sm"
             name="email"
             type="email"
             autocomplete="email"
@@ -90,20 +91,25 @@ const stats = [
             placeholder="your@email.com"
             required
           />
-          <button type="submit" aria-label="订阅更新">
+          <button
+            class="grid h-11 w-12 place-items-center rounded-lg border border-[#235fe2] bg-[#2f6fe4] text-white shadow-[0_10px_18px_rgba(47,111,228,0.22)] transition-[filter,box-shadow] duration-fast hover:border-[#174fcb] hover:bg-[#174fcb] hover:brightness-105 hover:shadow-[0_0_0_4px_rgba(47,111,228,0.16),0_12px_22px_rgba(47,111,228,0.28)]"
+            type="submit"
+            aria-label="订阅更新"
+          >
             <Icon name="ArrowRight" size={22} strokeWidth={2.4} />
           </button>
         </form>
-        <p class="subscribe-message" data-subscribe-message aria-live="polite"></p>
+        <p class="subscribe-message min-h-[1.35em] text-xs font-extrabold" data-subscribe-message aria-live="polite"></p>
       </article>
     </div>
   </section>
 
-  <section class="footer-main">
-    <div class="page-shell footer-main-grid">
-      <article class="footer-brand-card">
-        <div class="brand-row">
+  <section class="footer-main mt-8 border-y border-border-soft">
+    <div class="page-shell footer-main-grid grid min-h-[248px] grid-cols-[1.18fr_1.16fr_1fr_1.1fr] items-center gap-[clamp(26px,4vw,56px)] py-10">
+      <article class="min-w-0">
+        <div class="brand-row flex items-center gap-4">
           <img
+            class="size-[76px] shrink-0 rounded-full border border-border object-cover shadow-soft-lift"
             src={siteConfig.avatar}
             alt={`${siteConfig.name} 头像`}
             width="96"
@@ -112,28 +118,38 @@ const stats = [
             decoding="async"
             data-no-media-shell="true"
           />
-          <a class="brand-name" href="/" aria-label={`${siteConfig.name} 首页`}>
+          <a class="inline-flex items-center gap-3 text-blue" href="/" aria-label={`${siteConfig.name} 首页`}>
             <Icon name="Code2" size={34} strokeWidth={2.5} />
-            <strong>{siteConfig.name}</strong>
+            <strong class="font-hand text-2xl font-bold leading-none text-ink">{siteConfig.name}</strong>
           </a>
         </div>
-        <p>{siteConfig.description}。希望这些内容能为你带来一些启发。</p>
-        <nav class="social-links" aria-label="社交链接">
+        <p class="my-4 mb-5 text-sm leading-loose text-muted">{siteConfig.description}。希望这些内容能为你带来一些启发。</p>
+        <nav class="flex flex-wrap gap-2.5" aria-label="社交链接">
           {siteConfig.socials.map((item) => (
-            <a href={item.href} title={item.name} aria-label={item.name}>
+            <a
+              class="grid size-9 place-items-center rounded-lg border border-border bg-surface-strong text-ink-2 shadow-soft-card transition-[border-color,color,background,transform] duration-fast hover:-translate-y-px hover:border-blue hover:bg-blue-soft hover:text-blue"
+              href={item.href}
+              title={item.name}
+              aria-label={item.name}
+            >
               <Icon name={item.icon} size={18} strokeWidth={2.2} />
             </a>
           ))}
         </nav>
       </article>
 
-      <article class="latest-panel">
-        <h2><span></span>最近更新</h2>
-        <ol>
+      <article class="min-w-0">
+        <h2 class="mb-5 inline-flex items-center gap-3 m-0 text-base font-black leading-snug tracking-normal text-ink">
+          <span class="size-2.5 rounded-full border-[3px] border-blue bg-surface-strong shadow-[0_0_0_4px_color-mix(in_srgb,var(--blue)_12%,transparent)]"></span>
+          最近更新
+        </h2>
+        <ol class="m-0 grid list-none gap-0 p-0">
           {latestPosts.map((post) => (
-            <li>
-              <a href={`/blog/${post.id}`}>{post.data.title}</a>
-              <time datetime={(post.data.updatedDate ?? post.data.pubDate).toISOString()}>
+            <li class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3.5 border-b border-border-soft py-2 text-sm text-ink-2">
+              <a class="latest-link relative overflow-hidden pl-4 whitespace-nowrap text-ellipsis font-extrabold transition-colors duration-fast hover:text-blue" href={`/blog/${post.id}`}>
+                {post.data.title}
+              </a>
+              <time class="text-xs text-muted tabular-nums" datetime={(post.data.updatedDate ?? post.data.pubDate).toISOString()}>
                 {formatShortDate(post.data.updatedDate ?? post.data.pubDate)}
               </time>
             </li>
@@ -141,52 +157,70 @@ const stats = [
         </ol>
       </article>
 
-      <article class="stats-panel">
-        <h2><span></span>站点统计</h2>
-        <dl>
+      <article class="min-w-0">
+        <h2 class="mb-5 inline-flex items-center gap-3 m-0 text-base font-black leading-snug tracking-normal text-ink">
+          <span class="size-2.5 rounded-full border-[3px] border-[#2fbf7a] bg-surface-strong shadow-[0_0_0_4px_rgba(47,191,122,0.12)]"></span>
+          站点统计
+        </h2>
+        <dl class="stats-list m-0 grid grid-cols-2 gap-x-7 gap-y-6">
           {stats.map((item) => (
-            <div class={`stat-item stat-${item.accent}`}>
-              <dt>
-                <span aria-hidden="true"><Icon name={item.icon} size={24} strokeWidth={2.1} /></span>
-                <b>{item.label}</b>
+            <div class={`stat-${item.accent} grid grid-cols-[46px_minmax(0,1fr)] items-center gap-3`}>
+              <dt class="contents text-xs font-extrabold text-muted">
+                <span class="row-span-2 grid size-12 place-items-center rounded-full border border-current bg-[color-mix(in_srgb,currentColor_12%,var(--surface-strong))] shadow-[0_10px_20px_color-mix(in_srgb,currentColor_12%,transparent)]" aria-hidden="true">
+                  <Icon name={item.icon} size={24} strokeWidth={2.1} />
+                </span>
+                <b class="font-[inherit] whitespace-nowrap">{item.label}</b>
               </dt>
-              <dd>{item.value}</dd>
+              <dd class="m-0 text-xl font-black leading-none text-ink">{item.value}</dd>
             </div>
           ))}
         </dl>
       </article>
 
-      <div class="footer-illustration" aria-hidden="true">
-        <img src="/images/decorative_element/sprite3.png" alt="" loading="lazy" decoding="async" data-no-media-shell="true" />
-        <div class="footer-note">
-          <span></span>
-          <p>Stay curious.<br />Keep building.</p>
-          <Icon name="Code2" size={18} />
+      <div class="footer-illustration relative flex min-h-[170px] justify-center" aria-hidden="true">
+        <img
+          class="absolute bottom-2.5 left-[5%] w-[108px] drop-shadow-[0_16px_20px_var(--shadow-soft)]"
+          src="/images/decorative_element/sprite3.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          data-no-media-shell="true"
+        />
+        <div class="absolute right-[2%] bottom-4 min-h-[102px] w-[136px] rotate-[-5deg] border-2 border-[color-mix(in_srgb,var(--line-blue)_65%,transparent)] bg-surface-strong px-3.5 pt-6 pb-3 text-muted">
+          <span class="absolute -top-2.5 left-[34px] h-[15px] w-[62px] rotate-[-7deg] bg-[rgba(174,204,255,0.72)]"></span>
+          <p class="m-0 font-hand text-base leading-snug">Stay curious.<br />Keep building.</p>
+          <Icon class="absolute right-2.5 bottom-2 text-line-blue" name="Code2" size={18} />
         </div>
       </div>
     </div>
   </section>
 
-  <section class="footer-quote" aria-label="页脚引用">
-    <div class="page-shell">
-      <span aria-hidden="true"></span>
-      <p><Icon name="Quote" size={26} /> <em>Stay curious.</em> 保持好奇，才能走得更远。</p>
-      <span aria-hidden="true"></span>
+  <section class="footer-quote border-b border-border-soft" aria-label="页脚引用">
+    <div class="page-shell flex min-h-[100px] items-center justify-center gap-7">
+      <span class="size-1.5 rounded-full border-2 border-blue opacity-60" aria-hidden="true"></span>
+      <p class="m-0 inline-flex items-center gap-3 text-sm text-ink-2">
+        <Icon class="size-12 rounded-full border border-line-blue bg-surface-strong p-2.5 text-blue shadow-soft-card" name="Quote" size={26} />
+        <em class="font-hand text-lg not-italic text-ink-2">Stay curious.</em>
+        保持好奇，才能走得更远。
+      </p>
+      <span class="size-1.5 rounded-full border-2 border-blue opacity-60" aria-hidden="true"></span>
     </div>
   </section>
 
-  <section class="footer-bottom">
-    <div class="page-shell bottom-row">
-      <p>&copy; 2026 {siteConfig.name} <span>·</span> Built with Astro &amp; Tailwind CSS <span>·</span> &lt;3 from Chengdu, China</p>
-      <nav aria-label="页脚辅助链接">
-        <a class="online-status" href="/" aria-label="在线状态">
-          <span></span>
+  <section class="bg-[color-mix(in_srgb,var(--surface-strong)_78%,transparent)]">
+    <div class="page-shell bottom-row flex min-h-16 items-center justify-between gap-4 text-xs text-muted">
+      <p class="m-0 flex flex-wrap items-center gap-2.5">
+        &copy; 2026 {siteConfig.name} <span>·</span> Built with Astro &amp; Tailwind CSS <span>·</span> &lt;3 from Chengdu, China
+      </p>
+      <nav class="flex flex-wrap items-center gap-2.5" aria-label="页脚辅助链接">
+        <a class="inline-flex items-center gap-2 font-extrabold text-muted transition-colors duration-fast hover:text-blue" href="/" aria-label="在线状态">
+          <span class="online-dot size-2 rounded-full bg-[#25c983] shadow-[0_0_0_4px_rgba(37,201,131,0.15)]"></span>
           在线状态
         </a>
-        <i aria-hidden="true"></i>
-        <a href="/rss.xml">RSS</a>
-        <i aria-hidden="true"></i>
-        <a href="https://beian.miit.gov.cn/" rel="noreferrer">蜀ICP备2024001234号-1</a>
+        <i class="h-[18px] w-px bg-border" aria-hidden="true"></i>
+        <a class="font-extrabold text-muted transition-colors duration-fast hover:text-blue" href="/rss.xml">RSS</a>
+        <i class="h-[18px] w-px bg-border" aria-hidden="true"></i>
+        <a class="font-extrabold text-muted transition-colors duration-fast hover:text-blue" href="https://beian.miit.gov.cn/" rel="noreferrer">蜀ICP备2024001234号-1</a>
       </nav>
     </div>
   </section>
@@ -253,714 +287,3 @@ const stats = [
   document.addEventListener("astro:after-swap", initFooterSubscribe);
 </script>
 
-<style>
-  .site-footer {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    padding-top: 5px;
-    color: var(--ink);
-    background: transparent;
-  }
-
-  .site-footer::before,
-  .site-footer::after {
-    pointer-events: none;
-    position: absolute;
-    bottom: 70px;
-    width: min(28vw, 330px);
-    height: 132px;
-    background-image: radial-gradient(circle, rgba(47, 111, 228, 0.12) 1.7px, transparent 2px);
-    background-size: 12px 12px;
-    content: "";
-    opacity: 0.42;
-  }
-
-  .site-footer::before {
-    left: max(18px, calc((100vw - 1140px) / 2));
-  }
-
-  .site-footer::after {
-    right: max(18px, calc((100vw - 1140px) / 2));
-  }
-
-  .site-footer img[data-no-media-shell] {
-    opacity: 1 !important;
-    filter: none !important;
-  }
-
-  .footer-beliefs {
-    position: relative;
-    transform: translateY(-2px);
-  }
-
-  .belief-grid {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    overflow: hidden;
-    border: 1px solid var(--border-soft);
-    border-radius: 8px;
-    background: var(--surface-strong);
-    box-shadow: 0 24px 70px rgba(36, 57, 95, 0.1);
-  }
-
-  .belief-item,
-  .subscribe-panel {
-    min-width: 0;
-    padding: clamp(22px, 3.2vw, 40px) clamp(18px, 3vw, 34px);
-  }
-
-  .belief-item {
-    position: relative;
-    display: grid;
-    justify-items: center;
-    gap: 12px;
-    min-height: 196px;
-    text-align: center;
-  }
-
-  .belief-item + .belief-item,
-  .subscribe-panel {
-    border-left: 1px solid var(--border-soft);
-  }
-
-  .belief-icon {
-    position: relative;
-    display: grid;
-    width: 74px;
-    height: 50px;
-    place-items: center;
-  }
-
-  .belief-icon span {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.28;
-  }
-
-  .belief-icon span:first-of-type {
-    left: 5px;
-    bottom: 12px;
-  }
-
-  .belief-icon span:last-of-type {
-    right: 5px;
-    top: 11px;
-  }
-
-  .belief-blue {
-    color: #3f7df2;
-  }
-
-  .belief-green {
-    color: #2fbf7a;
-  }
-
-  .belief-orange {
-    color: #ff7a2f;
-  }
-
-  .belief-item h2,
-  .subscribe-panel h2,
-  .latest-panel h2,
-  .stats-panel h2 {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.02rem;
-    font-weight: 900;
-    letter-spacing: 0;
-    line-height: 1.35;
-  }
-
-  .belief-item p,
-  .subscribe-panel p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.8;
-  }
-
-  .belief-item i {
-    width: 28px;
-    height: 3px;
-    border-radius: 999px;
-    background: currentColor;
-  }
-
-  .subscribe-panel {
-    position: relative;
-    display: grid;
-    align-content: center;
-    gap: 14px;
-  }
-
-  .subscribe-form {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 48px;
-    gap: 8px;
-  }
-
-  .subscribe-form input {
-    min-width: 0;
-    height: 42px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    outline: 0;
-    background: var(--surface-strong);
-    padding: 0 14px;
-    color: var(--ink);
-    font-weight: 700;
-    transition: border-color 180ms ease-out, box-shadow 180ms ease-out;
-  }
-
-  .subscribe-form input::placeholder {
-    font-size: 0.82rem;
-  }
-
-  .subscribe-form input:focus {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 4px var(--focus-ring);
-  }
-
-  .subscribe-form button {
-    display: grid;
-    height: 42px;
-    width: 48px;
-    place-items: center;
-    border: 1px solid #235fe2;
-    border-radius: 7px;
-    background: #2f6fe4;
-    color: #fff;
-    box-shadow: 0 10px 18px rgba(47, 111, 228, 0.22);
-    transition: filter 180ms ease-out, box-shadow 180ms ease-out;
-  }
-
-  .subscribe-form button:hover {
-    border-color: #174fcb;
-    background: #174fcb;
-    filter: brightness(1.04);
-    box-shadow:
-      0 0 0 4px rgba(47, 111, 228, 0.16),
-      0 12px 22px rgba(47, 111, 228, 0.28);
-  }
-
-  .subscribe-message {
-    min-height: 1.35em;
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
-
-  .subscribe-message[data-state="success"] {
-    color: #16a56c;
-  }
-
-  .subscribe-message[data-state="error"] {
-    color: var(--status-error);
-  }
-
-  .footer-main {
-    margin-top: 30px;
-    border-top: 1px solid var(--border-soft);
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .footer-main-grid {
-    display: grid;
-    grid-template-columns: 1.18fr 1.16fr 1fr 1.1fr;
-    gap: clamp(26px, 4vw, 56px);
-    align-items: center;
-    min-height: 248px;
-    padding: 38px 0;
-  }
-
-  .footer-brand-card {
-    min-width: 0;
-  }
-
-  .brand-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .brand-row img {
-    width: 76px;
-    height: 76px;
-    flex: 0 0 auto;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 12px 26px var(--shadow-soft);
-  }
-
-  .brand-name {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--blue);
-  }
-
-  .brand-name strong {
-    color: var(--ink);
-    font-family: var(--font-hand);
-    font-size: 1.68rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .footer-brand-card p {
-    margin: 18px 0 20px;
-    color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.85;
-  }
-
-  .social-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .social-links a {
-    display: grid;
-    width: 34px;
-    height: 34px;
-    place-items: center;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--surface-strong);
-    color: var(--ink-2);
-    box-shadow: 0 8px 18px var(--shadow-soft);
-    transition: border-color 180ms ease-out, color 180ms ease-out, background 180ms ease-out, transform 180ms ease-out;
-  }
-
-  .social-links a:hover {
-    border-color: var(--blue);
-    background: var(--blue-soft);
-    color: var(--blue);
-    transform: translateY(-1px);
-  }
-
-  .latest-panel,
-  .stats-panel {
-    min-width: 0;
-  }
-
-  .latest-panel h2,
-  .stats-panel h2 {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .latest-panel h2 span,
-  .stats-panel h2 span {
-    width: 10px;
-    height: 10px;
-    border: 3px solid var(--blue);
-    border-radius: 50%;
-    background: var(--surface-strong);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 12%, transparent);
-  }
-
-  .stats-panel h2 span {
-    border-color: #2fbf7a;
-    box-shadow: 0 0 0 4px rgba(47, 191, 122, 0.12);
-  }
-
-  .latest-panel ol {
-    display: grid;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .latest-panel li {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px;
-    align-items: center;
-    border-bottom: 1px solid var(--border-soft);
-    padding: 8px 0;
-    color: var(--ink-2);
-    font-size: 0.85rem;
-  }
-
-  .latest-panel li::before {
-    grid-column: 1;
-  }
-
-  .latest-panel a {
-    position: relative;
-    overflow: hidden;
-    padding-left: 16px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 800;
-    transition: color 180ms ease-out;
-  }
-
-  .latest-panel a::before {
-    position: absolute;
-    left: 1px;
-    top: 50%;
-    width: 6px;
-    height: 6px;
-    border: 2px solid var(--blue);
-    border-radius: 50%;
-    content: "";
-    transform: translateY(-50%);
-  }
-
-  .latest-panel a:hover {
-    color: var(--blue);
-  }
-
-  .latest-panel time {
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .stats-panel dl {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 26px 28px;
-    margin: 0;
-  }
-
-  .stat-item {
-    display: grid;
-    grid-template-columns: 46px minmax(0, 1fr);
-    gap: 12px;
-    align-items: center;
-  }
-
-  .stat-item dt {
-    display: contents;
-    color: var(--muted);
-    font-size: 0.79rem;
-    font-weight: 800;
-  }
-
-  .stat-item dt b {
-    font: inherit;
-    white-space: nowrap;
-  }
-
-  .stat-item dt > span {
-    grid-row: span 2;
-    display: grid;
-    width: 46px;
-    height: 46px;
-    place-items: center;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    background: color-mix(in srgb, currentColor 12%, var(--surface-strong));
-    box-shadow: 0 10px 20px color-mix(in srgb, currentColor 12%, transparent);
-  }
-
-  .stat-item dd {
-    margin: 0;
-    color: var(--ink);
-    font-size: 1.42rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-
-  .stat-blue {
-    color: #3f7df2;
-  }
-
-  .stat-green {
-    color: #2fbf7a;
-  }
-
-  .stat-orange {
-    color: #ff7a2f;
-  }
-
-  .stat-purple {
-    color: #9b6be8;
-  }
-
-  .footer-illustration {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    min-height: 170px;
-  }
-
-  .footer-illustration img {
-    position: absolute;
-    left: 5%;
-    bottom: 10px;
-    width: 108px;
-    filter: drop-shadow(0 16px 20px var(--shadow-soft));
-  }
-
-  .footer-note {
-    position: absolute;
-    right: 2%;
-    bottom: 16px;
-    width: 136px;
-    min-height: 102px;
-    border: 2px solid color-mix(in srgb, var(--line-blue) 65%, transparent);
-    background: var(--surface-strong);
-    color: var(--muted);
-    padding: 24px 14px 12px;
-    transform: rotate(-5deg);
-  }
-
-  .footer-note span {
-    position: absolute;
-    top: -10px;
-    left: 34px;
-    width: 62px;
-    height: 15px;
-    background: rgba(174, 204, 255, 0.72);
-    transform: rotate(-7deg);
-  }
-
-  .footer-note p {
-    margin: 0;
-    font-family: var(--font-hand);
-    font-size: 1.1rem;
-    line-height: 1.35;
-  }
-
-  .footer-note svg {
-    position: absolute;
-    right: 10px;
-    bottom: 8px;
-    color: var(--line-blue);
-  }
-
-  .footer-quote {
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .footer-quote .page-shell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-    min-height: 100px;
-  }
-
-  .footer-quote .page-shell > span {
-    width: 6px;
-    height: 6px;
-    border: 2px solid var(--blue);
-    border-radius: 50%;
-    opacity: 0.62;
-  }
-
-  .footer-quote p {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin: 0;
-    color: var(--ink-2);
-    font-size: 0.96rem;
-  }
-
-  .footer-quote svg {
-    width: 46px;
-    height: 46px;
-    border: 1px solid var(--line-blue);
-    border-radius: 50%;
-    padding: 10px;
-    color: var(--blue);
-    background: var(--surface-strong);
-    box-shadow: 0 8px 20px var(--shadow-soft);
-  }
-
-  .footer-quote em {
-    font-family: var(--font-hand);
-    font-size: 1.16rem;
-    font-style: normal;
-    color: var(--ink-2);
-  }
-
-  .footer-bottom {
-    background: color-mix(in srgb, var(--surface-strong) 78%, transparent);
-  }
-
-  .bottom-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    min-height: 64px;
-    color: var(--muted);
-    font-size: 0.78rem;
-  }
-
-  .bottom-row p,
-  .bottom-row nav {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-  }
-
-  .bottom-row a {
-    color: var(--muted);
-    font-weight: 800;
-    transition: color 180ms ease-out;
-  }
-
-  .bottom-row a:hover {
-    color: var(--blue);
-  }
-
-  .bottom-row i {
-    width: 1px;
-    height: 18px;
-    background: var(--border);
-  }
-
-  .online-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  .online-status span {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #25c983;
-    box-shadow: 0 0 0 4px rgba(37, 201, 131, 0.15);
-    animation: footer-status-pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes footer-status-pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 0 4px rgba(37, 201, 131, 0.15);
-    }
-    50% {
-      box-shadow: 0 0 0 7px rgba(37, 201, 131, 0.06);
-    }
-  }
-
-  @media (max-width: 1040px) {
-    .belief-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .belief-item:nth-child(3),
-    .subscribe-panel {
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .belief-item:nth-child(3) {
-      border-left: 0;
-    }
-
-    .footer-main-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: start;
-    }
-
-    .footer-illustration {
-      min-height: 190px;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .site-footer {
-      margin-top: 18px;
-    }
-
-    .belief-grid,
-    .footer-main-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .belief-item,
-    .subscribe-panel {
-      min-height: auto;
-      border-left: 0;
-      border-top: 1px solid var(--border-soft);
-    }
-
-    .belief-item:first-child {
-      border-top: 0;
-    }
-
-    .footer-main {
-      margin-top: 24px;
-    }
-
-    .footer-main-grid {
-      gap: 30px;
-      padding: 30px 0;
-    }
-
-    .stats-panel dl {
-      gap: 18px;
-    }
-
-    .footer-quote .page-shell {
-      gap: 14px;
-      min-height: 88px;
-    }
-
-    .footer-quote p {
-      flex-wrap: wrap;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .bottom-row {
-      align-items: flex-start;
-      flex-direction: column;
-      justify-content: center;
-      padding: 14px 0;
-    }
-  }
-
-  @media (max-width: 460px) {
-    .belief-grid {
-      border-radius: 7px;
-    }
-
-    .belief-item,
-    .subscribe-panel {
-      padding: 24px 18px;
-    }
-
-    .subscribe-form {
-      grid-template-columns: minmax(0, 1fr) 44px;
-    }
-
-    .brand-row {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .stats-panel dl {
-      grid-template-columns: 1fr;
-    }
-
-    .footer-illustration {
-      display: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .online-status span {
-      animation: none;
-    }
-  }
-</style>

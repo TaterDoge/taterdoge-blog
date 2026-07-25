@@ -1,0 +1,156 @@
+/* notes page kit */
+/* 便签卡片：阴影、旋转、伪元素胶带与虚线框保留 CSS */
+.moment {
+	position: relative;
+	display: block;
+	width: 100%;
+	min-width: 0;
+	margin: 0;
+	padding: 20px;
+	border: 1px solid var(--border-strong);
+	border-radius: 8px;
+	background: var(--surface);
+	box-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.72) inset,
+		0 10px 22px var(--shadow-soft);
+	animation: moment-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.moment:nth-child(2n) {
+	transform: rotate(0.6deg);
+}
+
+.moment:nth-child(3n) {
+	transform: rotate(-0.5deg);
+}
+
+.tone-2 {
+	background: var(--note-blue-bg);
+}
+
+.tone-3 {
+	background: var(--note-quiet-bg);
+}
+
+.tone-4 {
+	background: var(--note-orange-bg);
+}
+
+.moment::before {
+	position: absolute;
+	top: -10px;
+	left: 34px;
+	width: 76px;
+	height: 18px;
+	background: var(--tape-bg);
+	box-shadow: 0 1px 0 var(--tape-shadow) inset;
+	content: "";
+	transform: rotate(-4deg);
+}
+
+.moment::after {
+	position: absolute;
+	inset: 8px;
+	border: 1px dashed color-mix(in srgb, var(--border-strong) 62%, transparent);
+	border-radius: 6px;
+	pointer-events: none;
+	content: "";
+}
+
+@keyframes moment-in {
+	from {
+		opacity: 0;
+		transform: translateY(18px) rotate(0);
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.private-note {
+	display: none;
+}
+
+.private-note.is-visible {
+	display: block;
+}
+
+.moment-title::after {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: min(130px, 36%);
+	height: 2px;
+	background: var(--orange);
+	content: "";
+	transform: rotate(-1deg);
+}
+
+/* 图片网格：count-N 变体 + media-shell 覆盖，保留 CSS */
+.image-grid {
+	display: grid;
+	gap: 8px;
+	margin: 0 0 14px;
+}
+
+.image-grid.count-1 {
+	grid-template-columns: 1fr;
+}
+
+.image-grid.count-2,
+.image-grid.count-4 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.image-grid.count-3 {
+	grid-template-columns: 1.2fr 0.8fr;
+}
+
+.image-grid.count-5,
+.image-grid.count-6,
+.image-grid.count-7,
+.image-grid.count-8,
+.image-grid.count-9 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.image-grid.count-3 img:first-child {
+	grid-row: span 2;
+}
+
+.image-grid.count-3 :global(.media-shell:first-child) {
+	grid-row: span 2;
+}
+
+.image-grid :global(.media-shell) {
+	width: 100%;
+	min-height: 132px;
+	aspect-ratio: 1;
+	border-radius: 6px;
+}
+
+.image-grid img {
+	width: 100%;
+	aspect-ratio: 1;
+	height: auto;
+	min-height: 132px;
+	border-radius: 6px;
+	object-fit: cover;
+	cursor: zoom-in;
+}
+
+.image-grid.count-1 img {
+	aspect-ratio: 4 / 3;
+	max-height: 360px;
+}
+
+.image-grid.count-1 :global(.media-shell) {
+	aspect-ratio: 4 / 3;
+	max-height: 360px;
+}
+
+@media (max-width: 560px) {
+	.moment {
+		padding: 16px;
+	}
+}

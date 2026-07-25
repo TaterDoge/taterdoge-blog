@@ -9,7 +9,7 @@ const categories = Array.from(new Set(favorites.map((item) => item.category)));
 ---
 
 <BaseLayout title="收藏" description={`${siteConfig.name} 收藏的好用工具、灵感来源和常去的地方`}>
-  <div class="page-shell page">
+  <div class="page-shell grid gap-8">
     <section class="page-intro">
       <div>
         <p class="eyebrow">Favorites</p>
@@ -29,7 +29,7 @@ const categories = Array.from(new Set(favorites.map((item) => item.category)));
         <div class="section-header">
           <h2 class="section-title">{category}</h2>
         </div>
-        <div class="favorite-list">
+        <div class="grid grid-cols-1 gap-x-6 min-md:grid-cols-2">
           {favorites.filter((item) => item.category === category).map((item) => (
             <ToolFavoriteCard title={item.title} description={item.description} href={item.url} icon={item.icon} label={item.category} />
           ))}
@@ -38,22 +38,3 @@ const categories = Array.from(new Set(favorites.map((item) => item.category)));
     ))}
   </div>
 </BaseLayout>
-
-<style>
-  .page {
-    display: grid;
-    gap: 32px;
-  }
-
-  .favorite-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 24px;
-  }
-
-  @media (max-width: 720px) {
-    .favorite-list {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

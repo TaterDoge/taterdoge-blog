@@ -1,0 +1,61 @@
+/* PhotoSwipe 控件样式 — 对齐参考项目 photoswipe.css */
+/* 站点的全局图片占位/淡入逻辑不能处理 PhotoSwipe 自己生成的 img */
+.pswp .media-shell {
+	display: contents;
+}
+
+.pswp .pswp__img {
+	position: absolute;
+	z-index: auto;
+	max-width: none;
+	background: transparent;
+	filter: none;
+	transition: none;
+}
+
+.pswp__button {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	width: 3rem !important;
+	height: 3rem !important;
+	margin-right: 0 !important;
+	background: rgb(0 0 0 / 0.4) !important;
+	transition:
+		background-color 0.15s ease,
+		transform 0.15s ease;
+}
+
+.pswp__button:hover {
+	background: rgb(0 0 0 / 0.5) !important;
+}
+
+.pswp__button:active {
+	background: rgb(0 0 0 / 0.6) !important;
+}
+
+.pswp__button--zoom,
+.pswp__button--close {
+	margin-top: 1rem !important;
+	border-radius: 0.75rem !important;
+}
+
+.pswp__button--zoom:active,
+.pswp__button--close:active {
+	transform: scale(0.9);
+}
+
+.pswp__button--zoom {
+	margin-right: 0.625rem !important;
+}
+
+.pswp__button--close {
+	margin-right: 1rem !important;
+}
+
+/* 可预览图：放大镜光标 */
+.article-hero .cover,
+[data-article-content] img,
+[data-note-image] {
+	cursor: zoom-in;
+}

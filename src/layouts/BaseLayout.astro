@@ -111,12 +111,18 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       function requestMarchenImageSource(image) {
         const source = image.dataset.mediaSrc;
         if (!source || image.dataset.noMediaShell === "true") return;
-        if (image.dataset.mediaRequested === "true" || image.dataset.mediaRequested === "pending") return;
+
+        // Solid 水合/重渲染可能把 src 重置回 placeholder，但 mediaRequested 仍在。
+        // 若尚未真正展示 source，允许重新请求。
+        if (image.dataset.mediaRequested === "true" || image.dataset.mediaRequested === "pending") {
+          if (isMarchenImageSource(image, source)) return;
+          delete image.dataset.mediaRequested;
+        }
 
         image.dataset.mediaRequested = "pending";
         const delay = Number.parseInt(image.dataset.mediaLoadDelay ?? "90", 10);
         window.setTimeout(() => {
-          if (image.dataset.mediaRequested === "true") return;
+          if (image.dataset.mediaRequested === "true" && isMarchenImageSource(image, source)) return;
           image.dataset.mediaRequested = "true";
           image.src = source;
         }, Math.max(0, Number.isFinite(delay) ? delay : 90));
@@ -170,7 +176,11 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       }
 
       function ensureMarchenImageShell(image) {
-        if (!(image instanceof HTMLImageElement) || image.dataset.noMediaShell === "true") return;
+        if (
+          !(image instanceof HTMLImageElement) ||
+          image.dataset.noMediaShell === "true" ||
+          image.closest(".pswp")
+        ) return;
         const parent = image.parentElement;
         if (parent?.classList.contains("media-shell")) return;
 
@@ -182,7 +192,7 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
 
       function initMarchenImages(root = document) {
         root.querySelectorAll("img").forEach((image) => {
-          if (!(image instanceof HTMLImageElement)) return;
+          if (!(image instanceof HTMLImageElement) || image.closest(".pswp")) return;
           if (!image.hasAttribute("loading")) image.loading = "lazy";
           image.decoding = "async";
           if (!image.dataset.mediaState) image.dataset.mediaState = "loading";
@@ -194,12 +204,13 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
             revealMarchenImage(image);
           };
 
-          if (image.dataset.marchenImageReady === "true") return;
-          image.dataset.marchenImageReady = "true";
-          image.addEventListener("load", markLoaded);
-          image.addEventListener("error", () => {
-            image.dataset.mediaState = "error";
-          });
+          if (image.dataset.marchenImageReady !== "true") {
+            image.dataset.marchenImageReady = "true";
+            image.addEventListener("load", markLoaded);
+            image.addEventListener("error", () => {
+              image.dataset.mediaState = "error";
+            });
+          }
 
           if (image.dataset.mediaSrc) {
             requestMarchenImageSource(image);
@@ -211,6 +222,34 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
 
       window.__marchenRevealImage = revealMarchenImage;
       window.__marchenInitImages = initMarchenImages;
+
+      // Solid 岛水合/筛选会重建 img；SPA 导航时 init 也可能早于水合。
+      // 用 MutationObserver 兜住后出现的 img，避免封面卡在 placeholder。
+      if (!window.__marchenImageObserver) {
+        let scheduled = false;
+        const scheduleInit = () => {
+          if (scheduled) return;
+          scheduled = true;
+          queueMicrotask(() => {
+            scheduled = false;
+            initMarchenImages();
+          });
+        };
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+              if (!(node instanceof Element)) continue;
+              if (node instanceof HTMLImageElement || node.querySelector("img")) {
+                scheduleInit();
+                return;
+              }
+            }
+          }
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        window.__marchenImageObserver = observer;
+      }
+
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => initMarchenImages(), { once: true });
       } else {
@@ -295,6 +334,28 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       initMarchenDecor();
       document.addEventListener("astro:page-load", initMarchenDecor);
       document.addEventListener("astro:after-swap", initMarchenDecor);
+    </script>
+    <script>
+      // Pagefind 只在生产构建后存在（dist/pagefind/）；dev 环境下 BlogArchive 降级内存搜索。
+      async function loadMarchenPagefind() {
+        if (window.__marchenPagefind || window.__marchenPagefindLoading) return;
+        window.__marchenPagefindLoading = true;
+        const scriptUrl = `${import.meta.env.BASE_URL}pagefind/pagefind.js`.replace(/\/+/g, "/");
+        try {
+          const head = await fetch(scriptUrl, { method: "HEAD" });
+          if (!head.ok) throw new Error("pagefind not found");
+          const pagefind = await import(/* @vite-ignore */ scriptUrl);
+          await pagefind.options?.({ excerptLength: 20 });
+          window.__marchenPagefind = pagefind;
+          window.dispatchEvent(new CustomEvent("marchen:pagefindready"));
+        } catch {
+          window.__marchenPagefind = null;
+          window.dispatchEvent(new CustomEvent("marchen:pagefindloaderror"));
+        } finally {
+          window.__marchenPagefindLoading = false;
+        }
+      }
+      if (import.meta.env.PROD) loadMarchenPagefind();
     </script>
     <title>{pageTitle}</title>
   </head>

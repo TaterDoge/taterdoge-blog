@@ -2,56 +2,13 @@
 import Icon from "@/components/Icon.astro";
 ---
 
-<section class="not-found">
+<section
+  class="relative mt-2 grid min-h-[520px] content-center justify-items-center border-b border-border-soft px-0 py-7 text-center"
+>
   <span class="tape" aria-hidden="true"></span>
-  <Icon name="FileQuestion" size={38} />
-  <p class="eyebrow">404</p>
-  <h1>页面未找到</h1>
-  <p>你访问的页面不存在，或者暂时还没开放</p>
-  <a class="button" href="/"><Icon name="ArrowLeft" size={18} /> 返回首页</a>
+  <Icon name="FileQuestion" size={58} class="text-blue" />
+  <p class="eyebrow mt-4 text-sm">404</p>
+  <h1 class="mt-2.5 mb-2 text-[clamp(2.3rem,5vw,4.2rem)] leading-tight">页面未找到</h1>
+  <p class="m-0 max-w-narrow text-base text-muted">你访问的页面不存在，或者暂时还没开放</p>
+  <a class="button mt-6 min-h-11 px-5 text-sm" href="/"><Icon name="ArrowLeft" size={18} /> 返回首页</a>
 </section>
-
-<style>
-  .not-found {
-    position: relative;
-    display: grid;
-    min-height: 520px;
-    align-content: center;
-    justify-items: center;
-    margin-top: 8px;
-    border-bottom: 1px solid var(--border-soft);
-    padding: 28px 0;
-    text-align: center;
-  }
-
-  .not-found > :global(svg) {
-    width: 58px;
-    height: 58px;
-    color: var(--blue);
-  }
-
-  .not-found .eyebrow {
-    margin-top: 16px;
-    font-size: 0.92rem;
-  }
-
-  .not-found h1 {
-    margin: 10px 0 8px;
-    font-size: clamp(2.3rem, 5vw, 4.2rem);
-    line-height: 1.08;
-  }
-
-  .not-found p:not(.eyebrow) {
-    max-width: 520px;
-    margin: 0;
-    color: var(--muted);
-    font-size: 1.04rem;
-  }
-
-  .not-found .button {
-    min-height: 44px;
-    margin-top: 24px;
-    padding: 0 20px;
-    font-size: 0.96rem;
-  }
-</style>

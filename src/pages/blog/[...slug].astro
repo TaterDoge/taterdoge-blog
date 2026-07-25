@@ -42,36 +42,36 @@ headings
 ---
 
 <BaseLayout title={post.data.title} description={post.data.description}>
-  <article class="page-shell article-layout">
-    <main class="article-main">
-      <header class="article-hero">
-        <nav class="crumbs" aria-label="面包屑">
-          <a href="/">首页</a>
+  <article class="page-shell grid grid-cols-[minmax(0,1fr)_282px] gap-8 max-lg:grid-cols-1">
+    <main class="article-main min-w-0">
+      <header class="article-hero border-b border-border-soft py-4 pb-6">
+        <nav class="mb-4 flex flex-wrap gap-2 text-xs font-extrabold text-muted" aria-label="面包屑">
+          <a class="text-blue" href="/">首页</a>
           <span>/</span>
-          <a href="/blog">文章</a>
+          <a class="text-blue" href="/blog">文章</a>
           <span>/</span>
           <b>{post.data.category}</b>
         </nav>
         <p class="eyebrow">{post.data.category}</p>
-        <h1>{post.data.title}</h1>
-        <p>{post.data.description}</p>
-        <div class="article-meta">
-          <span><Icon name="UserRound" size={16} /> {siteConfig.name}</span>
-          <time datetime={post.data.pubDate.toISOString()}><Icon name="CalendarDays" size={16} /> {post.data.pubDate.toLocaleDateString("zh-CN")}</time>
-          <span><Icon name="Clock3" size={16} /> {readingMinutes} 分钟</span>
-          {post.data.updatedDate && <span><Icon name="RefreshCw" size={16} /> 更新 {post.data.updatedDate.toLocaleDateString("zh-CN")}</span>}
+        <h1 class="my-3 max-w-4xl text-4xl leading-tight tracking-normal max-md:text-3xl" data-pagefind-meta="title">{post.data.title}</h1>
+        <p class="m-0 max-w-content text-base text-muted">{post.data.description}</p>
+        <div class="mt-3.5 flex flex-wrap gap-2.5">
+          <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="UserRound" size={16} /> {siteConfig.name}</span>
+          <time class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted" datetime={post.data.pubDate.toISOString()}><Icon name="CalendarDays" size={16} /> {post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+          <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="Clock3" size={16} /> {readingMinutes} 分钟</span>
+          {post.data.updatedDate && <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="RefreshCw" size={16} /> 更新 {post.data.updatedDate.toLocaleDateString("zh-CN")}</span>}
         </div>
-        <div class="tag-row">
+        <div class="tag-row mt-3.5 flex flex-wrap gap-2.5">
           {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
         </div>
-        {post.data.cover && <img class="cover" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt={`${post.data.title} 封面`} />}
+        {post.data.cover && <img class="cover mt-5 block h-auto w-full rounded-lg border border-border bg-paper-soft object-contain" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt={`${post.data.title} 封面`} />}
       </header>
 
-      <section class="prose article-content" data-article-content>
+      <section class="prose article-content max-w-content pt-2.5" data-article-content data-pagefind-body>
         <Content />
       </section>
 
-      <section class="continue">
+      <section class="mt-8">
         <div class="section-header">
           <div>
             <p class="eyebrow">Continue</p>
@@ -79,7 +79,7 @@ headings
           </div>
           <a class="plain-link" href="/blog">全部文章 <Icon name="ArrowRight" size={16} /></a>
         </div>
-        <div class="related-grid">
+        <div class="grid">
           {relatedPosts.map((entry) => (
             <ArticleCard
               href={`/blog/${entry.id}`}
@@ -95,18 +95,18 @@ headings
       </section>
     </main>
 
-    <aside class="article-sidebar">
-      <nav class="toc" aria-label="文章目录">
-        <h2>文章目录</h2>
+    <aside class="sticky top-[94px] grid h-max content-start gap-4 pt-4 max-lg:static max-lg:order-first max-lg:grid-cols-3 max-lg:pt-0 max-md:grid-cols-1">
+      <nav class="toc border-b border-border-soft py-4" aria-label="文章目录">
+        <h2 class="mb-3 mt-0 text-base">文章目录</h2>
         {tocTree.length > 0 ? (
-          <ol class="toc-list" data-article-toc>
+          <ol class="grid gap-1 p-0 m-0 list-none" data-article-toc>
             {tocTree.map((heading) => (
-              <li class="toc-item depth-2" data-toc-parent data-toc-item data-toc-slug={heading.slug}>
+              <li class="toc-item min-w-0" data-toc-parent data-toc-item data-toc-slug={heading.slug}>
                 <a href={`#${heading.slug}`} data-toc-link data-toc-depth="2">{heading.text}</a>
                 {heading.children.length > 0 && (
-                  <ol class="toc-sublist">
+                  <ol class="toc-sublist m-0 list-none gap-0.5 pl-3.5">
                     {heading.children.map((child) => (
-                      <li class="toc-item depth-3" data-toc-item data-toc-slug={child.slug}>
+                      <li class="toc-item depth-3 min-w-0" data-toc-item data-toc-slug={child.slug}>
                         <a href={`#${child.slug}`} data-toc-link data-toc-depth="3">{child.text}</a>
                       </li>
                     ))}
@@ -120,190 +120,35 @@ headings
         )}
       </nav>
 
-      <section class="side-note progress-note">
-        <h2>阅读进度</h2>
-        <span class="progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-reading-progress-track>
-          <i data-reading-progress style="width:0%"></i>
+      <section class="border-b border-border-soft py-4">
+        <h2 class="mb-3 mt-0 text-base">阅读进度</h2>
+        <span class="block h-2 overflow-hidden rounded-full bg-surface-soft" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-reading-progress-track>
+          <i class="block h-full rounded-[inherit] bg-blue" data-reading-progress style="width:0%"></i>
         </span>
-        <p><span data-reading-progress-text>0%</span> / 预计 {readingMinutes} 分钟读完</p>
+        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><span data-reading-progress-text>0%</span> / 预计 {readingMinutes} 分钟读完</p>
       </section>
 
-      <section class="side-note">
-        <h2>文章信息</h2>
-        <p><Icon name="BookMarked" size={16} /> 第 {currentIndex + 1} 篇公开文章</p>
-        <p><Icon name="Tags" size={16} /> {post.data.tags.length} 个标签</p>
-        <p><Icon name="MessageSquare" size={16} /> 评论区预留</p>
+      <section class="border-b border-border-soft py-4">
+        <h2 class="mb-3 mt-0 text-base">文章信息</h2>
+        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="BookMarked" size={16} /> 第 {currentIndex + 1} 篇公开文章</p>
+        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="Tags" size={16} /> {post.data.tags.length} 个标签</p>
+        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="MessageSquare" size={16} /> 评论区预留</p>
       </section>
     </aside>
   </article>
 
-  <div hidden data-article-lightbox-icons>
-    <span data-lightbox-icon="previous"><Icon name="ChevronLeft" class="pswp__icn" /></span>
-    <span data-lightbox-icon="next"><Icon name="ChevronRight" class="pswp__icn" /></span>
-    <span data-lightbox-icon="zoom-out"><Icon name="ZoomOut" class="pswp__icn" /></span>
-    <span data-lightbox-icon="zoom-in"><Icon name="ZoomIn" class="pswp__icn" /></span>
-    <span data-lightbox-icon="close"><Icon name="X" class="pswp__icn" /></span>
-  </div>
-
   <script>
-    import PhotoSwipeLightbox from "photoswipe/lightbox";
-    import "photoswipe/style.css";
+    import { setupLightbox } from "@/lib/lightbox";
 
     let cleanupReadingProgress = () => {};
     let cleanupArticleToc = () => {};
     let cleanupArticleLightbox = () => {};
-    const lightboxSizeCache = new WeakMap();
-
-    function resolveLightboxImage(image) {
-      const cached = lightboxSizeCache.get(image);
-      if (cached) return Promise.resolve(cached);
-
-      const src = image.dataset.mediaSrc || image.currentSrc || image.src;
-      const msrc = image.currentSrc || image.src;
-      const showingReal = !image.dataset.mediaSrc || image.src === src || image.currentSrc === src;
-
-      if (image.complete && image.naturalWidth > 0 && showingReal) {
-        const data = { src, msrc, w: image.naturalWidth, h: image.naturalHeight, alt: image.alt };
-        lightboxSizeCache.set(image, data);
-        return Promise.resolve(data);
-      }
-
-      return new Promise((resolve) => {
-        const probe = new Image();
-        probe.onload = () => {
-          const data = {
-            src,
-            msrc,
-            w: probe.naturalWidth || window.innerWidth,
-            h: probe.naturalHeight || window.innerHeight,
-            alt: image.alt,
-          };
-          lightboxSizeCache.set(image, data);
-          resolve(data);
-        };
-        probe.onerror = () => {
-          const data = {
-            src,
-            msrc,
-            w: image.naturalWidth || window.innerWidth,
-            h: image.naturalHeight || window.innerHeight,
-            alt: image.alt,
-          };
-          resolve(data);
-        };
-        probe.src = src;
-      });
-    }
 
     function initArticleLightbox() {
       cleanupArticleLightbox();
       const article = document.querySelector(".article-main");
       if (!(article instanceof HTMLElement)) return;
-
-      const imageSelector = ".article-hero .cover, [data-article-content] img";
-      const images = Array.from(article.querySelectorAll(imageSelector)).filter((image) => image instanceof HTMLImageElement);
-      if (images.length === 0) return;
-
-      const getIcon = (name) => document.querySelector(`[data-lightbox-icon="${name}"] svg`)?.outerHTML;
-      const lightbox = new PhotoSwipeLightbox({
-        gallery: article,
-        children: imageSelector,
-        pswpModule: () => import("photoswipe"),
-        wheelToZoom: true,
-        arrowPrev: true,
-        arrowNext: true,
-        arrowPrevSVG: getIcon("previous"),
-        arrowNextSVG: getIcon("next"),
-        closeSVG: getIcon("close"),
-        zoom: false,
-        initialZoomLevel: (zoomLevel) => {
-          const { elementSize, panAreaSize } = zoomLevel;
-          if (!elementSize || !panAreaSize) return zoomLevel.fit;
-          return Math.min(
-            (panAreaSize.x * 0.82) / elementSize.x,
-            (panAreaSize.y * 0.82) / elementSize.y,
-          );
-        },
-        secondaryZoomLevel: (zoomLevel) => Math.max(1, zoomLevel.initial * 1.75),
-        maxZoomLevel: (zoomLevel) => zoomLevel.initial * 4,
-        imageClickAction: "close",
-        tapAction: "close",
-        doubleTapAction: "zoom",
-      });
-
-      lightbox.on("uiRegister", () => {
-        const ui = lightbox.pswp?.ui;
-        if (!ui) return;
-
-        ui.registerElement({
-          name: "zoomOut",
-          order: 8,
-          isButton: true,
-          title: "缩小",
-          html: getIcon("zoom-out"),
-          onClick: (_event, _element, pswp) => {
-            const slide = pswp.currSlide;
-            if (slide) slide.zoomTo(slide.currZoomLevel / 1.25, undefined, 200);
-          },
-        });
-
-        ui.registerElement({
-          name: "zoomIn",
-          order: 9,
-          isButton: true,
-          title: "放大",
-          html: getIcon("zoom-in"),
-          onClick: (_event, _element, pswp) => {
-            const slide = pswp.currSlide;
-            if (slide) slide.zoomTo(slide.currZoomLevel * 1.25, undefined, 200);
-          },
-        });
-      });
-
-      lightbox.addFilter("domItemData", (itemData, element) => {
-        if (element instanceof HTMLImageElement) {
-          const cached = lightboxSizeCache.get(element);
-          const src = cached?.src || element.dataset.mediaSrc || element.currentSrc || element.src;
-          itemData.src = src;
-          itemData.msrc = element.currentSrc || element.src;
-          itemData.w = cached?.w || element.naturalWidth || window.innerWidth;
-          itemData.h = cached?.h || element.naturalHeight || window.innerHeight;
-          itemData.alt = element.alt;
-        }
-        return itemData;
-      });
-
-      const openAt = async (index) => {
-        const image = images[index];
-        if (!image) return;
-        await resolveLightboxImage(image);
-        lightbox.loadAndOpen(index);
-      };
-
-      const controller = new AbortController();
-      images.forEach((image, index) => {
-        image.tabIndex = 0;
-        image.setAttribute("role", "button");
-        image.setAttribute("aria-label", image.alt ? `${image.alt}，点击查看大图` : "点击查看大图");
-        void resolveLightboxImage(image);
-        image.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          void openAt(index);
-        }, { signal: controller.signal });
-        image.addEventListener("keydown", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            void openAt(index);
-          }
-        }, { signal: controller.signal });
-      });
-
-      lightbox.init();
-      cleanupArticleLightbox = () => {
-        controller.abort();
-        lightbox.destroy();
-      };
+      cleanupArticleLightbox = setupLightbox(article, ".article-hero .cover, [data-article-content] img");
       document.addEventListener("astro:before-swap", cleanupArticleLightbox, { once: true });
     }
 
@@ -424,252 +269,3 @@ headings
   </script>
 </BaseLayout>
 
-<style>
-  .article-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 282px;
-    gap: 34px;
-  }
-
-  .article-main {
-    min-width: 0;
-  }
-
-  .article-hero {
-    padding: 18px 0 24px;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .crumbs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
-
-  .crumbs a {
-    color: var(--blue);
-  }
-
-  h1 {
-    max-width: 850px;
-    margin: 12px 0 14px;
-    font-size: 2.35rem;
-    line-height: 1.12;
-    letter-spacing: 0;
-  }
-
-  .article-hero > p:not(.eyebrow) {
-    max-width: 760px;
-    margin: 0;
-    color: var(--muted);
-    font-size: 1rem;
-  }
-
-  .article-meta,
-  .tag-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .article-meta span,
-  .article-meta time {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--muted);
-    font-size: 0.84rem;
-    font-weight: 800;
-  }
-
-  .cover {
-    display: block;
-    width: 100%;
-    height: auto;
-    margin-top: 20px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--paper-soft);
-    object-fit: contain;
-  }
-
-  .article-hero :global(.media-shell) {
-    width: 100%;
-    margin-top: 20px;
-    border-radius: 8px;
-  }
-
-  .article-hero :global(.media-shell) .cover {
-    margin-top: 0;
-  }
-
-  .article-content {
-    padding: 10px 0 0;
-    max-width: 780px;
-  }
-
-  .article-hero .cover,
-  .article-content :global(img) {
-    cursor: zoom-in;
-  }
-
-  .article-sidebar {
-    position: sticky;
-    top: 94px;
-    display: grid;
-    align-content: start;
-    gap: 18px;
-    height: max-content;
-    padding-top: 18px;
-  }
-
-  .toc,
-  .side-note {
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .toc h2,
-  .side-note h2 {
-    margin: 0 0 12px;
-    font-size: 1rem;
-  }
-
-  .toc-list,
-  .toc-sublist {
-    display: grid;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .toc-list {
-    gap: 4px;
-  }
-
-  .toc-sublist {
-    display: none;
-    gap: 2px;
-    margin: 4px 0 2px;
-    padding-left: 14px;
-  }
-
-  .toc-item[data-expanded="true"] > .toc-sublist {
-    display: grid;
-  }
-
-  .toc-item {
-    min-width: 0;
-  }
-
-  .toc a {
-    position: relative;
-    display: block;
-    overflow: hidden;
-    border-radius: 5px;
-    padding: 5px 7px 5px 12px;
-    color: var(--ink-2);
-    font-size: 0.88rem;
-    font-weight: 800;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-    transition:
-      background 180ms ease-out,
-      color 180ms ease-out,
-      padding-left 180ms ease-out;
-  }
-
-  .toc a::before {
-    position: absolute;
-    top: 50%;
-    left: 3px;
-    width: 3px;
-    height: 0;
-    border-radius: 999px;
-    background: var(--blue);
-    content: "";
-    opacity: 0;
-    transform: translateY(-50%);
-    transition:
-      height 180ms ease-out,
-      opacity 180ms ease-out;
-  }
-
-  .toc a:hover,
-  .toc a.active {
-    background: var(--blue-soft);
-    color: var(--blue);
-    padding-left: 15px;
-  }
-
-  .toc a.active::before {
-    height: 18px;
-    opacity: 1;
-  }
-
-  .toc .depth-3 a {
-    color: var(--muted);
-    font-size: 0.82rem;
-    font-weight: 750;
-  }
-
-  .side-note p {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 9px 0;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-
-  .progress {
-    display: block;
-    height: 7px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--surface-soft);
-  }
-
-  .progress i {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--blue);
-  }
-
-  .continue {
-    margin-top: 32px;
-  }
-
-  .related-grid {
-    display: grid;
-  }
-
-  @media (max-width: 980px) {
-    .article-layout {
-      grid-template-columns: 1fr;
-    }
-
-    .article-sidebar {
-      position: static;
-      order: -1;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      padding-top: 0;
-    }
-  }
-
-  @media (max-width: 680px) {
-    h1 {
-      font-size: 1.9rem;
-    }
-
-    .article-sidebar {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
