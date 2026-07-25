@@ -1,0 +1,6 @@
+exclude_selectors:
+  - "[data-pagefind-ignore]"
+  - ".site-header"
+  - ".site-footer"
+  - ".site-decor"
+  - ".article-content pre"

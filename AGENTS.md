@@ -1,6 +1,6 @@
 # 内容编写约束
 
-写 blog / 碎念 / 项目前先读本文件。生成内容后必须跑 `pnpm check:content`（或完整 `pnpm build`）。
+写 blog / 碎念 / 项目前先读本文件。生成内容后必须跑 `bun run check:content`（或完整 `bun run build`）。
 
 ## 博客 `src/content/blog`
 
@@ -122,5 +122,5 @@ images: []                  # 远程 URL 列表；碎念不使用本地资源目
 1. 确认类型：blog / note / project
 2. 缺 title、要点、分类、素材时先问，不瞎补
 3. blog：确认/创建分类目录（中文名）→ 创建文章目录（中文短名）→ 写 `index.md`
-4. `pnpm check:content`
-5. 需要时再 `pnpm build`
+4. `bun run check:content`
+5. 需要时再 `bun run build`
