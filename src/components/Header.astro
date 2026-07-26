@@ -15,6 +15,7 @@ const navItems = [
 ];
 
 const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+const pagefindEnabled = import.meta.env.PROD;
 ---
 
 <header
@@ -53,9 +54,9 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.st
         <span class="theme-icon light col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Sun" size={19} /></span>
         <span class="theme-icon dark col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Moon" size={19} /></span>
       </button>
-      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="/blog#search" aria-label="搜索">
+      <button class="search-toggle grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-search-toggle aria-label="打开搜索" aria-expanded="false" aria-controls="search-panel">
         <Icon name="Search" size={20} />
-      </a>
+      </button>
       <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="/rss.xml" aria-label="RSS">
         <Icon name="Rss" size={20} />
       </a>
@@ -64,6 +65,20 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.st
       </a>
     </div>
   </div>
+
+  <dialog id="search-panel" class="search-panel" data-search-panel data-search-production={String(pagefindEnabled)} aria-labelledby="search-panel-title" aria-modal="true" aria-hidden="true" data-pagefind-ignore inert>
+    <h2 id="search-panel-title" class="sr-only">站内搜索</h2>
+    <div class="search-box" role="search">
+      <div class="search-field">
+        <Icon name="Search" size={20} />
+        <label class="sr-only" for="site-search-input">搜索文章</label>
+        <input id="site-search-input" type="search" inputmode="search" autocomplete="off" placeholder="搜索文章、关键字..." data-search-input />
+        <span class="search-shortcut" aria-hidden="true">Esc</span>
+      </div>
+      <div class="search-status text-sm text-muted" data-search-status role="status" aria-live="polite">输入关键词搜索全部文章</div>
+      <ul class="search-results" data-search-results></ul>
+    </div>
+  </dialog>
   <button class="nav-backdrop" type="button" data-nav-backdrop aria-label="关闭导航"></button>
 </header>
 
@@ -128,10 +143,159 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.st
     window.__marchenThemeToggleBound = true;
   }
 
+  function setSearch(open) {
+    const panel = document.querySelector("[data-search-panel]");
+    const input = document.querySelector("[data-search-input]");
+    const toggle = document.querySelector("[data-search-toggle]");
+    if (!(panel instanceof HTMLDialogElement)) return;
+
+    const restoreFocus = !open && panel.open && panel.contains(document.activeElement);
+    if (open) {
+      setMobileNav(false);
+      if (!panel.open) {
+        panel.removeAttribute("inert");
+        panel.setAttribute("aria-hidden", "false");
+        panel.showModal();
+      }
+      document.documentElement.classList.add("search-open");
+      document.querySelectorAll("[data-search-toggle]").forEach((button) => {
+        button.setAttribute("aria-expanded", "true");
+        button.setAttribute("aria-label", "关闭搜索");
+      });
+      if (input instanceof HTMLInputElement) requestAnimationFrame(() => input.focus());
+      return;
+    }
+
+    document.documentElement.classList.remove("search-open");
+    if (panel.open) panel.close();
+    panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("inert", "");
+    document.querySelectorAll("[data-search-toggle]").forEach((button) => {
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", "打开搜索");
+    });
+    if (restoreFocus && toggle instanceof HTMLElement) toggle.focus();
+  }
+
+  async function runSearch(query) {
+    const status = document.querySelector("[data-search-status]");
+    const results = document.querySelector("[data-search-results]");
+    if (!(status instanceof HTMLElement) || !(results instanceof HTMLElement)) return;
+
+    const requestId = String(Number(results.dataset.requestId ?? "0") + 1);
+    results.dataset.requestId = requestId;
+    const keyword = query.trim();
+    if (!keyword) {
+      status.textContent = "输入关键词搜索全部文章";
+      results.replaceChildren();
+      return;
+    }
+
+    if (!window.__marchenPagefind) {
+      const panel = document.querySelector("[data-search-panel]");
+      status.textContent = panel?.getAttribute("data-search-production") === "true"
+        ? window.__marchenPagefindFailed ? "搜索索引加载失败，请稍后重试" : "搜索索引正在加载..."
+        : "开发环境没有搜索索引，请运行 bun run build 后预览";
+      return;
+    }
+    status.textContent = "正在搜索...";
+
+    try {
+      const response = await window.__marchenPagefind.search(keyword);
+      const items = await Promise.all(response.results.slice(0, 12).map((item) => item.data()));
+      if (results.dataset.requestId !== requestId) return;
+
+      results.replaceChildren(...items.map((item) => {
+        const row = document.createElement("li");
+        row.className = "search-result-item";
+        const link = document.createElement("a");
+        link.className = "search-result";
+        link.href = item.url;
+
+        const title = document.createElement("strong");
+        title.textContent = item.meta.title;
+        const excerpt = document.createElement("span");
+        excerpt.innerHTML = item.excerpt;
+        link.append(title, excerpt);
+        row.append(link);
+        return row;
+      }));
+      status.textContent = items.length > 0
+        ? `找到 ${response.results.length} 条结果${response.results.length > items.length ? `，显示前 ${items.length} 条` : ""}`
+        : "没有匹配结果，换个关键词试试";
+    } catch {
+      if (results.dataset.requestId === requestId) {
+        results.replaceChildren();
+        status.textContent = "搜索暂时不可用，请稍后重试";
+      }
+    }
+  }
+
+  window.__marchenRefreshSearch = () => {
+    const input = document.querySelector("[data-search-input]");
+    if (input instanceof HTMLInputElement && input.value.trim()) runSearch(input.value);
+  };
+
+  if (!window.__marchenSearchBound) {
+    let searchTimer;
+    document.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+      const panel = document.querySelector("[data-search-panel]");
+      if (panel instanceof HTMLDialogElement && panel.open && event.target === panel) {
+        setSearch(false);
+        return;
+      }
+      if (event.target.closest("[data-search-toggle]")) {
+        setSearch(!document.documentElement.classList.contains("search-open"));
+        return;
+      }
+      if (event.target.closest(".search-result")) setSearch(false);
+    });
+    document.addEventListener("input", (event) => {
+      const input = event.target;
+      if (!(input instanceof HTMLInputElement) || !input.matches("[data-search-input]")) return;
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => runSearch(input.value), 180);
+    });
+    window.addEventListener("marchen:pagefindready", () => window.__marchenRefreshSearch?.());
+    window.addEventListener("marchen:pagefindloaderror", () => {
+      window.__marchenPagefindFailed = true;
+      const input = document.querySelector("[data-search-input]");
+      const status = document.querySelector("[data-search-status]");
+      if (input instanceof HTMLInputElement && input.value.trim() && status instanceof HTMLElement) {
+        status.textContent = "搜索索引加载失败，请稍后重试";
+      }
+    });
+    document.addEventListener("cancel", (event) => {
+      if (event.target instanceof HTMLDialogElement && event.target.matches("[data-search-panel]")) {
+        event.preventDefault();
+        setSearch(false);
+      }
+    }, true);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setSearch(false);
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearch(true);
+      }
+    });
+    document.addEventListener("astro:before-swap", () => {
+      clearTimeout(searchTimer);
+      const results = document.querySelector("[data-search-results]");
+      if (results instanceof HTMLElement) {
+        results.dataset.requestId = String(Number(results.dataset.requestId ?? "0") + 1);
+      }
+      setSearch(false);
+    });
+    document.addEventListener("astro:after-swap", () => setSearch(false));
+    window.__marchenSearchBound = true;
+  }
+
   let mobileNavScrollY = 0;
 
   function setMobileNav(open) {
     if (open) {
+      setSearch(false);
       mobileNavScrollY = window.scrollY;
       document.body.style.position = "fixed";
       document.body.style.top = `-${mobileNavScrollY}px`;

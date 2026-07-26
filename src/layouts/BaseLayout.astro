@@ -336,7 +336,7 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       document.addEventListener("astro:after-swap", initMarchenDecor);
     </script>
     <script>
-      // Pagefind 只在生产构建后存在（dist/pagefind/）；dev 环境下 BlogArchive 降级内存搜索。
+      // Pagefind 只在生产构建后存在（dist/pagefind/）；dev 环境下 BlogArchive 继续降级为内存搜索。
       async function loadMarchenPagefind() {
         if (window.__marchenPagefind || window.__marchenPagefindLoading) return;
         window.__marchenPagefindLoading = true;
@@ -348,8 +348,10 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
           await pagefind.options?.({ excerptLength: 20 });
           window.__marchenPagefind = pagefind;
           window.dispatchEvent(new CustomEvent("marchen:pagefindready"));
+          window.__marchenRefreshSearch?.();
         } catch {
           window.__marchenPagefind = null;
+          window.__marchenPagefindFailed = true;
           window.dispatchEvent(new CustomEvent("marchen:pagefindloaderror"));
         } finally {
           window.__marchenPagefindLoading = false;

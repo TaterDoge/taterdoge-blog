@@ -24,5 +24,8 @@ declare global {
 	interface Window {
 		__marchenPagefind?: PagefindApi | null;
 		__marchenPagefindLoading?: boolean;
+		__marchenPagefindFailed?: boolean;
+		__marchenRefreshSearch?: () => void;
+		__marchenSearchBound?: boolean;
 	}
 }
