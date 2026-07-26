@@ -1422,6 +1422,10 @@ body>footer {
   }
 
   @media (max-width: 980px) {
+    .site-header {
+      backdrop-filter: none;
+    }
+
     .site-header .header-inner {
       grid-template-columns: 1fr auto;
       padding-block: 8px;
@@ -1432,7 +1436,7 @@ body>footer {
       top: 0;
       right: 0;
       z-index: 45;
-      display: grid;
+      display: grid !important;
       width: min(320px, calc(100vw - 42px));
       height: 100dvh;
       align-content: start;
