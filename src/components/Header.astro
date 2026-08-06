@@ -6,7 +6,6 @@ const pathname = Astro.url.pathname;
 const navItems = [
   { href: "/", label: "首页" },
   { href: "/blog", label: "博客" },
-  { href: "/notes", label: "碎念" },
   { href: "/projects", label: "项目" },
   { href: "/tools", label: "工具" },
   { href: "/favorites", label: "收藏" },
@@ -57,12 +56,13 @@ const pagefindEnabled = import.meta.env.PROD;
       <button class="search-toggle grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-search-toggle aria-label="打开搜索" aria-expanded="false" aria-controls="search-panel">
         <Icon name="Search" size={20} />
       </button>
-      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="/rss.xml" aria-label="RSS">
-        <Icon name="Rss" size={20} />
-      </a>
-      <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href="https://github.com/marchen-orz" aria-label="GitHub">
-        <Icon name="Github" size={20} />
-      </a>
+      {siteConfig.socials
+        .filter((item) => item.inHeader)
+        .map((item) => (
+          <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href={item.href} aria-label={item.name}>
+            <Icon name={item.icon} size={20} />
+          </a>
+        ))}
     </div>
   </div>
 

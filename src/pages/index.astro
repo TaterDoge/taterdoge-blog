@@ -16,10 +16,6 @@ const posts = (await getCollection("blog"))
   .filter((post) => !post.data.draft && post.data.visibility === "public")
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
-const notes = (await getCollection("notes"))
-  .filter((note) => note.data.visibility === "public")
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
 const featuredProjects = projects.slice(0, 3);
 const featuredTools = tools.slice(0, 3);
 const featuredFavorites = favorites.slice(0, 4);
@@ -27,14 +23,6 @@ const formatDailyQuote = (quote: string) => quote.replace(/\s+[—-]\s+[^—-]+$
 const displayDailyQuotes = dailyQuotes.map(formatDailyQuote);
 const dayIndex = Math.floor(Date.now() / 86400000) % dailyQuotes.length;
 const todayQuote = displayDailyQuotes[dayIndex];
-const formatNoteTime = (date: Date) =>
-  date.toLocaleString("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
 const titleSuffix = siteConfig.title.startsWith(siteConfig.name)
   ? siteConfig.title.slice(siteConfig.name.length)
   : "";
@@ -73,7 +61,6 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
           <p class="m-0 max-w-prose text-base text-muted">灵感碎片、有趣的项目和顺手的小工具都收在这里，清爽一点，少年气一点，也真的好用</p>
           <div class="mt-5 flex flex-wrap gap-2.5">
             <a class="button px-4" href="/blog"><Icon name="BookOpen" size={18} /> 看文章</a>
-            <a class="button border-tag-border bg-blue-soft px-4 text-blue hover:border-blue hover:bg-[#d4e4ff] hover:text-blue" href="/notes"><Icon name="Images" size={18} /> 看碎念</a>
           </div>
         </div>
         <aside class="relative z-10 w-full rotate-[2.2deg] self-start border border-border-strong bg-surface-strong px-5 py-4 shadow-pop-card before:absolute before:top-[-10px] before:left-[26px] before:h-[18px] before:w-16 before:-rotate-[6deg] before:bg-tape-bg before:shadow-[0_1px_0_var(--tape-shadow)_inset] before:content-[''] min-lg:col-start-2 min-lg:row-start-1 max-lg:mt-5.5 max-lg:max-w-xs">
@@ -155,21 +142,6 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
         <section class="rounded-md border border-border-strong bg-note-bg p-4 -rotate-[1.1deg]">
           <h2 class="m-0 text-base">今日一句</h2>
           <p class="mt-2 mb-0 font-note text-base text-ink-2" data-daily-quote>{todayQuote}</p>
-        </section>
-
-        <section class="border-b border-border-soft py-4">
-          <div class="mb-2 flex items-center justify-between gap-3">
-            <h2 class="m-0 text-base">最近碎念</h2>
-            <a class="text-xs font-black text-blue" href="/notes">全部</a>
-          </div>
-          <div class="grid">
-            {notes.map((note) => (
-              <a class="grid grid-cols-[86px_1fr] gap-2.5 border-b border-dashed border-border py-2 text-sm font-extrabold text-ink" href="/notes">
-                <time class="text-xs text-orange" datetime={note.data.pubDate.toISOString()}>{formatNoteTime(note.data.pubDate)}</time>
-                <span>{note.data.title}</span>
-              </a>
-            ))}
-          </div>
         </section>
 
         <section class="border-b border-border-soft py-4">
