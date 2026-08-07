@@ -68,7 +68,7 @@ headings
         <div class="tag-row mt-3.5 flex flex-wrap gap-2.5">
           {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
         </div>
-        {heroCover && post.data.cover && <img class="cover mt-5 block h-auto w-full rounded-lg border border-border bg-paper-soft object-contain" src={heroCover.src} width={heroCover.attributes.width} height={heroCover.attributes.height} data-lightbox-src={post.data.cover.src} alt={`${post.data.title} 封面`} loading="eager" fetchpriority="high" decoding="async" />}
+        {heroCover && post.data.cover && <img class="cover block h-auto w-full rounded-lg border border-border bg-paper-soft object-contain" src={heroCover.src} width={heroCover.attributes.width} height={heroCover.attributes.height} data-lightbox-src={post.data.cover.src} alt={`${post.data.title} 封面`} loading="eager" fetchpriority="high" decoding="async" />}
       </header>
 
       <section class="prose article-content max-w-content pt-2.5" data-article-content data-pagefind-body>
