@@ -23,6 +23,7 @@ export default function ArticleCard(props: ArticleCardProps) {
 				"grid-cols-[124px_minmax(0,1fr)]": !props.featured,
 			}}
 			href={props.href}
+			data-astro-prefetch="hover"
 			aria-label={`阅读：${props.title}`}
 		>
 			<span class="block min-w-0 [&_.media-shell]:w-full [&_.media-shell]:rounded-md">

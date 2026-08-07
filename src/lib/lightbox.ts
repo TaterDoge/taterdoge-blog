@@ -10,9 +10,6 @@ type ItemData = {
 	alt: string;
 };
 
-// 预加载主模块，避免每次 open 再动态 import（对齐参考项目）
-const pswpModule = import("photoswipe");
-
 const CLOSE_SVG =
 	'<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg>';
 
@@ -22,7 +19,12 @@ const ZOOM_SVG =
 const sizeCache = new WeakMap<HTMLImageElement, ItemData>();
 
 function realSrc(image: HTMLImageElement) {
-	return image.dataset.mediaSrc || image.currentSrc || image.src;
+	return (
+		image.dataset.lightboxSrc ||
+		image.dataset.mediaSrc ||
+		image.currentSrc ||
+		image.src
+	);
 }
 
 function settle(
@@ -50,7 +52,9 @@ function resolveLightboxImage(image: HTMLImageElement): Promise<ItemData> {
 
 	const src = realSrc(image);
 	const showingReal =
-		!image.dataset.mediaSrc || image.src === src || image.currentSrc === src;
+		(!image.dataset.mediaSrc && !image.dataset.lightboxSrc) ||
+		image.src === src ||
+		image.currentSrc === src;
 
 	if (image.complete && image.naturalWidth > 0 && showingReal) {
 		return Promise.resolve(
@@ -81,7 +85,7 @@ export function setupLightbox(root: HTMLElement, children: string): () => void {
 	const lightbox = new PhotoSwipeLightbox({
 		gallery: root,
 		children,
-		pswpModule: () => pswpModule,
+		pswpModule: () => import("photoswipe"),
 		closeSVG: CLOSE_SVG,
 		zoomSVG: ZOOM_SVG,
 		padding: { top: 20, bottom: 20, left: 20, right: 20 },
@@ -91,6 +95,8 @@ export function setupLightbox(root: HTMLElement, children: string): () => void {
 		imageClickAction: "close",
 		tapAction: "close",
 		doubleTapAction: "zoom",
+		// 打开时默认显示 80%（fit 为铺满视口的缩放级别），双击/缩放仍可到全尺寸
+		initialZoomLevel: (zoomLevels) => zoomLevels.fit * 0.8,
 	});
 
 	lightbox.addFilter("domItemData", (itemData, element) => {
@@ -110,7 +116,7 @@ export function setupLightbox(root: HTMLElement, children: string): () => void {
 		return itemData;
 	});
 
-	// resolveLightboxImage 已把真实图加载进浏览器缓存。直接显示主图，
+	// openAt 会先把当前真实图加载进浏览器缓存。直接显示主图，
 	// 不再创建 PhotoSwipe 的第二张 placeholder，避免短暂重叠。
 	lightbox.addFilter("useContentPlaceholder", () => false);
 
@@ -122,6 +128,7 @@ export function setupLightbox(root: HTMLElement, children: string): () => void {
 		const image = images[index];
 		if (!image) return;
 		await resolveLightboxImage(image);
+		if (controller.signal.aborted) return;
 		lightbox.loadAndOpen(index);
 	};
 
@@ -132,7 +139,6 @@ export function setupLightbox(root: HTMLElement, children: string): () => void {
 			"aria-label",
 			image.alt ? `${image.alt}，点击查看大图` : "点击查看大图",
 		);
-		void resolveLightboxImage(image);
 		image.addEventListener(
 			"click",
 			(event) => {

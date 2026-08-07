@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { getImage } from "astro:assets";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Icon from "@/components/Icon.astro";
 import ArticleCard from "@/components/ArticleCard.astro";
@@ -25,6 +26,9 @@ const relatedPosts = [
   ...others.filter((entry) => entry.data.category !== post.data.category),
 ].slice(0, 3);
 const readingMinutes = getReadingMinutes(post.body);
+const heroCover = post.data.cover
+  ? await getImage({ src: post.data.cover, width: Math.min(960, post.data.cover.width), format: "webp", quality: 82 })
+  : undefined;
 const tocTree: Array<{ slug: string; text: string; children: Array<{ slug: string; text: string }> }> = [];
 let currentTocParent: (typeof tocTree)[number] | undefined;
 
@@ -64,7 +68,7 @@ headings
         <div class="tag-row mt-3.5 flex flex-wrap gap-2.5">
           {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
         </div>
-        {post.data.cover && <img class="cover mt-5 block h-auto w-full rounded-lg border border-border bg-paper-soft object-contain" src="/images/image-placeholder.svg" data-media-src={post.data.cover.src} alt={`${post.data.title} 封面`} />}
+        {heroCover && post.data.cover && <img class="cover mt-5 block h-auto w-full rounded-lg border border-border bg-paper-soft object-contain" src={heroCover.src} width={heroCover.attributes.width} height={heroCover.attributes.height} data-lightbox-src={post.data.cover.src} alt={`${post.data.title} 封面`} loading="eager" fetchpriority="high" decoding="async" />}
       </header>
 
       <section class="prose article-content max-w-content pt-2.5" data-article-content data-pagefind-body>
@@ -87,7 +91,7 @@ headings
               description={entry.data.description}
               date={entry.data.pubDate}
               tags={entry.data.tags}
-              cover={entry.data.cover?.src}
+              cover={entry.data.cover}
               readingMinutes={getReadingMinutes(entry.body)}
             />
           ))}
@@ -260,12 +264,13 @@ headings
       document.addEventListener("astro:before-swap", cleanupArticleToc, { once: true });
     }
 
-    initReadingProgress();
-    initArticleToc();
-    initArticleLightbox();
-    document.addEventListener("astro:page-load", initReadingProgress);
-    document.addEventListener("astro:page-load", initArticleToc);
-    document.addEventListener("astro:page-load", initArticleLightbox);
+    function initArticlePage() {
+      initReadingProgress();
+      initArticleToc();
+      initArticleLightbox();
+    }
+
+    document.addEventListener("astro:page-load", initArticlePage);
   </script>
 </BaseLayout>
 

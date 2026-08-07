@@ -116,7 +116,7 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
                 description={post.data.description}
                 date={post.data.pubDate}
                 tags={post.data.tags}
-                cover={post.data.cover?.src}
+                cover={post.data.cover}
                 readingMinutes={getReadingMinutes(post.body)}
                 featured={index === 0}
               />

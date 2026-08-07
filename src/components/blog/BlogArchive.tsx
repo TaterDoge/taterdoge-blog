@@ -13,6 +13,8 @@ declare global {
 	interface Window {
 		__marchenInitImages?: (root?: ParentNode) => void;
 		__marchenPagefind?: PagefindApi | null;
+		__marchenPagefindEnabled?: boolean;
+		__marchenLoadPagefind?: () => Promise<PagefindApi>;
 	}
 }
 
@@ -73,6 +75,16 @@ export default function BlogArchive(props: BlogArchiveProps) {
 	}
 
 	const normalizedQuery = createMemo(() => query().trim().toLocaleLowerCase());
+
+	createEffect(() => {
+		if (
+			typeof window !== "undefined" &&
+			normalizedQuery() &&
+			window.__marchenPagefindEnabled
+		) {
+			void window.__marchenLoadPagefind?.().catch(() => {});
+		}
+	});
 
 	// 有 Pagefind 且有关键词 → 走全文搜索；否则内存兜底（分类/标签过滤仍在客户端）
 	createEffect(() => {
