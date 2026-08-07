@@ -23,8 +23,10 @@ export interface PagefindApi {
 declare global {
 	interface Window {
 		__marchenPagefind?: PagefindApi | null;
-		__marchenPagefindLoading?: boolean;
+		__marchenPagefindPromise?: Promise<PagefindApi>;
+		__marchenPagefindEnabled?: boolean;
 		__marchenPagefindFailed?: boolean;
+		__marchenLoadPagefind?: () => Promise<PagefindApi>;
 		__marchenRefreshSearch?: () => void;
 		__marchenSearchBound?: boolean;
 	}

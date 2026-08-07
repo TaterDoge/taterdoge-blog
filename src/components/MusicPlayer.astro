@@ -44,9 +44,9 @@ const hasPlaylist = Boolean(siteConfig.music.playlistId && !siteConfig.music.pla
       </div>
       <iframe
         class="block h-[var(--music-frame-height,84px)] min-w-0 w-full rounded-lg border-0 bg-transparent [color-scheme:light_dark] transition-[height] duration-200 ease-out max-md:h-[var(--music-frame-height,76px)]"
-        src="/music-player-frame"
+        data-src="/music-player-frame"
         title={`${siteConfig.name} Playlist`}
-        loading="eager"
+        loading="lazy"
         data-music-frame
       ></iframe>
     </div>

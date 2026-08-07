@@ -978,7 +978,6 @@ body>footer {
 
   .site-main>.page-shell {
     padding: 15px 10px 10px;
-    animation: page-reveal 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
   /* page kits: publish / blog archive / article toc / 404 */
@@ -1835,20 +1834,6 @@ body>footer {
   50% { transform: translateY(-12px); }
 }
 
-@keyframes page-reveal {
-  from {
-    clip-path: inset(0 0 100% 0);
-    opacity: 0.35;
-    transform: translateY(12px);
-  }
-
-  to {
-    clip-path: inset(0);
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes line-draw {
   from {
     transform: scaleX(0);
@@ -1865,32 +1850,19 @@ body>footer {
 }
 
 ::view-transition-old(page-content) {
-  animation: 180ms cubic-bezier(0.35, 0, 0.8, 1) both page-out;
+  animation: 160ms ease-out both page-opacity-out;
 }
 
 ::view-transition-new(page-content) {
-  animation: 430ms cubic-bezier(0.2, 0.8, 0.2, 1) both page-in;
+  animation: 160ms ease-out both page-opacity-in;
 }
 
-@keyframes page-out {
-  to {
-    opacity: 0;
-    transform: translateX(-18px) rotate(-0.25deg);
-  }
+@keyframes page-opacity-out {
+  to { opacity: 0; }
 }
 
-@keyframes page-in {
-  from {
-    clip-path: inset(0 0 0 12%);
-    opacity: 0;
-    transform: translateX(22px) rotate(0.25deg);
-  }
-
-  to {
-    clip-path: inset(0);
-    opacity: 1;
-    transform: translateX(0) rotate(0);
-  }
+@keyframes page-opacity-in {
+  from { opacity: 0; }
 }
 
 @media (max-width: 860px) {

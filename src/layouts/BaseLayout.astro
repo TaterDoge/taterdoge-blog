@@ -33,7 +33,6 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
     <meta property="og:type" content="website" />
     <link rel="icon" href="/favicon.svg" />
     <link rel="preload" href="/images/image-placeholder.svg" as="image" />
-    <link rel="preload" href="/fonts/MiSansVF.ttf" as="font" type="font/ttf" crossorigin />
     <script is:inline>
       (() => {
         const storageKey = "marchen_theme";
@@ -56,38 +55,6 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
           document.addEventListener("astro:after-swap", () => applyTheme());
           window.__marchenThemeSwapBound = true;
         }
-      })();
-    </script>
-    <script is:inline>
-      (() => {
-        const syncBodyFont = (body = document.body) => {
-          if (!body) return;
-          body.style.fontFamily = "var(--font-sans)";
-          body.style.fontWeight = "500";
-        };
-
-        const loadMarchenFont = () => {
-          syncBodyFont();
-          if (!document.fonts?.load) return;
-          Promise.allSettled([
-            document.fonts.load('500 16px "Marchen Sans"'),
-            document.fonts.load('800 16px "Marchen Sans"'),
-            document.fonts.load('900 16px "Marchen Sans"'),
-          ]).then(() => {
-            document.documentElement.dataset.fontReady = "true";
-            document.documentElement.style.setProperty("--font-refresh", Date.now().toString());
-            requestAnimationFrame(() => {
-              document.documentElement.style.removeProperty("--font-refresh");
-            });
-          });
-        };
-
-        loadMarchenFont();
-        document.addEventListener("astro:before-swap", (event) => {
-          syncBodyFont(event.newDocument.body);
-        });
-        document.addEventListener("astro:after-swap", loadMarchenFont);
-        document.addEventListener("astro:page-load", loadMarchenFont);
       })();
     </script>
     <ClientRouter />
@@ -223,16 +190,15 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
       window.__marchenRevealImage = revealMarchenImage;
       window.__marchenInitImages = initMarchenImages;
 
-      // Solid 岛水合/筛选会重建 img；SPA 导航时 init 也可能早于水合。
-      // 用 MutationObserver 兜住后出现的 img，避免封面卡在 placeholder。
-      if (!window.__marchenImageObserver) {
+      if (!window.__marchenImagesBound) {
+        // Solid 岛水合/筛选会重建 img；用 observer 兜住后出现的图片。
         let scheduled = false;
         const scheduleInit = () => {
-          if (scheduled) return;
+          if (scheduled || window.__marchenImageSwapping) return;
           scheduled = true;
           queueMicrotask(() => {
             scheduled = false;
-            initMarchenImages();
+            if (!window.__marchenImageSwapping) initMarchenImages();
           });
         };
         const observer = new MutationObserver((mutations) => {
@@ -248,15 +214,25 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
         });
         observer.observe(document.documentElement, { childList: true, subtree: true });
         window.__marchenImageObserver = observer;
-      }
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => initMarchenImages(), { once: true });
-      } else {
-        initMarchenImages();
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", () => initMarchenImages(), { once: true });
+        } else {
+          initMarchenImages();
+        }
+        document.addEventListener("astro:before-swap", () => {
+          window.__marchenImageSwapping = true;
+        });
+        document.addEventListener("astro:after-swap", () => {
+          queueMicrotask(() => {
+            initMarchenImages();
+            queueMicrotask(() => {
+              window.__marchenImageSwapping = false;
+            });
+          });
+        });
+        window.__marchenImagesBound = true;
       }
-      document.addEventListener("astro:page-load", () => initMarchenImages());
-      document.addEventListener("astro:after-swap", () => initMarchenImages());
     </script>
     <script is:inline>
       function initMarchenDecor() {
@@ -331,33 +307,43 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
         );
       }
 
-      initMarchenDecor();
-      document.addEventListener("astro:page-load", initMarchenDecor);
-      document.addEventListener("astro:after-swap", initMarchenDecor);
+      if (!window.__marchenDecorBound) {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initMarchenDecor, { once: true });
+        } else {
+          initMarchenDecor();
+        }
+        document.addEventListener("astro:after-swap", initMarchenDecor);
+        window.__marchenDecorBound = true;
+      }
     </script>
     <script>
       // Pagefind 只在生产构建后存在（dist/pagefind/）；dev 环境下 BlogArchive 继续降级为内存搜索。
-      async function loadMarchenPagefind() {
-        if (window.__marchenPagefind || window.__marchenPagefindLoading) return;
-        window.__marchenPagefindLoading = true;
+      function loadMarchenPagefind() {
+        if (window.__marchenPagefind) return Promise.resolve(window.__marchenPagefind);
+        if (window.__marchenPagefindPromise) return window.__marchenPagefindPromise;
+
         const scriptUrl = `${import.meta.env.BASE_URL}pagefind/pagefind.js`.replace(/\/+/g, "/");
-        try {
-          const head = await fetch(scriptUrl, { method: "HEAD" });
-          if (!head.ok) throw new Error("pagefind not found");
-          const pagefind = await import(/* @vite-ignore */ scriptUrl);
-          await pagefind.options?.({ excerptLength: 20 });
-          window.__marchenPagefind = pagefind;
-          window.dispatchEvent(new CustomEvent("marchen:pagefindready"));
-          window.__marchenRefreshSearch?.();
-        } catch {
-          window.__marchenPagefind = null;
-          window.__marchenPagefindFailed = true;
-          window.dispatchEvent(new CustomEvent("marchen:pagefindloaderror"));
-        } finally {
-          window.__marchenPagefindLoading = false;
-        }
+        window.__marchenPagefindFailed = false;
+        window.__marchenPagefindPromise = (async () => {
+          try {
+            const pagefind = await import(/* @vite-ignore */ scriptUrl);
+            await pagefind.options?.({ excerptLength: 20 });
+            window.__marchenPagefind = pagefind;
+            window.dispatchEvent(new CustomEvent("marchen:pagefindready"));
+            return pagefind;
+          } catch (error) {
+            window.__marchenPagefind = null;
+            window.__marchenPagefindPromise = null;
+            window.__marchenPagefindFailed = true;
+            window.dispatchEvent(new CustomEvent("marchen:pagefindloaderror"));
+            throw error;
+          }
+        })();
+        return window.__marchenPagefindPromise;
       }
-      if (import.meta.env.PROD) loadMarchenPagefind();
+      window.__marchenPagefindEnabled = import.meta.env.PROD;
+      window.__marchenLoadPagefind = loadMarchenPagefind;
     </script>
     <title>{pageTitle}</title>
   </head>

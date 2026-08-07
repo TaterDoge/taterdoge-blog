@@ -107,10 +107,8 @@ const pagefindEnabled = import.meta.env.PROD;
   }
 
   window.__marchenSyncPrivateNav = syncPrivateNav;
-  syncPrivateNav();
   if (!window.__marchenPrivateNavBound) {
-    document.addEventListener("DOMContentLoaded", () => window.__marchenSyncPrivateNav?.(), { once: true });
-    document.addEventListener("astro:page-load", () => window.__marchenSyncPrivateNav?.());
+    syncPrivateNav();
     document.addEventListener("astro:after-swap", () => window.__marchenSyncPrivateNav?.());
     window.__marchenPrivateNavBound = true;
   }
@@ -163,6 +161,9 @@ const pagefindEnabled = import.meta.env.PROD;
         button.setAttribute("aria-label", "关闭搜索");
       });
       if (input instanceof HTMLInputElement) requestAnimationFrame(() => input.focus());
+      if (window.__marchenPagefindEnabled && !window.__marchenPagefind) {
+        void window.__marchenLoadPagefind?.().catch(() => {});
+      }
       return;
     }
 
@@ -193,9 +194,12 @@ const pagefindEnabled = import.meta.env.PROD;
 
     if (!window.__marchenPagefind) {
       const panel = document.querySelector("[data-search-panel]");
-      status.textContent = panel?.getAttribute("data-search-production") === "true"
-        ? window.__marchenPagefindFailed ? "搜索索引加载失败，请稍后重试" : "搜索索引正在加载..."
-        : "开发环境没有搜索索引，请运行 bun run build 后预览";
+      if (panel?.getAttribute("data-search-production") === "true") {
+        status.textContent = window.__marchenPagefindFailed ? "搜索索引加载失败，请稍后重试" : "搜索索引正在加载...";
+        void window.__marchenLoadPagefind?.().catch(() => {});
+      } else {
+        status.textContent = "开发环境没有搜索索引，请运行 bun run build 后预览";
+      }
       return;
     }
     status.textContent = "正在搜索...";

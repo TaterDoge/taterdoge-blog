@@ -39,6 +39,12 @@ export default function MusicPlayerControls() {
 			"[data-music-drag-handle]",
 		);
 		const frame = player.querySelector<HTMLIFrameElement>("[data-music-frame]");
+		const loadFrame = () => {
+			if (!(frame instanceof HTMLIFrameElement) || frame.hasAttribute("src"))
+				return;
+			const src = frame.dataset.src;
+			if (src) frame.src = src;
+		};
 		const getFrameWindow = () =>
 			frame instanceof HTMLIFrameElement ? frame.contentWindow : null;
 
@@ -98,6 +104,7 @@ export default function MusicPlayerControls() {
 		};
 
 		const setCollapsed = (collapsed: boolean) => {
+			if (!collapsed) loadFrame();
 			player.classList.toggle("is-collapsed", collapsed);
 			localStorage.setItem(STATE_KEY, collapsed ? "true" : "false");
 			toggle?.setAttribute("aria-expanded", collapsed ? "false" : "true");
