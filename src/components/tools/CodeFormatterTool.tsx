@@ -1,10 +1,4 @@
 import { createSignal } from "solid-js";
-import { format as formatSql } from "sql-formatter";
-import * as prettier from "prettier/standalone";
-import * as parserBabel from "prettier/plugins/babel";
-import * as parserEstree from "prettier/plugins/estree";
-import * as parserTypescript from "prettier/plugins/typescript";
-import * as parserYaml from "prettier/plugins/yaml";
 import { clamp, copyText } from "./shared";
 
 type FormatLang = "typescript" | "babel" | "json" | "yaml" | "sql";
@@ -23,30 +17,44 @@ export default function CodeFormatterTool() {
 		try {
 			const tw = clamp(Number.parseInt(tab(), 10) || 2, 2, 8);
 			const text = input();
-			const parser =
-				lang() === "json"
-					? "json"
-					: lang() === "yaml"
-						? "yaml"
-						: lang() === "babel"
-							? "babel"
-							: lang() === "typescript"
-								? "typescript"
-								: "";
+			const langValue = lang();
+			// Prettier 全家桶（standalone + babel/typescript/estree/yaml 插件）约 1.3 MiB，
+			// 只在点击“格式化”时按语言加载对应插件。
 			const formatted =
-				lang() === "sql"
-					? formatSql(text, { language: "sql", tabWidth: tw })
-					: await prettier.format(text, {
-							parser,
-							plugins: [
-								parserBabel,
-								parserTypescript,
-								parserEstree,
-								parserYaml,
-							],
+				langValue === "sql"
+					? (await import("sql-formatter")).format(text, {
+							language: "sql",
 							tabWidth: tw,
-							semi: true,
-						});
+						})
+					: await (async () => {
+							const prettier = await import("prettier/standalone");
+							const parser =
+								langValue === "json"
+									? "json"
+									: langValue === "yaml"
+										? "yaml"
+										: langValue === "babel"
+											? "babel"
+											: "typescript";
+							const plugins = [];
+							if (langValue === "yaml") {
+								plugins.push(await import("prettier/plugins/yaml"));
+							} else {
+								plugins.push(
+									await import("prettier/plugins/babel"),
+									await import("prettier/plugins/estree"),
+								);
+								if (langValue === "typescript") {
+									plugins.push(await import("prettier/plugins/typescript"));
+								}
+							}
+							return prettier.format(text, {
+								parser,
+								plugins,
+								tabWidth: tw,
+								semi: true,
+							});
+						})();
 			setOutput(formatted.trimEnd());
 			setStatus("格式化完成");
 			setStatusState("ok");
@@ -67,9 +75,7 @@ export default function CodeFormatterTool() {
 				<select
 					class="tool-control"
 					value={lang()}
-					onChange={(e) =>
-						setLang(e.currentTarget.value as FormatLang)
-					}
+					onChange={(e) => setLang(e.currentTarget.value as FormatLang)}
 				>
 					<option value="typescript">TypeScript</option>
 					<option value="babel">JavaScript</option>
@@ -107,7 +113,11 @@ export default function CodeFormatterTool() {
 					{status()}
 				</p>
 				<div class="panel-actions">
-					<button class="tool-button primary" type="button" onClick={handleFormat}>
+					<button
+						class="tool-button primary"
+						type="button"
+						onClick={handleFormat}
+					>
 						格式化
 					</button>
 					<button class="tool-button" type="button" onClick={handleCopy}>

@@ -7,20 +7,7 @@ import {
 	onCleanup,
 } from "solid-js";
 import ArticleCard from "./ArticleCard";
-import type { PagefindApi, PagefindSearchResult } from "@/types/pagefind";
-
-declare global {
-	interface Window {
-		__marchenInitImages?: (root?: ParentNode) => void;
-		__marchenPagefind?: PagefindApi | null;
-		__marchenPagefindEnabled?: boolean;
-		__marchenLoadPagefind?: () => Promise<PagefindApi>;
-	}
-}
-
-function refreshMarchenImages() {
-	queueMicrotask(() => window.__marchenInitImages?.());
-}
+import type { PagefindSearchResult } from "@/types/pagefind";
 
 interface PostData {
 	id: string;
@@ -169,11 +156,7 @@ export default function BlogArchive(props: BlogArchiveProps) {
 		return tag;
 	});
 
-	// SPA 导航时 BaseLayout 可能早于 Solid 水合 init；筛选也会重建 img。
-	createEffect(() => {
-		filteredPosts();
-		refreshMarchenImages();
-	});
+	// 筛选重建 img 时，BaseLayout 的 MutationObserver 会捕获 addedNodes 并重新初始化。
 
 	return (
 		<section class="archive-layout grid grid-cols-[minmax(0,1fr)_260px] items-start gap-7 max-lg:grid-cols-1">
