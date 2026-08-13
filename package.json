@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev --host",
-    "build": "bun run check:content && astro build && pagefind --site dist/client && rm -rf .vercel/output/static/pagefind && cp -R dist/client/pagefind .vercel/output/static/pagefind",
+    "build": "bash scripts/subset-font.sh && bun run check:content && astro build && pagefind --site dist/client && rm -rf .vercel/output/static/pagefind && cp -R dist/client/pagefind .vercel/output/static/pagefind",
     "preview": "bun run build && bunx --bun serve -l 4173 .vercel/output/static",
     "astro": "astro",
     "check:content": "tsx scripts/check-content.ts",

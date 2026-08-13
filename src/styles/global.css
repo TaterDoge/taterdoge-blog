@@ -136,14 +136,15 @@
   }
 }
 
+/* 站点按需裁剪的 WOFF2（scripts/subset-font.sh 生成）；新增内容后重新跑脚本 */
 @font-face {
   font-family: "Marchen Sans";
   font-style: normal;
   font-weight: 250 900;
   font-display: swap;
   src:
-    url("/fonts/MiSansVF.ttf") format("truetype-variations"),
-    url("/fonts/MiSansVF.ttf") format("truetype");
+    url("/fonts/MiSansVF.subset.woff2") format("woff2-variations"),
+    url("/fonts/MiSansVF.subset.woff2") format("woff2");
 }
 
 
