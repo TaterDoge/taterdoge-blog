@@ -1,8 +1,9 @@
 ---
 import { getCollection } from "astro:content";
+import { getImage } from "astro:assets";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Icon from "@/components/Icon.astro";
-import ArticleCard from "@/components/ArticleCard.astro";
+import ArticleCard from "@/components/blog/ArticleCard.tsx";
 import ProjectCard from "@/components/ProjectCard.astro";
 import ToolFavoriteCard from "@/components/ToolFavoriteCard.astro";
 import { favorites } from "@/data/favorites";
@@ -16,6 +17,13 @@ const posts = (await getCollection("blog"))
   .filter((post) => !post.data.draft && post.data.visibility === "public")
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
+const postCovers = await Promise.all(
+  posts.map(async (post) =>
+    post.data.cover
+      ? (await getImage({ src: post.data.cover, width: Math.min(368, post.data.cover.width), format: "webp", quality: 80 })).src
+      : undefined,
+  ),
+);
 const featuredProjects = projects.slice(0, 3);
 const featuredTools = tools.slice(0, 3);
 const featuredFavorites = favorites.slice(0, 4);
@@ -114,9 +122,9 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
                 href={`/blog/${post.id}`}
                 title={post.data.title}
                 description={post.data.description}
-                date={post.data.pubDate}
+                pubDate={post.data.pubDate.toISOString()}
                 tags={post.data.tags}
-                cover={post.data.cover}
+                cover={postCovers[index]}
                 readingMinutes={getReadingMinutes(post.body)}
                 featured={index === 0}
               />

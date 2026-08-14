@@ -57,7 +57,9 @@ const pageTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.
         }
       })();
     </script>
-    <ClientRouter />
+    {/* dev 下 ClientRouter 软导航会用 SSR 内联的残缺 Tailwind dev CSS 覆盖完整客户端样式，
+        导致路由返回后卡片栅格/图片样式丢失；生产构建无此问题，仅 dev 禁用。 */}
+    {import.meta.env.PROD && <ClientRouter />}
     <script src="../scripts/marchen-images.ts" />
     <script src="../scripts/marchen-decor.ts" />
     <script src="../scripts/marchen-pagefind.ts" />
