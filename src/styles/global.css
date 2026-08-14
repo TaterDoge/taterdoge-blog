@@ -1115,6 +1115,30 @@ body>footer {
     animation-delay: min(calc(var(--filter-index) * 34ms), 170ms);
   }
 
+  .archive-layout .pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .archive-layout .pager .tag {
+    min-width: 32px;
+    justify-content: center;
+    padding-inline: 6px;
+  }
+
+  .archive-layout .pager button.tag:disabled {
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  .archive-layout .pager-dots {
+    padding: 0 2px;
+    color: var(--muted);
+    font-weight: 900;
+  }
+
   .archive-layout .post-item[hidden],
   .archive-layout .empty-state[hidden] {
     display: none;

@@ -1,0 +1,16 @@
+---
+import ArchivePage from "@/components/blog/ArchivePage.astro";
+import { loadArchiveData } from "@/lib/blog-archive";
+
+// 与 [...slug].astro 共存：/blog/2 等纯数字段优先匹配本路由（文章 id 均为中文短名，不会冲突）
+export async function getStaticPaths() {
+	const { totalPages } = await loadArchiveData();
+	return Array.from({ length: totalPages - 1 }, (_, i) => ({
+		params: { page: String(i + 2) },
+	}));
+}
+
+const { page } = Astro.params;
+---
+
+<ArchivePage initialPage={Number(page)} />

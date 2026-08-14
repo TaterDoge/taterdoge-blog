@@ -7,6 +7,7 @@ import {
 	onCleanup,
 } from "solid-js";
 import ArticleCard from "./ArticleCard";
+import Pagination from "./Pagination";
 import type { PagefindSearchResult } from "@/types/pagefind";
 
 interface PostData {
@@ -29,6 +30,7 @@ interface BlogArchiveProps {
 	categoryCounts: Record<string, number>;
 	totalCount: number;
 	totalMinutes: number;
+	initialPage?: number;
 }
 
 interface PagefindHit {
@@ -40,10 +42,13 @@ interface PagefindHit {
 const TAG_BASE =
 	"tag flex-0 flex flex-nowrap items-center gap-1 whitespace-nowrap";
 
+const PER_PAGE = 10;
+
 export default function BlogArchive(props: BlogArchiveProps) {
 	const [query, setQuery] = createSignal("");
 	const [activeTag, setActiveTag] = createSignal("all");
 	const [activeCategory, setActiveCategory] = createSignal("all");
+	const [page, setPage] = createSignal(props.initialPage ?? 1);
 
 	// Pagefind 运行时（生产构建后由 BaseLayout 注入 window.__marchenPagefind）
 	const [pagefindReady, setPagefindReady] = createSignal(
@@ -149,6 +154,33 @@ export default function BlogArchive(props: BlogArchiveProps) {
 		return baseFiltered().filter((post) => post.tags.includes(tag));
 	});
 
+	// 搜索/标签/分类变化时回到第一页（首次运行跳过，保留 URL 带来的 initialPage）
+	createEffect((prev) => {
+		const posts = filteredPosts();
+		if (prev) setPage(1);
+		return posts;
+	}, undefined);
+
+	// 分页同步到 URL：第 1 页为 /blog，其余为 /blog/{page}，刷新后仍停留在当前页
+	createEffect(() => {
+		const p = page();
+		if (typeof window === "undefined") return;
+		const url = p > 1 ? `/blog/${p}` : "/blog";
+		if (window.location.pathname !== url) {
+			history.replaceState(null, "", url);
+		}
+	});
+
+	const totalPages = createMemo(() =>
+		Math.max(1, Math.ceil(filteredPosts().length / PER_PAGE)),
+	);
+
+	const pagedPosts = createMemo(() => {
+		const all = filteredPosts();
+		const start = (page() - 1) * PER_PAGE;
+		return all.slice(start, start + PER_PAGE);
+	});
+
 	// activeTag 不在可用标签中时自动重置
 	const currentTag = createMemo(() => {
 		const tag = activeTag();
@@ -205,7 +237,7 @@ export default function BlogArchive(props: BlogArchiveProps) {
 
 				<section class="grid" aria-live="polite">
 					<For
-						each={filteredPosts()}
+						each={pagedPosts()}
 						fallback={
 							<p class="empty-state mt-4 rounded-lg border border-dashed border-border-strong p-4 text-center text-sm text-muted">
 								没有匹配到文章，换个关键词试试
@@ -225,12 +257,18 @@ export default function BlogArchive(props: BlogArchiveProps) {
 									tags={post.tags}
 									cover={post.cover}
 									readingMinutes={post.readingMinutes}
-									featured={index() === 0}
+									featured={page() === 1 && index() === 0}
 								/>
 							</div>
 						)}
 					</For>
 				</section>
+
+				<Pagination
+					currentPage={page()}
+					totalPages={totalPages()}
+					onChange={setPage}
+				/>
 			</main>
 
 			<aside class="sticky top-[94px] grid gap-5 max-lg:static max-lg:order-first max-lg:grid-cols-2 max-xs:grid-cols-1">

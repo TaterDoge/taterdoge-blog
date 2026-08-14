@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import BlogArchive from "@/components/blog/BlogArchive.tsx";
+import { siteConfig } from "@/data/site";
+import { loadArchiveData } from "@/lib/blog-archive";
+
+interface Props {
+	initialPage?: number;
+}
+
+const { initialPage = 1 } = Astro.props;
+const archive = await loadArchiveData();
+const title =
+	initialPage === 1 ? "博客" : `博客 · 第 ${initialPage} 页`;
+const description =
+	initialPage === 1
+		? `${siteConfig.name} 的文章、随笔和记录`
+		: `${siteConfig.name} 的文章、随笔和记录（第 ${initialPage} 页）`;
+---
+
+<BaseLayout title={title} description={description}>
+	<div class="page-shell grid gap-6">
+		<section class="page-intro">
+			<div>
+				<p class="eyebrow">Articles</p>
+				<h1>文章归档</h1>
+				<p>文章、随笔和学习心得按时间排好队，先看阅读时间，再决定现在读还是晚点翻</p>
+			</div>
+			<aside class="intro-note">
+				<span>认真写，写给自己看</span>
+				<a class="private-publish" href="/admin/publish?type=blog" data-private-action hidden>
+					<Icon name="PencilLine" size={16} /> 发布文章
+				</a>
+			</aside>
+		</section>
+
+		<BlogArchive
+			client:load
+			initialPage={initialPage}
+			posts={archive.postData}
+			tags={archive.tags}
+			tagCounts={archive.tagCountMap}
+			categories={archive.categories}
+			categoryCounts={archive.categoryCountMap}
+			totalCount={archive.posts.length}
+			totalMinutes={archive.totalMinutes}
+		/>
+	</div>
+</BaseLayout>
