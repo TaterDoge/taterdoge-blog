@@ -60,7 +60,7 @@ const isExternal = (href: string) => href.startsWith("http");
         {
           hasDemo && (
             <a
-              class="grid size-8 place-items-center rounded-md border border-transparent text-ink transition-[border-color,background,color] duration-fast ease-out hover:border-tag-border hover:bg-blue-soft hover:text-blue"
+              class="icon-link"
               href={project.demo}
               target={isExternal(project.demo) ? "_blank" : undefined}
               rel={isExternal(project.demo) ? "noreferrer" : undefined}
@@ -73,7 +73,7 @@ const isExternal = (href: string) => href.startsWith("http");
         {
           hasGithub && (
             <a
-              class="grid size-8 place-items-center rounded-md border border-transparent text-ink transition-[border-color,background,color] duration-fast ease-out hover:border-tag-border hover:bg-blue-soft hover:text-blue"
+              class="icon-link"
               href={project.github}
               target="_blank"
               rel="noreferrer"

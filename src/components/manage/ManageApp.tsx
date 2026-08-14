@@ -1,6 +1,7 @@
 import { createStore, produce } from "solid-js/store";
 import { createSignal, createMemo, For, Show, createEffect } from "solid-js";
 import { useDragSort } from "./useDragSort";
+import { lucideIconClass } from "@/lib/icons";
 
 type TabKind = "projects" | "tools" | "favorites";
 type StatusState = "idle" | "loading" | "ok" | "error";
@@ -92,6 +93,10 @@ const SAVE_BTN =
 const SORTABLE_ROW_BASE =
 	"sortable-row relative grid overflow-hidden grid-cols-[34px_minmax(0,1fr)_auto] gap-3 items-center min-h-[72px] rounded-lg border border-border bg-surface px-3 py-[11px] shadow-soft-card transition-[background,border-color,box-shadow,opacity,transform] duration-[180ms] animate-[manage-row-in_220ms_cubic-bezier(0.2,0.8,0.2,1)_both] hover:border-line-blue hover:bg-[color-mix(in_srgb,var(--blue-soft)_42%,var(--surface))] hover:-translate-y-px max-md:grid-cols-[28px_minmax(0,1fr)]";
 const DRAGGING_EXTRA = "opacity-50 rotate-[-0.6deg] scale-[0.985]";
+const ITEM_TITLE =
+	"block overflow-hidden text-ellipsis whitespace-nowrap text-ink text-[0.98rem] leading-[1.35]";
+const ITEM_DESC =
+	"block mt-1 text-muted text-[0.84rem] not-italic leading-[1.55] [-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden";
 const DROPTARGET_EXTRA =
 	"border-blue bg-[color-mix(in_srgb,var(--blue-soft)_68%,var(--surface))] shadow-pop-card -translate-y-1";
 const FAV_GROUP_BASE =
@@ -397,7 +402,7 @@ export default function ManageApp(props: ManageAppProps) {
 			type="button"
 			onClick={() => setTab(tab)}
 		>
-			<span class={`icon--lucide--${icon} size-[17px]`} />
+			<span class={`${lucideIconClass(icon)} size-[17px]`} />
 			{label}
 		</button>
 	);
@@ -409,7 +414,7 @@ export default function ManageApp(props: ManageAppProps) {
 			disabled={saving() === kind}
 			onClick={() => save(kind)}
 		>
-			<span class="icon--lucide--save size-[17px]" />
+			<span class="icon-[lucide--save] size-[17px]" />
 			{label}
 		</button>
 	);
@@ -449,12 +454,8 @@ export default function ManageApp(props: ManageAppProps) {
 			>
 				<span class="drag-handle" aria-hidden="true" />
 				<span class="block min-w-0">
-					<strong class="block overflow-hidden text-ellipsis whitespace-nowrap text-ink text-[0.98rem] leading-[1.35]">
-						{item.name as string}
-					</strong>
-					<em class="block mt-1 text-muted text-[0.84rem] not-italic leading-[1.55] [-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
-						{item.description as string}
-					</em>
+					<strong class={ITEM_TITLE}>{item.name as string}</strong>
+					<em class={ITEM_DESC}>{item.description as string}</em>
 				</span>
 				<span class="inline-flex items-center justify-end gap-1.5 max-md:col-start-2 max-md:justify-start">
 					<Badge text={(item.category as string) ?? "未分类"} />
@@ -538,12 +539,8 @@ export default function ManageApp(props: ManageAppProps) {
 			>
 				<span class="drag-handle" aria-hidden="true" />
 				<span class="block min-w-0">
-					<strong class="block overflow-hidden text-ellipsis whitespace-nowrap text-ink text-[0.98rem] leading-[1.35]">
-						{item.title}
-					</strong>
-					<em class="block mt-1 text-muted text-[0.84rem] not-italic leading-[1.55] [-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
-						{item.description}
-					</em>
+					<strong class={ITEM_TITLE}>{item.title}</strong>
+					<em class={ITEM_DESC}>{item.description}</em>
 				</span>
 				<span class="inline-flex items-center justify-end gap-1.5 max-md:col-start-2 max-md:justify-start">
 					<Show
@@ -718,7 +715,7 @@ export default function ManageApp(props: ManageAppProps) {
 						</div>
 						<div class="flex flex-wrap justify-end gap-2.5">
 							<button class={PLAIN_ACTION} type="button" onClick={addCategory}>
-								<span class="icon--lucide--folder-plus size-[17px]" />
+								<span class="icon-[lucide--folder-plus] size-[17px]" />
 								新增分类
 							</button>
 							<button
@@ -726,7 +723,7 @@ export default function ManageApp(props: ManageAppProps) {
 								type="button"
 								onClick={() => openFavoriteDialog()}
 							>
-								<span class="icon--lucide--plus size-[17px]" />
+								<span class="icon-[lucide--plus] size-[17px]" />
 								添加收藏
 							</button>
 							{renderSaveButton("favorites", "保存收藏")}
@@ -764,7 +761,7 @@ export default function ManageApp(props: ManageAppProps) {
 							type="submit"
 							aria-label="关闭"
 						>
-							<span class="icon--lucide--x size-[18px]" />
+							<span class="icon-[lucide--x] size-[18px]" />
 						</button>
 					</div>
 

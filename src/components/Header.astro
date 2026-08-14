@@ -45,21 +45,21 @@ const pagefindEnabled = import.meta.env.PROD;
     </nav>
 
     <div class="header-actions inline-flex items-center justify-end gap-2">
-      <button class="nav-toggle size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-nav-toggle aria-label="打开导航" aria-expanded="false">
+      <button class="nav-toggle icon-btn" type="button" data-nav-toggle aria-label="打开导航" aria-expanded="false">
         <span class="nav-icon open col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Menu" size={20} /></span>
         <span class="nav-icon close col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="X" size={20} /></span>
       </button>
-      <button class="theme-toggle relative grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-theme-toggle aria-label="切换夜间模式" title="切换夜间模式">
+      <button class="theme-toggle relative icon-btn" type="button" data-theme-toggle aria-label="切换夜间模式" title="切换夜间模式">
         <span class="theme-icon light col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Sun" size={19} /></span>
         <span class="theme-icon dark col-start-1 row-start-1 grid place-items-center transition duration-fast"><Icon name="Moon" size={19} /></span>
       </button>
-      <button class="search-toggle grid size-9 place-items-center rounded-md border-0 bg-transparent text-ink transition-colors duration-fast" type="button" data-search-toggle aria-label="打开搜索" aria-expanded="false" aria-controls="search-panel">
+      <button class="search-toggle icon-btn" type="button" data-search-toggle aria-label="打开搜索" aria-expanded="false" aria-controls="search-panel">
         <Icon name="Search" size={20} />
       </button>
       {siteConfig.socials
         .filter((item) => item.inHeader)
         .map((item) => (
-          <a class="grid size-9 place-items-center rounded-md text-ink transition-colors duration-fast" href={item.href} aria-label={item.name}>
+          <a class="icon-btn" href={item.href} aria-label={item.name}>
             <Icon name={item.icon} size={20} />
           </a>
         ))}

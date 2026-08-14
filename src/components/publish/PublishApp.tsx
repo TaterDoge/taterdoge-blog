@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { lucideIconClass } from "@/lib/icons";
 
 type PublishType = "blog" | "note" | "project";
 type StatusState = "idle" | "loading" | "ok" | "error";
@@ -39,7 +40,7 @@ export default function PublishApp(props: PublishAppProps) {
 			type="button"
 			onClick={() => setActiveType(type)}
 		>
-			<span class={`icon--lucide--${icon} size-[17px]`} />
+			<span class={`${lucideIconClass(icon)} size-[17px]`} />
 			{label}
 		</button>
 	);
@@ -325,7 +326,7 @@ export default function PublishApp(props: PublishAppProps) {
 						type="submit"
 						disabled={submitting()}
 					>
-						<span class="icon--lucide--send size-[17px]" />
+						<span class="icon-[lucide--send] size-[17px]" />
 						发布
 					</button>
 					<output class={`text-sm font-extrabold ${statusColor()}`}>

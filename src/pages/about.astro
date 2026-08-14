@@ -30,6 +30,9 @@ const timeline = [
   { icon: "Code", label: "2024", text: "公开记录学习笔记和踩坑经验，做出第一批能跑起来的效率工具" },
   { icon: "Sparkles", label: "更早", text: "从前端入坑，一路折腾到全栈，始终保持对新产品和技术的好奇心" },
 ];
+
+const focusRow =
+  "grid grid-cols-1 gap-1 border-t border-border-soft py-3 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4";
 ---
 
 <BaseLayout title="关于" description={`关于 ${siteConfig.name} 和正在折腾的各种有趣小东西`}>
@@ -99,13 +102,13 @@ const timeline = [
           <h2 class="mt-1.5 mb-0 text-xl leading-tight">最近在关心</h2>
         </div>
         <ul class="mt-3.5 grid list-none gap-3.5 p-0 m-0">
-          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+          <li class={focusRow}>
             <b class="text-ink">AI 工作流</b><span class="text-muted">把知识库、自动化和工具调用拼成真正能省时间的流程</span>
           </li>
-          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+          <li class={focusRow}>
             <b class="text-ink">前端体验</b><span class="text-muted">界面不只是能用，还要清楚、顺手、有自己的气质</span>
           </li>
-          <li class="grid grid-cols-1 gap-1 border-t border-border-soft py-3 max-xs:grid-cols-1 min-xs:grid-cols-[108px_minmax(0,1fr)] min-xs:gap-4">
+          <li class={focusRow}>
             <b class="text-ink">后端与数据</b><span class="text-muted">接口、鉴权、数据库设计和性能优化都要一起考虑</span>
           </li>
         </ul>

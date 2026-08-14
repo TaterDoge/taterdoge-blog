@@ -67,10 +67,10 @@ headings
         <h1 class="my-3 max-w-4xl text-4xl leading-tight tracking-normal max-md:text-3xl" data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title">{post.data.title}</h1>
         <p class="m-0 max-w-content text-base text-muted" data-pagefind-body>{post.data.description}</p>
         <div class="mt-3.5 flex flex-wrap gap-2.5">
-          <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="UserRound" size={16} /> {siteConfig.name}</span>
-          <time class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted" datetime={post.data.pubDate.toISOString()}><Icon name="CalendarDays" size={16} /> {post.data.pubDate.toLocaleDateString("zh-CN")}</time>
-          <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="Clock3" size={16} /> {readingMinutes} 分钟</span>
-          {post.data.updatedDate && <span class="inline-flex items-center gap-1.5 text-sm font-extrabold text-muted"><Icon name="RefreshCw" size={16} /> 更新 {post.data.updatedDate.toLocaleDateString("zh-CN")}</span>}
+          <span class="article-meta"><Icon name="UserRound" size={16} /> {siteConfig.name}</span>
+          <time class="article-meta" datetime={post.data.pubDate.toISOString()}><Icon name="CalendarDays" size={16} /> {post.data.pubDate.toLocaleDateString("zh-CN")}</time>
+          <span class="article-meta"><Icon name="Clock3" size={16} /> {readingMinutes} 分钟</span>
+          {post.data.updatedDate && <span class="article-meta"><Icon name="RefreshCw" size={16} /> 更新 {post.data.updatedDate.toLocaleDateString("zh-CN")}</span>}
         </div>
         <div class="tag-row mt-3.5 flex flex-wrap gap-2.5">
           {post.data.tags.map((tag) => <span class="tag">#{tag}</span>)}
@@ -108,7 +108,7 @@ headings
 
     <aside class="sticky top-[94px] grid h-max content-start gap-4 pt-4 max-lg:static max-lg:order-first max-lg:grid-cols-3 max-lg:pt-0 max-md:grid-cols-1">
       <nav class="toc border-b border-border-soft py-4" aria-label="文章目录">
-        <h2 class="mb-3 mt-0 text-base">文章目录</h2>
+        <h2 class="aside-title">文章目录</h2>
         {tocTree.length > 0 ? (
           <ol class="grid gap-1 p-0 m-0 list-none" data-article-toc>
             {tocTree.map((heading) => (
@@ -132,7 +132,7 @@ headings
       </nav>
 
       <section class="border-b border-border-soft py-4">
-        <h2 class="mb-3 mt-0 text-base">阅读进度</h2>
+        <h2 class="aside-title">阅读进度</h2>
         <span class="block h-2 overflow-hidden rounded-full bg-surface-soft" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-reading-progress-track>
           <i class="block h-full rounded-[inherit] bg-blue" data-reading-progress style="width:0%"></i>
         </span>
@@ -140,10 +140,10 @@ headings
       </section>
 
       <section class="border-b border-border-soft py-4">
-        <h2 class="mb-3 mt-0 text-base">文章信息</h2>
-        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="BookMarked" size={16} /> 第 {currentIndex + 1} 篇公开文章</p>
-        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="Tags" size={16} /> {post.data.tags.length} 个标签</p>
-        <p class="my-2.5 flex items-center gap-2 text-sm text-muted"><Icon name="MessageSquare" size={16} /> 评论区预留</p>
+        <h2 class="aside-title">文章信息</h2>
+        <p class="info-row"><Icon name="BookMarked" size={16} /> 第 {currentIndex + 1} 篇公开文章</p>
+        <p class="info-row"><Icon name="Tags" size={16} /> {post.data.tags.length} 个标签</p>
+        <p class="info-row"><Icon name="MessageSquare" size={16} /> 评论区预留</p>
       </section>
     </aside>
   </article>
@@ -277,6 +277,9 @@ headings
       initArticleLightbox();
     }
 
+    // dev 下无 ClientRouter（astro:page-load 不派发），直接调用保证首屏初始化；
+    // 生产软导航靠事件重新绑定（与 Footer/index/notes 脚本同一模式）。
+    initArticlePage();
     document.addEventListener("astro:page-load", initArticlePage);
   </script>
 </BaseLayout>

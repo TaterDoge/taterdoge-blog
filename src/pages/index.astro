@@ -40,9 +40,9 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
 <BaseLayout title={siteConfig.title} description={siteConfig.description}>
   <div class="page-shell relative z-10 grid gap-10">
     <section class="grid grid-cols-1 items-stretch gap-6 overflow-visible min-lg:grid-cols-[236px_minmax(0,1fr)]">
-      <aside class="relative flex h-full flex-col overflow-visible rounded-lg border border-border-strong bg-surface px-4 pb-4 pt-5.5 shadow-soft-card transition-[box-shadow,transform,border-color] duration-200 hover:border-line-blue hover:shadow-pop-card max-lg:grid max-lg:grid-cols-[112px_minmax(0,1fr)] max-lg:items-center max-lg:gap-x-4 max-sm:grid-cols-1 max-sm:text-center [&_.media-shell]:mx-auto [&_.media-shell]:mb-3 [&_.media-shell]:size-28 [&_.media-shell]:rounded-full max-lg:[&_.media-shell]:row-span-3 max-lg:[&_.media-shell]:m-0 max-sm:[&_.media-shell]:mx-auto max-sm:[&_.media-shell]:mb-3">
+      <aside class="relative flex h-full flex-col overflow-visible rounded-lg border border-border-strong bg-surface px-4 pb-4 pt-5.5 shadow-soft-card transition-[box-shadow,transform,border-color] duration-200 hover:border-line-blue hover:shadow-pop-card max-lg:grid max-lg:grid-cols-[112px_minmax(0,1fr)] max-lg:items-center max-lg:gap-x-4 max-sm:grid-cols-1 max-sm:text-center [&_.media-shell]:mx-auto [&_.media-shell]:mb-3 [&_.media-shell]:size-28 [&_.media-shell]:rounded-full max-lg:[&_.media-shell]:row-span-3 max-lg:[&_.media-shell]:m-0">
         <span class="absolute top-[-12px] left-[22px] z-20 h-5 w-[62px] -rotate-[9deg] bg-tape-blue-bg" aria-hidden="true"></span>
-        <img class="mx-auto mb-3 block size-28 rounded-full object-cover max-lg:row-span-3 max-lg:m-0 max-sm:mx-auto max-sm:mb-3" src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={`${siteConfig.name} 的头像插画`} />
+        <img class="block size-full rounded-full object-cover" src="/images/image-placeholder.svg" data-media-src={siteConfig.avatar} alt={`${siteConfig.name} 的头像插画`} />
         <h2 class="m-0 text-center font-hand text-3xl leading-none tracking-normal">{siteConfig.name}</h2>
         <p class="mt-4 mb-auto text-sm leading-relaxed text-muted">攒灵感、收藏好东西、折腾有趣的小项目，把生活过成自己喜欢的样子</p>
         <div class="grid grid-cols-2 gap-2 max-lg:col-span-full">
@@ -62,16 +62,17 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
           <p class="eyebrow">Personal Site</p>
           <h1 class="relative my-3 grid gap-1.5 text-[clamp(2.2rem,3vw,3.35rem)] leading-tight tracking-normal max-sm:text-4xl" data-typewriter-title aria-label={heroAriaLabel}>
             <span class="font-hand text-[0.92em] font-normal leading-tight text-blue">
-              <span id="big-title" class="mr-1 min-h-[1.2em] text-[1.48em] font-normal after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text={siteConfig.name}>{siteConfig.name}</span>{titleSuffix && <span class="min-h-[1.2em] after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text={titleSuffix}>{titleSuffix}</span>}
+              <span id="big-title" class="type-caret mr-1 min-h-[1.2em] text-[1.48em] font-normal" data-typewriter-part data-typewriter-text={siteConfig.name}>{siteConfig.name}</span>{titleSuffix && <span class="type-caret min-h-[1.2em]" data-typewriter-part data-typewriter-text={titleSuffix}>{titleSuffix}</span>}
             </span>
-            <span class="min-h-[1.2em] text-[0.68em] font-black after:ml-0.5 after:hidden after:h-[1em] after:w-2.5 after:translate-y-0 after:rounded-sm after:bg-orange after:align-[-0.1em] after:opacity-100 after:transition-[opacity,transform,background-color] after:duration-300 after:content-[''] [&.is-active]:after:inline-block [&.is-active]:after:animate-type-caret [&.is-final]:after:inline-block [&.is-final]:after:animate-type-caret" data-typewriter-part data-typewriter-text="把灵感变成可以翻阅的日常">把灵感变成可以翻阅的日常</span>
+            <span class="type-caret min-h-[1.2em] text-[0.68em] font-black" data-typewriter-part data-typewriter-text="把灵感变成可以翻阅的日常">把灵感变成可以翻阅的日常</span>
           </h1>
           <p class="m-0 max-w-prose text-base text-muted">灵感碎片、有趣的项目和顺手的小工具都收在这里，清爽一点，少年气一点，也真的好用</p>
           <div class="mt-5 flex flex-wrap gap-2.5">
             <a class="button px-4" href="/blog"><Icon name="BookOpen" size={18} /> 看文章</a>
           </div>
         </div>
-        <aside class="relative z-10 w-full rotate-[2.2deg] self-start border border-border-strong bg-surface-strong px-5 py-4 shadow-pop-card before:absolute before:top-[-10px] before:left-[26px] before:h-[18px] before:w-16 before:-rotate-[6deg] before:bg-tape-bg before:shadow-[0_1px_0_var(--tape-shadow)_inset] before:content-[''] min-lg:col-start-2 min-lg:row-start-1 max-lg:mt-5.5 max-lg:max-w-xs">
+        <aside class="relative z-10 w-full rotate-[2.2deg] self-start border border-border-strong bg-surface-strong px-5 py-4 shadow-pop-card min-lg:col-start-2 min-lg:row-start-1 max-lg:mt-5.5 max-lg:max-w-xs">
+          <span class="tape tape-left" aria-hidden="true"></span>
           <span class="block font-hand text-xl font-black text-orange">stay curious</span>
           <p class="mt-1.5 mb-0 font-note text-base text-ink-2">每一天都值得被认真记录下来</p>
         </aside>
@@ -194,7 +195,7 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
 
     <section class="border-t border-border-soft pt-5.5">
       <div>
-        <div class="section-header compact mb-1">
+        <div class="section-header mb-1">
           <h2 class="section-title">常去的地方</h2>
           <a class="plain-link" href="/favorites">全部收藏 <Icon name="ArrowRight" size={16} /></a>
         </div>

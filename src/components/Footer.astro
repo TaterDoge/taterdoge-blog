@@ -70,15 +70,15 @@ const stats = [
             <span class="absolute bottom-3 left-1 size-2 rounded-full bg-current opacity-30"></span>
             <span class="absolute top-2.5 right-1 size-2 rounded-full bg-current opacity-30"></span>
           </div>
-          <h2 class="m-0 text-base font-black leading-snug tracking-normal text-ink">{item.title}</h2>
-          <p class="m-0 text-sm leading-loose text-muted">{item.description}</p>
+          <h2 class="footer-title">{item.title}</h2>
+          <p class="footer-desc">{item.description}</p>
           <i class="h-0.5 w-7 rounded-full bg-current" aria-hidden="true"></i>
         </article>
       ))}
 
       <article class="subscribe-panel relative grid min-w-0 content-center gap-3.5 border-l border-border-soft px-[clamp(18px,3vw,34px)] py-[clamp(22px,3.2vw,40px)]">
-        <h2 class="m-0 text-base font-black leading-snug tracking-normal text-ink">订阅更新</h2>
-        <p class="m-0 text-sm leading-loose text-muted">输入邮箱，获取最新文章、项目和思考的更新通知。</p>
+        <h2 class="footer-title">订阅更新</h2>
+        <p class="footer-desc">输入邮箱，获取最新文章、项目和思考的更新通知。</p>
         <form class="subscribe-form grid grid-cols-[minmax(0,1fr)_48px] gap-2" data-footer-subscribe novalidate>
           <label class="sr-only" for="footer-email">订阅邮箱</label>
           <input
@@ -92,7 +92,7 @@ const stats = [
             required
           />
           <button
-            class="grid h-11 w-12 place-items-center rounded-lg border border-[#235fe2] bg-[#2f6fe4] text-white shadow-[0_10px_18px_rgba(47,111,228,0.22)] transition-[filter,box-shadow] duration-fast hover:border-[#174fcb] hover:bg-[#174fcb] hover:brightness-105 hover:shadow-[0_0_0_4px_rgba(47,111,228,0.16),0_12px_22px_rgba(47,111,228,0.28)]"
+            class="grid h-11 w-12 place-items-center rounded-lg border border-[color-mix(in_srgb,var(--blue)_82%,var(--ink))] bg-blue text-on-accent shadow-[0_10px_18px_color-mix(in_srgb,var(--blue)_22%,transparent)] transition-[filter,box-shadow] duration-fast hover:border-[color-mix(in_srgb,var(--blue)_74%,var(--ink))] hover:bg-[color-mix(in_srgb,var(--blue)_74%,var(--ink))] hover:brightness-105 hover:shadow-[0_0_0_4px_color-mix(in_srgb,var(--blue)_16%,transparent),0_12px_22px_color-mix(in_srgb,var(--blue)_28%,transparent)]"
             type="submit"
             aria-label="订阅更新"
           >
@@ -139,8 +139,8 @@ const stats = [
       </article>
 
       <article class="min-w-0">
-        <h2 class="mb-5 inline-flex items-center gap-3 m-0 text-base font-black leading-snug tracking-normal text-ink">
-          <span class="size-2.5 rounded-full border-[3px] border-blue bg-surface-strong shadow-[0_0_0_4px_color-mix(in_srgb,var(--blue)_12%,transparent)]"></span>
+        <h2 class="mb-5 inline-flex items-center gap-3 footer-title">
+          <span class="title-dot border-blue shadow-[0_0_0_4px_color-mix(in_srgb,var(--blue)_12%,transparent)]"></span>
           最近更新
         </h2>
         <ol class="m-0 grid list-none gap-0 p-0">
@@ -158,8 +158,8 @@ const stats = [
       </article>
 
       <article class="min-w-0">
-        <h2 class="mb-5 inline-flex items-center gap-3 m-0 text-base font-black leading-snug tracking-normal text-ink">
-          <span class="size-2.5 rounded-full border-[3px] border-[#2fbf7a] bg-surface-strong shadow-[0_0_0_4px_rgba(47,191,122,0.12)]"></span>
+        <h2 class="mb-5 inline-flex items-center gap-3 footer-title">
+          <span class="title-dot border-green shadow-[0_0_0_4px_color-mix(in_srgb,var(--green)_12%,transparent)]"></span>
           站点统计
         </h2>
         <dl class="stats-list m-0 grid grid-cols-2 gap-x-7 gap-y-6">
@@ -214,7 +214,7 @@ const stats = [
       </p>
       <nav class="flex flex-wrap items-center gap-2.5" aria-label="页脚辅助链接">
         <a class="inline-flex items-center gap-2 font-extrabold text-muted transition-colors duration-fast hover:text-blue" href="/" aria-label="在线状态">
-          <span class="online-dot size-2 rounded-full bg-[#25c983] shadow-[0_0_0_4px_rgba(37,201,131,0.15)]"></span>
+          <span class="online-dot size-2 rounded-full bg-green shadow-[0_0_0_4px_color-mix(in_srgb,var(--green)_15%,transparent)]"></span>
           在线状态
         </a>
         <i class="h-[18px] w-px bg-border" aria-hidden="true"></i>

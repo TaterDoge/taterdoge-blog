@@ -39,8 +39,7 @@ interface PagefindHit {
 	excerpt: string;
 }
 
-const TAG_BASE =
-	"tag flex-0 flex flex-nowrap items-center gap-1 whitespace-nowrap";
+const TAG_BASE = "tag";
 
 const PER_PAGE = 10;
 
@@ -197,7 +196,7 @@ export default function BlogArchive(props: BlogArchiveProps) {
 					id="search"
 					class="search-line grid grid-cols-[24px_minmax(0,1fr)] items-center gap-2.5 border-b border-border-soft py-2.5"
 				>
-					<span class="icon--lucide--search size-[19px] text-muted" />
+					<span class="icon-[lucide--search] size-[19px] text-muted" />
 					<input
 						class="min-w-0 w-full border-0 bg-transparent text-ink outline-0"
 						type="search"
@@ -273,7 +272,7 @@ export default function BlogArchive(props: BlogArchiveProps) {
 
 			<aside class="sticky top-[94px] grid gap-5 max-lg:static max-lg:order-first max-lg:grid-cols-2 max-xs:grid-cols-1">
 				<section class="border-b border-border-soft py-4">
-					<h2 class="mb-3 mt-0 text-base">归档概览</h2>
+					<h2 class="aside-title">归档概览</h2>
 					<dl class="m-0 grid gap-2">
 						<div class="flex justify-between gap-2.5 text-sm text-muted">
 							<dt class="m-0">文章</dt>
@@ -295,7 +294,7 @@ export default function BlogArchive(props: BlogArchiveProps) {
 				</section>
 
 				<section class="border-b border-border-soft py-4">
-					<h2 class="mb-3 mt-0 text-base">分类</h2>
+					<h2 class="aside-title">分类</h2>
 					<div class="category-list grid gap-2.5">
 						<button
 							type="button"
