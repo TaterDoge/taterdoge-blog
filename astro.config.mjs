@@ -4,11 +4,15 @@ import sitemap from "@astrojs/sitemap";
 import solid from "@astrojs/solid-js";
 import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
+import { remarkCodeTabs } from "./src/lib/remark-code-tabs";
 
 export default defineConfig({
 	site: "https://marchen.dev",
 	adapter: vercel(),
 	integrations: [mdx(), sitemap(), solid()],
+	markdown: {
+		remarkPlugins: [remarkCodeTabs],
+	},
 	vite: {
 		plugins: [tailwindcss()],
 		build: {

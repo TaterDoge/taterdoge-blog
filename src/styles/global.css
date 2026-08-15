@@ -957,6 +957,66 @@ body>footer {
     background-clip: padding-box;
   }
 
+  /* 代码 Tab（remark-code-tabs 生成）：纯 CSS radio 切换，零 JS */
+  .prose .code-tabs {
+    margin: 1.35em 0;
+    border: 1px solid var(--code-block-border);
+    border-radius: 7px;
+    background: var(--code-block-bg);
+    overflow: hidden;
+  }
+
+  .prose .code-tabs > input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .prose .code-tabs > label {
+    display: inline-block;
+    margin: 0;
+    padding: 8px 14px;
+    border-right: 1px solid var(--code-block-border);
+    border-bottom: 1px solid var(--code-block-border);
+    color: color-mix(in srgb, var(--code-block-text) 55%, transparent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  .prose .code-tabs > label:hover {
+    color: var(--code-block-text);
+  }
+
+  .prose .code-tabs > input:checked + label {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+    background: color-mix(in srgb, var(--blue) 12%, transparent);
+  }
+
+  .prose .code-tabs > pre {
+    display: none;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  /* 第 k 个 input 选中 → 显示第 k 个 pre；上限 MAX_FILES=8 */
+  .prose .code-tabs > input:nth-of-type(1):checked ~ pre:nth-of-type(1),
+  .prose .code-tabs > input:nth-of-type(2):checked ~ pre:nth-of-type(2),
+  .prose .code-tabs > input:nth-of-type(3):checked ~ pre:nth-of-type(3),
+  .prose .code-tabs > input:nth-of-type(4):checked ~ pre:nth-of-type(4),
+  .prose .code-tabs > input:nth-of-type(5):checked ~ pre:nth-of-type(5),
+  .prose .code-tabs > input:nth-of-type(6):checked ~ pre:nth-of-type(6),
+  .prose .code-tabs > input:nth-of-type(7):checked ~ pre:nth-of-type(7),
+  .prose .code-tabs > input:nth-of-type(8):checked ~ pre:nth-of-type(8) {
+    display: block;
+  }
+
   .prose table {
     display: block;
     overflow-x: auto;

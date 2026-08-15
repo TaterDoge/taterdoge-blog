@@ -13,3 +13,6 @@ dist/
 .pi-subagents/
 scripts/.charset.txt
 fonts-src/
+
+# 抓取缓存（中间产物）
+.scraped/
