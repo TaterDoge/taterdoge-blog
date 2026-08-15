@@ -1,0 +1,118 @@
+<svg width="1800" height="1500" viewBox="0 0 1800 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow" x="-8%" y="-10%" width="116%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10 Z" fill="#334155" />
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10 Z" fill="#15803d" />
+    </marker>
+    <marker id="arrow-red" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10 Z" fill="#dc2626" />
+    </marker>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M2 2 L10 6 L2 10 Z" fill="#7c3aed" />
+    </marker>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#dbeafe" />
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ecfdf5" />
+      <stop offset="100%" stop-color="#dcfce7" />
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff7ed" />
+      <stop offset="100%" stop-color="#ffedd5" />
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef2f2" />
+      <stop offset="100%" stop-color="#fee2e2" />
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#faf5ff" />
+      <stop offset="100%" stop-color="#f3e8ff" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1800" height="1500" fill="#fffaf0" />
+  <path d="M0 80H1800M0 160H1800M0 240H1800M0 320H1800M0 400H1800M0 480H1800M0 560H1800M0 640H1800M0 720H1800M0 800H1800M0 880H1800M0 960H1800M0 1040H1800M0 1120H1800M0 1200H1800M0 1280H1800M0 1360H1800M120 0V1500M240 0V1500M360 0V1500M480 0V1500M600 0V1500M720 0V1500M840 0V1500M960 0V1500M1080 0V1500M1200 0V1500M1320 0V1500M1440 0V1500M1560 0V1500M1680 0V1500" stroke="#f1e7d5" stroke-width="1" />
+
+  <text x="900" y="78" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="42" font-weight="800" fill="#0f172a">Agent 聊天安全边界链路</text>
+  <text x="900" y="122" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="500" fill="#64748b">准备上下文 → 结构化判断 → 三路分流 → 落库与记忆策略</text>
+
+  <rect x="90" y="185" width="1620" height="170" rx="30" fill="#ffffff" stroke="#dbeafe" stroke-width="4" opacity="0.82" />
+  <text x="150" y="225" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="800" fill="#2563eb">准备阶段</text>
+
+  <rect x="150" y="250" width="260" height="74" rx="20" fill="url(#blue)" stroke="#2563eb" stroke-width="4" filter="url(#shadow)" />
+  <text x="280" y="296" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">用户发送消息</text>
+
+  <rect x="530" y="250" width="260" height="74" rx="20" fill="url(#green)" stroke="#16a34a" stroke-width="4" filter="url(#shadow)" />
+  <text x="660" y="296" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">解析 LLM 配置</text>
+
+  <rect x="910" y="250" width="290" height="74" rx="20" fill="url(#orange)" stroke="#ea580c" stroke-width="4" filter="url(#shadow)" />
+  <text x="1055" y="296" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="800" fill="#0f172a">加载 Prompt / Guardrails</text>
+
+  <rect x="1310" y="244" width="300" height="86" rx="20" fill="url(#purple)" stroke="#7c3aed" stroke-width="4" filter="url(#shadow)" />
+  <text x="1460" y="280" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21" font-weight="800" fill="#0f172a">加载最近消息</text>
+  <text x="1460" y="310" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21" font-weight="800" fill="#0f172a">和长期记忆</text>
+
+  <path d="M410 287H530" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+  <path d="M790 287H910" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+  <path d="M1200 287H1310" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+
+  <rect x="500" y="440" width="800" height="255" rx="30" fill="#ffffff" stroke="#fecaca" stroke-width="4" opacity="0.82" />
+  <text x="560" y="482" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="800" fill="#dc2626">安全判断</text>
+
+  <rect x="590" y="525" width="300" height="110" rx="24" fill="url(#red)" stroke="#dc2626" stroke-width="4" filter="url(#shadow)" />
+  <text x="740" y="570" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="800" fill="#0f172a">LangChain</text>
+  <text x="740" y="604" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="800" fill="#0f172a">安全边界判断</text>
+
+  <rect x="970" y="525" width="300" height="110" rx="24" fill="url(#blue)" stroke="#2563eb" stroke-width="4" filter="url(#shadow)" />
+  <text x="1120" y="570" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">写入用户消息</text>
+  <text x="1120" y="604" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">metadata_json</text>
+
+  <path d="M1460 330C1460 395 740 395 740 525" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+  <path d="M890 580H970" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+
+  <path d="M900 765L1045 850L900 935L755 850Z" fill="#ffffff" stroke="#334155" stroke-width="4" filter="url(#shadow)" />
+  <text x="900" y="844" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="25" font-weight="800" fill="#0f172a">boundaryAction</text>
+  <text x="900" y="880" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="700" fill="#64748b">三路分流</text>
+  <path d="M1120 635C1120 715 900 715 900 765" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+
+  <rect x="90" y="1010" width="430" height="190" rx="30" fill="#ffffff" stroke="#fecaca" stroke-width="4" opacity="0.86" />
+  <rect x="145" y="1072" width="320" height="82" rx="22" fill="url(#red)" stroke="#dc2626" stroke-width="4" filter="url(#shadow)" />
+  <text x="305" y="1122" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">直接返回安全拒绝</text>
+  <rect x="205" y="962" width="134" height="44" rx="14" fill="#ffffff" stroke="#fecaca" stroke-width="3" />
+  <text x="272" y="991" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="800" fill="#dc2626">refuse</text>
+  <path d="M795 900C640 955 500 960 305 1072" stroke="#dc2626" stroke-width="3.5" marker-end="url(#arrow-red)" />
+
+  <rect x="685" y="1010" width="430" height="190" rx="30" fill="#ffffff" stroke="#bbf7d0" stroke-width="4" opacity="0.86" />
+  <rect x="735" y="1045" width="330" height="68" rx="20" fill="url(#green)" stroke="#16a34a" stroke-width="4" filter="url(#shadow)" />
+  <text x="900" y="1088" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="800" fill="#0f172a">注入安全策略到 system prompt</text>
+  <rect x="735" y="1148" width="330" height="68" rx="20" fill="url(#blue)" stroke="#2563eb" stroke-width="4" filter="url(#shadow)" />
+  <text x="900" y="1191" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="800" fill="#0f172a">调用普通聊天模型并流式返回</text>
+  <rect x="710" y="962" width="380" height="44" rx="14" fill="#ffffff" stroke="#bbf7d0" stroke-width="3" />
+  <text x="900" y="991" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="800" fill="#15803d">continue / soft_boundary / redirect</text>
+  <path d="M900 935V1045" stroke="#15803d" stroke-width="3.5" marker-end="url(#arrow-green)" />
+  <path d="M900 1113V1148" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+
+  <rect x="1250" y="1010" width="410" height="190" rx="30" fill="#ffffff" stroke="#fecaca" stroke-width="4" opacity="0.86" />
+  <rect x="1300" y="1072" width="310" height="82" rx="22" fill="url(#red)" stroke="#dc2626" stroke-width="4" filter="url(#shadow)" />
+  <text x="1455" y="1122" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">直接返回危机支持</text>
+  <rect x="1328" y="962" width="192" height="44" rx="14" fill="#ffffff" stroke="#fecaca" stroke-width="3" />
+  <text x="1424" y="991" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="800" fill="#dc2626">crisis_support</text>
+  <path d="M1005 900C1160 955 1275 960 1455 1072" stroke="#dc2626" stroke-width="3.5" marker-end="url(#arrow-red)" />
+
+  <rect x="735" y="1295" width="330" height="82" rx="22" fill="url(#orange)" stroke="#ea580c" stroke-width="4" filter="url(#shadow)" />
+  <text x="900" y="1345" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">保存 assistant 消息</text>
+  <path d="M305 1154C305 1250 720 1250 820 1295" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+  <path d="M900 1216V1295" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+  <path d="M1455 1154C1455 1250 1080 1250 980 1295" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+
+  <rect x="520" y="1420" width="760" height="70" rx="24" fill="#ffffff" stroke="#ddd6fe" stroke-width="4" filter="url(#shadow)" />
+  <text x="900" y="1464" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="23" font-weight="800" fill="#0f172a">根据 allowMemoryExtraction 决定是否抽取长期记忆</text>
+  <path d="M900 1377V1420" stroke="#334155" stroke-width="3.5" marker-end="url(#arrow)" />
+</svg>
