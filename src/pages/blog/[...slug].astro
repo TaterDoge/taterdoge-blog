@@ -277,6 +277,39 @@ headings
       initArticleLightbox();
     }
 
+    // 代码块复制按钮：document 级事件委托，页面脚本只执行一次，无需在软导航时重绑。
+    // 支持两种按钮：块内 .copy-btn（复制所在 pre）与 tabs-bar 的 .tabs-copy-btn（复制当前激活 tab）。
+    document.addEventListener("click", async (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const button = target.closest(".copy-btn, .tabs-copy-btn");
+      if (!(button instanceof HTMLElement)) return;
+
+      let codeElement = null;
+      if (button.classList.contains("tabs-copy-btn")) {
+        const tabs = button.closest(".code-tabs");
+        const inputs = tabs ? Array.from(tabs.querySelectorAll(".code-tabs-bar > input")) : [];
+        const checkedIdx = inputs.findIndex((i) => i.checked);
+        const block = tabs ? tabs.querySelectorAll(":scope > .expressive-code")[checkedIdx] : null;
+        codeElement = block?.querySelector("pre code") ?? null;
+      } else {
+        codeElement = button.closest("pre")?.querySelector("code") ?? null;
+      }
+      if (!(codeElement instanceof HTMLElement)) return;
+
+      const text = Array.from(codeElement.querySelectorAll(".code:not(summary *) "))
+        .map((el) => el.textContent ?? "")
+        .map((t) => (t === "\n" ? "" : t))
+        .join("\n");
+      await navigator.clipboard.writeText(text);
+
+      const previous = button?.getAttribute("data-timeout-id");
+      if (previous) window.clearTimeout(Number(previous));
+      button?.classList.add("success");
+      const timeoutId = window.setTimeout(() => button?.classList.remove("success"), 1000);
+      button?.setAttribute("data-timeout-id", String(timeoutId));
+    });
+
     // dev 下无 ClientRouter（astro:page-load 不派发），直接调用保证首屏初始化；
     // 生产软导航靠事件重新绑定（与 Footer/index/notes 脚本同一模式）。
     initArticlePage();

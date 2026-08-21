@@ -112,13 +112,16 @@
       opacity: 1;
       transform: translateY(0);
     }
+
     45% {
       opacity: 1;
     }
+
     72% {
       opacity: 0.18;
       transform: translateY(1px);
     }
+
     100% {
       opacity: 1;
       transform: translateY(0);
@@ -130,6 +133,7 @@
       opacity: 0;
       transform: translateY(12px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -915,7 +919,18 @@ body>footer {
     color: var(--ink-2);
   }
 
-  .prose pre {
+  /* expressive-code 代码块：整个预览组件最大高度 600px，超出滚动（header 自带 sticky 吸顶）。
+     滚动容器是 div.expressive-code（expressive-code 0.44 输出 div 而非 figure），
+     滚动条外观样式见下方 ::-webkit-scrollbar 规则；这里是标准属性兜底（Firefox 等）。 */
+  .expressive-code {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--blue) 62%, var(--border-strong)) transparent;
+  }
+
+  /* 裸 <pre>（无 data-language，非 expressive-code）回退样式 */
+  .prose pre:not([data-language]) {
     overflow-x: auto;
     overflow-y: auto;
     max-height: min(70vh, 680px);
@@ -931,33 +946,42 @@ body>footer {
     scrollbar-width: thin;
   }
 
-  .prose pre::-webkit-scrollbar,
+  .prose pre:not([data-language])::-webkit-scrollbar,
+  .prose .expressive-code::-webkit-scrollbar,
   .prose table::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
-  .prose pre::-webkit-scrollbar-track,
-  .prose table::-webkit-scrollbar-track {
+  .prose pre:not([data-language])::-webkit-scrollbar-track,
+  .prose .expressive-code::-webkit-scrollbar-track,
+  .prose table::-webkit-scrollbar-track,
+  .prose .code-tabs-bar::-webkit-scrollbar-track {
     border-radius: 999px;
     background: transparent;
   }
 
-  .prose pre::-webkit-scrollbar-thumb,
-  .prose table::-webkit-scrollbar-thumb {
+  .prose pre:not([data-language])::-webkit-scrollbar-thumb,
+  .prose .expressive-code::-webkit-scrollbar-thumb,
+  .prose table::-webkit-scrollbar-thumb,
+  .prose .code-tabs-bar::-webkit-scrollbar-thumb {
     border: 3px solid transparent;
     border-radius: 999px;
     background: color-mix(in srgb, var(--blue) 58%, var(--border-strong));
     background-clip: padding-box;
   }
 
-  .prose pre::-webkit-scrollbar-thumb:hover,
-  .prose table::-webkit-scrollbar-thumb:hover {
+  .prose pre:not([data-language])::-webkit-scrollbar-thumb:hover,
+  .prose .expressive-code::-webkit-scrollbar-thumb:hover,
+  .prose table::-webkit-scrollbar-thumb:hover,
+  .prose .code-tabs-bar::-webkit-scrollbar-thumb:hover {
     background: var(--blue);
     background-clip: padding-box;
   }
 
-  /* 代码 Tab（remark-code-tabs 生成）：纯 CSS radio 切换，零 JS */
+  /* 代码 Tab（remark-code-tabs 生成）：纯 CSS radio 切换，零 JS。
+     expressive-code 0.44 输出 div.expressive-code 而非 figure，
+     原兄弟选择器失效，改用 :has() 控制显示 */
   .prose .code-tabs {
     margin: 1.35em 0;
     border: 1px solid var(--code-block-border);
@@ -966,14 +990,25 @@ body>footer {
     overflow: hidden;
   }
 
-  .prose .code-tabs > input {
+  .prose .code-tabs-bar {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* 取消滚动条，保留滚动 */
+  }
+
+  .prose .code-tabs-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .prose .code-tabs-bar>input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
   }
 
-  .prose .code-tabs > label {
-    display: inline-block;
+  .prose .code-tabs-bar>label {
+    flex: 0 0 auto;
     margin: 0;
     padding: 8px 14px;
     border-right: 1px solid var(--code-block-border);
@@ -988,32 +1023,34 @@ body>footer {
     transition: color 0.15s;
   }
 
-  .prose .code-tabs > label:hover {
+  .prose .code-tabs-bar>label:hover {
     color: var(--code-block-text);
   }
 
-  .prose .code-tabs > input:checked + label {
-    color: var(--blue);
+  .prose .code-tabs-bar>input:checked+label {
+    color: var(--color-white);
     border-bottom-color: var(--blue);
     background: color-mix(in srgb, var(--blue) 12%, transparent);
   }
 
-  .prose .code-tabs > pre {
+  .prose .code-tabs>.expressive-code {
     display: none;
     margin: 0;
     border: none;
     border-radius: 0;
   }
 
-  /* 第 k 个 input 选中 → 显示第 k 个 pre；上限 MAX_FILES=8 */
-  .prose .code-tabs > input:nth-of-type(1):checked ~ pre:nth-of-type(1),
-  .prose .code-tabs > input:nth-of-type(2):checked ~ pre:nth-of-type(2),
-  .prose .code-tabs > input:nth-of-type(3):checked ~ pre:nth-of-type(3),
-  .prose .code-tabs > input:nth-of-type(4):checked ~ pre:nth-of-type(4),
-  .prose .code-tabs > input:nth-of-type(5):checked ~ pre:nth-of-type(5),
-  .prose .code-tabs > input:nth-of-type(6):checked ~ pre:nth-of-type(6),
-  .prose .code-tabs > input:nth-of-type(7):checked ~ pre:nth-of-type(7),
-  .prose .code-tabs > input:nth-of-type(8):checked ~ pre:nth-of-type(8) {
+  /* 第 k 个 input 选中 → 显示第 k 个代码块；上限 MAX_FILES=8。
+     注意用 nth-child 而非 nth-of-type：expressive-code 输出 div，
+     .code-tabs-bar 也是 div 会占用 div 类型计数，nth-of-type 会整体错位 */
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(1):checked)>.expressive-code:nth-child(2),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(2):checked)>.expressive-code:nth-child(3),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(3):checked)>.expressive-code:nth-child(4),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(4):checked)>.expressive-code:nth-child(5),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(5):checked)>.expressive-code:nth-child(6),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(6):checked)>.expressive-code:nth-child(7),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(7):checked)>.expressive-code:nth-child(8),
+  .prose .code-tabs:has(> .code-tabs-bar > input:nth-of-type(8):checked)>.expressive-code:nth-child(9) {
     display: block;
   }
 
@@ -1100,14 +1137,14 @@ body>footer {
     border-radius: inherit;
   }
 
-  .prose code {
+  .prose code:not(pre > code) {
     border-radius: 5px;
     background: var(--code-inline-bg);
     padding: 0.12rem 0.34rem;
     color: var(--code-inline-text);
   }
 
-  .prose pre code {
+  .prose :not(.expressive-code)>pre code {
     background: transparent;
     padding: 0;
     color: inherit;
@@ -1368,7 +1405,7 @@ body>footer {
     margin: 4px 0 2px;
   }
 
-  .toc-item[data-expanded="true"] > .toc-sublist {
+  .toc-item[data-expanded="true"]>.toc-sublist {
     display: grid;
   }
 
@@ -1513,6 +1550,7 @@ body>footer {
   }
 
   @media (prefers-reduced-motion: reduce) {
+
     .archive-layout .tag,
     .archive-layout .search-line button,
     .archive-layout .category-list button,
@@ -1826,7 +1864,7 @@ body>footer {
     filter: none !important;
   }
 
-  .site-footer .belief-item + .belief-item,
+  .site-footer .belief-item+.belief-item,
   .site-footer .subscribe-panel {
     border-left: 1px solid var(--border-soft);
   }
@@ -1846,8 +1884,13 @@ body>footer {
     color: #ff7a2f;
   }
 
-  .site-footer .subscribe-message[data-state="success"] { color: var(--green); }
-  .site-footer .subscribe-message[data-state="error"] { color: var(--status-error); }
+  .site-footer .subscribe-message[data-state="success"] {
+    color: var(--green);
+  }
+
+  .site-footer .subscribe-message[data-state="error"] {
+    color: var(--status-error);
+  }
 
   .site-footer .latest-link::before {
     position: absolute;
@@ -1861,7 +1904,9 @@ body>footer {
     transform: translateY(-50%);
   }
 
-  .site-footer .stat-purple { color: #9b6be8; }
+  .site-footer .stat-purple {
+    color: #9b6be8;
+  }
 
   .site-footer .online-dot {
     animation: footer-status-pulse 2.4s ease-in-out infinite;
@@ -1982,10 +2027,12 @@ body>footer {
 }
 
 @keyframes footer-status-pulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 15%, transparent);
   }
+
   50% {
     box-shadow: 0 0 0 7px color-mix(in srgb, var(--green) 6%, transparent);
   }
@@ -1996,6 +2043,7 @@ body>footer {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2003,13 +2051,25 @@ body>footer {
 }
 
 @keyframes compass-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes lost-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 ::view-transition-old(root),
@@ -2026,11 +2086,15 @@ body>footer {
 }
 
 @keyframes page-opacity-out {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes page-opacity-in {
-  from { opacity: 0; }
+  from {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 860px) {
@@ -2082,4 +2146,151 @@ body>footer {
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ── Expressive Code 适配 ─────────────────────────────────────────────
+   必须保持在 @layer 之外（未分层）：expressive-code 自带的
+   `.expressive-code :not(:is(svg, svg *)) { all: revert }` 是未分层规则，
+   会覆盖任何 layer 内声明，导致复制按钮被 revert 成 UA 默认（巨大图标）。
+   未分层 + 更高 specificity 才能压过它。 */
+
+.prose .expressive-code .copy-btn {
+  all: initial;
+  /* 滚动容器是 .expressive-code（max-height:600px + overflow-y:auto）。
+     按钮（插件已放到 frame 内、pre 之前）用 sticky 锚定最近的纵向滚动容器 = .expressive-code，
+     滚动时保持可见；float:right 实现右上角、不占父级宽度。
+     不能把按钮放回 pre 内：pre 的 overflow-x:auto 会让 overflow-y 被 CSS 规范计算为 auto，
+     成为更近的滚动容器抢走锚点；absolute 定位到内部 frame 也会随内容滚出可视区。 */
+  position: sticky;
+  top: 0.6rem;
+  float: right;
+  margin: 0.6rem 0.6rem 0 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--code-block-text) 10%, transparent);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.15s;
+}
+
+.prose .code-tabs .tabs-copy-btn {
+  flex: 0 0 auto;
+  margin: 0 0.35rem 0 auto;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--code-block-text);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.15s;
+}
+
+.prose .code-tabs:hover .tabs-copy-btn,
+.prose .code-tabs-bar .tabs-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.prose .code-tabs-bar .tabs-copy-btn:hover {
+  background: color-mix(in srgb, var(--code-block-text) 12%, transparent);
+}
+
+/* child combinator：.copy-btn-icon 类同时挂在 span 和两个 svg 上，
+   若不加 > 会让 (0,4,0) 选择器把 svg 的 absolute 定位盖掉，
+   成功 icon 会错位到按钮外。 */
+.prose .code-tabs-bar .tabs-copy-btn > .copy-btn-icon {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+}
+
+.prose .code-tabs-bar .tabs-copy-btn svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  transition: opacity 0.2s;
+}
+
+.prose .code-tabs-bar .tabs-copy-btn .success-icon {
+  opacity: 0;
+}
+
+.prose .code-tabs-bar .tabs-copy-btn.success .copy-icon {
+  opacity: 0;
+}
+
+.prose .code-tabs-bar .tabs-copy-btn.success .success-icon {
+  opacity: 1;
+  fill: var(--green);
+}
+
+/* tabs 场景复制按钮在 bar 右侧，隐藏块内按钮避免占用代码渲染区。
+   用 :has() 条件化：仅当 bar 里确实有 .tabs-copy-btn 时才隐藏块级按钮，
+   避免本地 dev 因 markdown 编译缓存未刷新（缺 tabs-copy-btn）时出现整页无复制按钮。 */
+.prose .code-tabs:has(.tabs-copy-btn) > .expressive-code .copy-btn {
+  display: none;
+}
+
+.prose .expressive-code .copy-btn:hover {
+  background: color-mix(in srgb, var(--code-block-text) 18%, transparent);
+}
+
+.prose .expressive-code .copy-btn:active {
+  transform: scale(0.9);
+}
+
+.prose .expressive-code:hover .copy-btn,
+.prose .expressive-code .copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.prose .expressive-code .copy-btn-icon {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+}
+
+.prose .expressive-code .copy-btn-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--code-block-text);
+  transition: opacity 0.2s;
+}
+
+.prose .expressive-code .copy-btn .success-icon {
+  opacity: 0;
+}
+
+.prose .expressive-code .copy-btn.success .copy-icon {
+  opacity: 0;
+}
+
+.prose .expressive-code .copy-btn.success .success-icon {
+  opacity: 1;
+  fill: var(--green);
+}
+
+.prose .expressive-code .title {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+.prose .expressive-code code {
+  font-weight: 500;
+}
+
+.prose .expressive-code ::selection {
+  background: color-mix(in srgb, var(--blue) 30%, transparent);
 }
