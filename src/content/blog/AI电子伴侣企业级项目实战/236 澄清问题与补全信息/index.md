@@ -71,7 +71,7 @@ NOTE
 
 澄清问题与补全信息完整展示意图识别、信息抽取和澄清从上一篇的上海出差问题开始，观察三步结果如何连续传递agent.tsintent-schema.tsintent-prompt.tsclarify-schema.tsclarify-prompt.tschat.tsx
 
-```typescript
+```typescript agent.ts
 import { ChatOpenAI } from '@langchain/openai'
 import { readRequiredActiveLlmConfig } from '@keepzml/llm-runtime/client'
 
@@ -353,6 +353,341 @@ function formatList(items: readonly string[]) {
   return items.length ? items.join('、') : '无'
 }
 
+```
+
+```typescript intent-schema.ts
+import { z } from 'zod'
+
+const IntentConfidenceSchema = z.enum(['高', '中', '低'])
+type IntentConfidence = z.infer<typeof IntentConfidenceSchema>
+const StringListSchema = z.union([z.array(z.string()), z.string()]).nullable().optional()
+const DetailValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.union([z.string(), z.number(), z.boolean()])),
+]).nullable()
+const ExplicitDetailsSchema = z.union([
+  z.array(z.string()),
+  z.string(),
+  z.record(DetailValueSchema),
+]).nullable().optional()
+
+export const IntentSchema = z.object({
+  intent: z.string().describe('用户这次输入想完成的事情，用一句短语表示'),
+  goal: z.string().optional().describe('用户希望最终得到什么结果'),
+  expected_result: z.string().optional().describe('goal 的兼容字段'),
+  confidence: z.union([
+    IntentConfidenceSchema,
+    z.number().min(0).max(1),
+  ]).describe('判断信心，可以是高/中/低或 0 到 1 的数值'),
+}).transform(({ intent, goal, expected_result, confidence }) => ({
+  intent,
+  goal: goal ?? expected_result ?? '未提供',
+  confidence: normalizeConfidence(confidence),
+}))
+
+export const InformationSchema = z.object({
+  time: z.string().nullable().optional().describe('用户明确提到的时间'),
+  destination: z.string().nullable().optional().describe('用户明确提到的地点'),
+  purpose: z.string().nullable().optional().describe('用户明确提到的出行目的'),
+  duration: z.string().nullable().optional().describe('用户明确提到的停留时长'),
+  explicitDetails: ExplicitDetailsSchema.describe('问题中明确出现的其他条件，优先返回字符串数组，也兼容键值对象'),
+  explicit_details: ExplicitDetailsSchema.describe('explicitDetails 的兼容字段'),
+  missingInformation: StringListSchema.describe('当前尚未提供的信息'),
+  missing_information: StringListSchema.describe('missingInformation 的兼容字段'),
+}).transform(({
+  time,
+  destination,
+  purpose,
+  duration,
+  explicitDetails,
+  explicit_details,
+  missingInformation,
+  missing_information,
+}) => ({
+  time: time ?? null,
+  destination: destination ?? null,
+  purpose: purpose ?? null,
+  duration: duration ?? null,
+  explicitDetails: normalizeExplicitDetails(explicitDetails ?? explicit_details),
+  missingInformation: normalizeStringList(missingInformation ?? missing_information),
+}))
+
+function normalizeStringList(value: readonly string[] | string | null | undefined) {
+  if (Array.isArray(value)) return value.map(item => item.trim()).filter(Boolean)
+  if (typeof value !== 'string' || !value.trim()) return []
+  return [value.trim()]
+}
+
+type ExplicitDetailsInput = z.input<typeof ExplicitDetailsSchema>
+
+const DETAIL_LABELS: Record<string, string> = {
+  transportation: '交通方式',
+  transport: '交通方式',
+  dressCode: '着装要求',
+  dress_code: '着装要求',
+  companions: '同行人员',
+  equipment: '携带设备',
+}
+
+function normalizeExplicitDetails(value: ExplicitDetailsInput) {
+  if (Array.isArray(value) || typeof value === 'string' || value == null) {
+    return normalizeStringList(value)
+  }
+
+  return Object.entries(value).flatMap(([key, detail]) => {
+    if (detail == null) return []
+    const label = DETAIL_LABELS[key] ?? key
+    const content = Array.isArray(detail)
+      ? detail.map(formatDetailValue).filter(Boolean).join('、')
+      : formatDetailValue(detail)
+
+    return content ? [`${label}：${content}`] : []
+  })
+}
+
+function formatDetailValue(value: string | number | boolean) {
+  if (typeof value === 'boolean') return value ? '是' : '否'
+  return String(value).trim()
+}
+
+function normalizeConfidence(value: IntentConfidence | number): IntentConfidence {
+  if (typeof value !== 'number') return value
+  if (value >= 0.8) return '高'
+  if (value >= 0.5) return '中'
+  return '低'
+}
+```
+
+```typescript intent-prompt.ts
+export const INTENT_SYSTEM_PROMPT = `你只负责识别用户意图，不负责回答问题。
+
+请根据用户输入判断：
+1. 用户想完成什么事情；
+2. 用户最终希望得到什么结果；
+3. 对这个判断的信心程度。
+
+不要补充用户没有表达的事实。
+请严格使用 intent、goal、confidence 这三个字段；confidence 优先使用“高”“中”“低”之一。
+请只输出符合要求的 json 对象，不要输出 Markdown 或其他文字。`
+
+export const INFORMATION_SYSTEM_PROMPT = `你只负责从用户输入中抽取信息，不负责生成最终建议。
+
+要求：
+- 只能记录用户明确说出的内容；
+- 没有出现的字段返回 null；
+- 不要根据常识猜测地点、天气、出行目的或用户习惯；
+- missingInformation 只列出完成用户目标时可能需要、但当前尚未提供的信息。
+请严格使用 time、destination、purpose、duration、explicitDetails、missingInformation 这些字段。
+- explicitDetails 使用字符串数组，例如 ["交通方式：高铁"]；没有其他明确条件时返回空数组。
+请只输出符合要求的 json 对象，不要输出 Markdown 或其他文字。`
+```
+
+```typescript clarify-schema.ts
+import { z } from 'zod'
+
+const StringListSchema = z.union([
+  z.array(z.string()),
+  z.string(),
+]).nullable().optional()
+const DetailValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.union([z.string(), z.number(), z.boolean()])),
+]).nullable()
+const ExplicitDetailsSchema = z.union([
+  z.array(z.string()),
+  z.string(),
+  z.record(DetailValueSchema),
+]).nullable().optional()
+
+const NullableTextSchema = z.string().nullable().optional()
+
+export const ClarificationSchema = z.object({
+  time: NullableTextSchema.describe('合并补充信息后的出行时间'),
+  destination: NullableTextSchema.describe('合并补充信息后的目的地'),
+  purpose: NullableTextSchema.describe('合并补充信息后的出行目的'),
+  duration: NullableTextSchema.describe('合并补充信息后的停留时长'),
+  explicitDetails: ExplicitDetailsSchema.describe('合并后的其他明确条件，优先返回字符串数组，也兼容键值对象'),
+  explicit_details: ExplicitDetailsSchema.describe('explicitDetails 的兼容字段'),
+  missingInformation: StringListSchema.describe('合并后仍然缺少的信息'),
+  missing_information: StringListSchema.describe('missingInformation 的兼容字段'),
+  askUserFor: StringListSchema.describe('仍然需要向用户确认的信息'),
+  ask_user_for: StringListSchema.describe('askUserFor 的兼容字段'),
+  toolInformation: StringListSchema.describe('更适合由外部工具查询的信息'),
+  tool_information: StringListSchema.describe('toolInformation 的兼容字段'),
+  notRequiredInformation: StringListSchema.describe('当前不值得继续补充的信息'),
+  not_required_information: StringListSchema.describe('notRequiredInformation 的兼容字段'),
+  nextQuestion: NullableTextSchema.describe('下一轮只向用户提出的一个问题'),
+  next_question: NullableTextSchema.describe('nextQuestion 的兼容字段'),
+  reason: NullableTextSchema.describe('为什么选择这个问题或结束澄清'),
+}).transform((result) => {
+  const askUserFor = mergeStringLists(
+    result.askUserFor,
+    result.ask_user_for,
+  )
+  const nextQuestion = firstText(result.nextQuestion, result.next_question)
+
+  return {
+    information: {
+      time: result.time ?? null,
+      destination: result.destination ?? null,
+      purpose: result.purpose ?? null,
+      duration: result.duration ?? null,
+      explicitDetails: mergeExplicitDetails(
+        result.explicitDetails,
+        result.explicit_details,
+      ),
+      missingInformation: mergeStringLists(
+        result.missingInformation,
+        result.missing_information,
+      ),
+    },
+    askUserFor,
+    toolInformation: mergeStringLists(
+      result.toolInformation,
+      result.tool_information,
+    ),
+    notRequiredInformation: mergeStringLists(
+      result.notRequiredInformation,
+      result.not_required_information,
+    ),
+    // 是否可以规划由“还要不要问用户”推导，避免模型返回矛盾状态。
+    readyToPlan: askUserFor.length === 0,
+    nextQuestion: askUserFor.length
+      ? nextQuestion ?? `请补充一下：${askUserFor[0]}？`
+      : null,
+    reason: result.reason?.trim() || '根据当前信息缺口决定下一步动作',
+  }
+})
+
+function mergeStringLists(...values: (readonly string[] | string | null | undefined)[]) {
+  const items = values.flatMap(normalizeStringList)
+  return [...new Set(items)]
+}
+
+type ExplicitDetailsInput = z.input<typeof ExplicitDetailsSchema>
+
+const DETAIL_LABELS: Record<string, string> = {
+  transportation: '交通方式',
+  transport: '交通方式',
+  dressCode: '着装要求',
+  dress_code: '着装要求',
+  companions: '同行人员',
+  equipment: '携带设备',
+}
+
+function mergeExplicitDetails(...values: ExplicitDetailsInput[]) {
+  return [...new Set(values.flatMap(normalizeExplicitDetails))]
+}
+
+function normalizeExplicitDetails(value: ExplicitDetailsInput) {
+  if (Array.isArray(value) || typeof value === 'string' || value == null) {
+    return normalizeStringList(value)
+  }
+
+  return Object.entries(value).flatMap(([key, detail]) => {
+    if (detail == null) return []
+    const label = DETAIL_LABELS[key] ?? key
+    const content = Array.isArray(detail)
+      ? detail.map(formatDetailValue).filter(Boolean).join('、')
+      : formatDetailValue(detail)
+
+    return content ? [`${label}：${content}`] : []
+  })
+}
+
+function normalizeStringList(value: readonly string[] | string | null | undefined) {
+  if (Array.isArray(value)) {
+    return value.map(item => item.trim()).filter(Boolean)
+  }
+  if (typeof value !== 'string' || !value.trim()) return []
+  return [value.trim()]
+}
+
+function formatDetailValue(value: string | number | boolean) {
+  if (typeof value === 'boolean') return value ? '是' : '否'
+  return String(value).trim()
+}
+
+function firstText(...values: (string | null | undefined)[]) {
+  return values.find(value => value?.trim())?.trim() ?? null
+}
+```
+
+```typescript clarify-prompt.ts
+export const CLARIFICATION_SYSTEM_PROMPT = `你负责第三步“澄清问题与补全信息”，不负责重新识别意图，也不重新执行前面的信息抽取步骤。
+
+你会收到前两步保存的 currentInformation，以及用户本轮新增的 latestUserSupplement。请在一次处理中完成两件事：
+1. 把用户新增内容合并进 currentInformation；
+2. 对合并后剩余的 missingInformation 重新分类。
+
+请输出一个 json 对象，并严格使用以下字段：
+- time、destination、purpose、duration：合并后的字段，没有变化时复制原值；
+- explicitDetails：使用字符串数组，保留原有内容，并加入用户这次明确补充的其他条件；
+- missingInformation：删除已经被补齐的缺口，保留仍未解决的缺口；
+- askUserFor：仍需用户回答、并且会明显改变最终结果的信息；
+- toolInformation：更适合由天气、日历等外部工具查询的信息；
+- notRequiredInformation：当前影响很小，不值得继续打扰用户的信息；
+- nextQuestion：这一轮只向用户提出的一个问题；无需继续询问时返回 null；
+- reason：为什么优先询问这个问题，或者为什么可以结束澄清。
+
+面向用户的问题必须使用自然中文描述，例如“这次出行主要是做什么？”；不要把 purpose、destination、time、duration、explicitDetails 等内部字段名放进 askUserFor 或 nextQuestion。
+
+判断规则：
+1. 只能合并用户明确补充的事实，不要猜测新信息；
+2. 没有新增补充时，原样保留 currentInformation；
+3. 不要创造 currentInformation 中不存在的新缺口；
+4. 如果一个缺口已经被本轮回答解决，必须从 missingInformation 中移除；
+5. 每个剩余缺口都必须进入 askUserFor、toolInformation、notRequiredInformation 中的一个；
+6. 天气、车次状态等客观事实交给工具，不要让用户替工具查询；
+7. 每轮最多提出一个最影响结果、并且容易回答的问题；
+8. 只输出 json，不要输出 Markdown 或额外说明。`
+```
+
+```tsx chat.tsx
+'use client'
+
+import { useRef } from 'react'
+import {
+  ArticleChat,
+  type ArticleChatRun,
+} from '@keepzml/ui/article-chat'
+
+import {
+  createClarificationSession,
+  runClarificationAgent,
+} from './agent'
+
+export default function ClarificationChat() {
+  const sessionRef = useRef(createClarificationSession())
+  const runAgent: ArticleChatRun = ({ messages, abortSignal }) => {
+    return runClarificationAgent(
+      messages,
+      sessionRef.current,
+      abortSignal,
+    )
+  }
+
+  return (
+    <ArticleChat
+      title='澄清问题与补全信息'
+      subtitle='完整展示意图识别、信息抽取和澄清'
+      emptyText='从上一篇的上海出差问题开始，观察三步结果如何连续传递'
+      suggestions={[
+        {
+          label: '开始上海出差案例',
+          prompt: '我明天要坐高铁去上海出差，应该带什么？',
+        },
+      ]}
+      placeholder='回答 Agent 的问题...'
+      pendingText='Agent 正在检查信息缺口'
+      onRun={runAgent}
+    />
+  )
+}
 ```
 
 `agent.ts` 是这次案例最值得观察的文件。首轮运行时，它没有复制或改写上一篇的 Zod 和提示词，而是直接导入它们，然后按「意图识别 → 信息抽取 → 缺口分类」的顺序传递真实结果。完成首轮之后，它会把 `intent`、当前信息和已经处理的用户消息数量保存到会话状态中。
