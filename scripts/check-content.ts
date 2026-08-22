@@ -1,16 +1,23 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { hasValidDirName } from "../src/lib/content-rules";
 
 const blogRoot = path.resolve("src/content/blog");
-const mediaExt = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".avif", ".mp4", ".webm", ".gifv"]);
-const localMediaRef = /!\[[^\]]*]\((\.\/|\.\.\/)([^)\s]+)\)|<img\b[^>]*\bsrc=["'](\.\/|\.\.\/)([^"']+)["']/gi;
-// 允许中文/英文可读目录名；禁止路径与系统非法字符
-function isValidDirName(name: string) {
-  if (!name || name === "." || name === "..") return false;
-  if (/[/\\:*?"<>|\n\r\t]/.test(name)) return false;
-  if (name !== name.trim()) return false;
-  return true;
-}
+const mediaExt = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".webp",
+  ".svg",
+  ".avif",
+  ".mp4",
+  ".webm",
+  ".gifv",
+]);
+const localMediaRef =
+  /!\[[^\]]*]\((\.\/|\.\.\/)([^)\s]+)\)|<img\b[^>]*\bsrc=["'](\.\/|\.\.\/)([^"']+)["']/gi;
+// 目录名校验规则集中在 src/lib/content-rules.ts（与 publish-markdown.ts 共用）
 
 type Issue = string;
 
@@ -69,7 +76,9 @@ async function main() {
     if (entry.name === ".gitkeep" || entry.name === ".DS_Store") continue;
     const full = path.join(blogRoot, entry.name);
     if (entry.isFile()) {
-      issues.push(`blog 根目录禁止直接放文件，文章必须在 分类/文章/index.md: src/content/blog/${entry.name}`);
+      issues.push(
+        `blog 根目录禁止直接放文件，文章必须在 分类/文章/index.md: src/content/blog/${entry.name}`,
+      );
       continue;
     }
     if (!entry.isDirectory()) continue;
@@ -77,8 +86,10 @@ async function main() {
       issues.push(`禁止 *.assets 目录: src/content/blog/${entry.name}`);
       continue;
     }
-    if (!isValidDirName(entry.name)) {
-      issues.push(`分类目录名非法（勿含 /\\:*?\"<>| 等）: src/content/blog/${entry.name}`);
+    if (!hasValidDirName(entry.name)) {
+      issues.push(
+        `分类目录名非法（勿含 /\\:*?"<>| 等）: src/content/blog/${entry.name}`,
+      );
     }
 
     const postEntries = await readdir(full, { withFileTypes: true });
@@ -93,17 +104,24 @@ async function main() {
       }
       if (!postEntry.isDirectory()) continue;
       if (postEntry.name.endsWith(".assets")) {
-        issues.push(`禁止 *.assets 目录: src/content/blog/${entry.name}/${postEntry.name}`);
+        issues.push(
+          `禁止 *.assets 目录: src/content/blog/${entry.name}/${postEntry.name}`,
+        );
         continue;
       }
-      if (!isValidDirName(postEntry.name)) {
-        issues.push(`文章目录名非法（勿含 /\\:*?\"<>| 等）: src/content/blog/${entry.name}/${postEntry.name}`);
+      if (!hasValidDirName(postEntry.name)) {
+        issues.push(
+          `文章目录名非法（勿含 /\\:*?"<>| 等）: src/content/blog/${entry.name}/${postEntry.name}`,
+        );
       }
       const indexMd = path.join(postFull, "index.md");
       const indexMdx = path.join(postFull, "index.mdx");
-      const hasIndex = allFiles.includes(indexMd) || allFiles.includes(indexMdx);
+      const hasIndex =
+        allFiles.includes(indexMd) || allFiles.includes(indexMdx);
       if (!hasIndex) {
-        issues.push(`文章目录缺少 index.md(x): src/content/blog/${entry.name}/${postEntry.name}`);
+        issues.push(
+          `文章目录缺少 index.md(x): src/content/blog/${entry.name}/${postEntry.name}`,
+        );
       }
     }
   }
@@ -127,9 +145,14 @@ async function main() {
         issues.push(`媒体文件只能放在文章目录内: src/content/blog/${rel}`);
         continue;
       }
-      const hasIndex = allFiles.some((candidate) => path.dirname(candidate) === parent && isPostIndex(candidate));
+      const hasIndex = allFiles.some(
+        (candidate) =>
+          path.dirname(candidate) === parent && isPostIndex(candidate),
+      );
       if (!hasIndex) {
-        issues.push(`含媒体的目录缺少 index.md(x): src/content/blog/${parentRel}`);
+        issues.push(
+          `含媒体的目录缺少 index.md(x): src/content/blog/${parentRel}`,
+        );
       }
     }
 
@@ -137,7 +160,9 @@ async function main() {
 
     // only allow category/post/index.md
     if (!isPostIndex(file) || depth !== 3) {
-      issues.push(`文章必须是 分类/文章/index.md 结构: src/content/blog/${rel}`);
+      issues.push(
+        `文章必须是 分类/文章/index.md 结构: src/content/blog/${rel}`,
+      );
       continue;
     }
 
@@ -148,7 +173,9 @@ async function main() {
     }
     for (const ref of refs) {
       if (ref.startsWith("../")) {
-        issues.push(`本地资源不要引用上级目录: src/content/blog/${rel} -> ${ref}`);
+        issues.push(
+          `本地资源不要引用上级目录: src/content/blog/${rel} -> ${ref}`,
+        );
       }
     }
   }
@@ -158,7 +185,9 @@ async function main() {
 }
 
 function fail(issues: Issue[]): never {
-  console.error("content check failed:\n" + issues.map((issue) => `- ${issue}`).join("\n"));
+  console.error(
+    "content check failed:\n" + issues.map((issue) => `- ${issue}`).join("\n"),
+  );
   process.exit(1);
 }
 

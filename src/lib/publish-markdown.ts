@@ -1,6 +1,9 @@
 // 发布内容的 Markdown/TS 序列化纯函数（/admin/publish 与 /admin/manage 使用）。
-// 与 check-content.ts、content.config.ts 共享「什么算合法内容」的语义；
-// 校验逻辑改动请同步三处，并优先放本文件（可单测）。
+// 目录名/文件名合法性规则集中在 ./content-rules（check-content.ts 同源引用）；
+// 内容 schema 真相源为 src/content.config.ts，字段变更需与两边对齐。
+import { cleanDirName } from "./content-rules";
+
+export { cleanDirName };
 
 export type PublishType = "blog" | "note" | "project";
 
@@ -34,25 +37,6 @@ export function toList(value: string[] | string | undefined) {
 		.split(/[\n,，]/)
 		.map((item) => item.trim())
 		.filter(Boolean);
-}
-
-/** 保留中文可读目录名；仅去掉文件系统非法字符 */
-export function cleanDirName(value: string | undefined, fallback: string) {
-	const raw = (value ?? "").trim();
-	const name = (raw || fallback)
-		.trim()
-		.replace(/[/\\:*?"<>|#%]+/g, "")
-		.replace(/[\u0000-\u001f\u007f]/g, "")
-		.replace(/\s+/g, " ")
-		.slice(0, 80)
-		.trim();
-
-	// `.`/`..` 会被 GitHub contents URL 规范化逃逸出目标目录；
-	// 非空但清洗后为空（全空白/全非法字符）显式报错，不静默回退。
-	if (!name || name === "." || name === "..") {
-		throw new Error(`Invalid directory name: ${JSON.stringify(raw || fallback)}`);
-	}
-	return name;
 }
 
 function timestampSlug() {
