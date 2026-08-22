@@ -207,14 +207,13 @@ headings
 
       const links = Array.from(toc.querySelectorAll("[data-toc-link]")).filter((link) => link instanceof HTMLAnchorElement);
       const sections = links
-        .map((link) => {
+        .flatMap((link) => {
           const id = decodeURIComponent(link.hash.slice(1));
           const section = document.getElementById(id);
-          return section instanceof HTMLElement ? { id, section } : undefined;
-        })
-        .filter((item) => Boolean(item));
+          return section instanceof HTMLElement ? [{ id, section }] : [];
+        });
 
-      const setActive = (id) => {
+      const setActive = (id: string) => {
         toc.querySelectorAll("[data-toc-parent]").forEach((item) => {
           if (item instanceof HTMLElement) item.dataset.expanded = "false";
         });
@@ -288,7 +287,7 @@ headings
       let codeElement = null;
       if (button.classList.contains("tabs-copy-btn")) {
         const tabs = button.closest(".code-tabs");
-        const inputs = tabs ? Array.from(tabs.querySelectorAll(".code-tabs-bar > input")) : [];
+        const inputs = tabs ? Array.from(tabs.querySelectorAll<HTMLInputElement>(".code-tabs-bar > input")) : [];
         const checkedIdx = inputs.findIndex((i) => i.checked);
         const block = tabs ? tabs.querySelectorAll(":scope > .expressive-code")[checkedIdx] : null;
         codeElement = block?.querySelector("pre code") ?? null;

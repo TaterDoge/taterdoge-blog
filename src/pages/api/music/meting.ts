@@ -18,10 +18,7 @@ export const GET: APIRoute = async ({ url }) => {
 	const id = url.searchParams.get("id") ?? "";
 
 	if (!allowedServers.has(server) || !allowedTypes.has(type)) {
-		return Response.json(
-			{ error: "Unsupported music source." },
-			{ status: 400 },
-		);
+		return Response.json({ error: "Unsupported music source." }, { status: 400 });
 	}
 
 	if (!id || id.startsWith("YOUR_")) {
@@ -38,10 +35,6 @@ export const GET: APIRoute = async ({ url }) => {
 		upstream.searchParams.set("server", server);
 		upstream.searchParams.set("type", type);
 		upstream.searchParams.set("id", id);
-		upstream.searchParams.set(
-			"r",
-			url.searchParams.get("r") ?? String(Math.random()),
-		);
 
 		const response = await fetch(upstream, {
 			headers: {

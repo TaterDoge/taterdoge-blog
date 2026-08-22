@@ -40,7 +40,7 @@ const formatMomentTime = (date: Date) =>
 
     <section class="mx-auto grid w-full max-w-content gap-6 max-xs:w-full" aria-label="碎念列表">
       {visibleNotes.map((note, index) => {
-        const text = note.body.trim();
+        const text = (note.body ?? "").trim();
         const images = note.data.images ?? [];
         const visibleImages = images.slice(0, 9);
         const imageCount = visibleImages.length;

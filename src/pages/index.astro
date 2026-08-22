@@ -238,7 +238,7 @@ const heroAriaLabel = `${siteConfig.title}，把灵感变成可以翻阅的日�
           if (part instanceof HTMLElement) part.textContent = "";
         });
 
-        const writePart = (part, text, done) => {
+        const writePart = (part: HTMLElement, text: string, done: () => void) => {
           part.classList.add("is-active");
           let index = 0;
           const write = () => {

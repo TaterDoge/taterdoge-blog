@@ -180,7 +180,7 @@ const stats = [
       <div class="footer-illustration relative flex min-h-[170px] justify-center" aria-hidden="true">
         <img
           class="absolute bottom-2.5 left-[5%] w-[108px] drop-shadow-[0_16px_20px_var(--shadow-soft)]"
-          src="/images/decorative_element/sprite3.png"
+          src="/images/decorative_element/sprite3.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -238,7 +238,7 @@ const stats = [
     const storageKey = "marchen_footer_subscribers";
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const setMessage = (text, state) => {
+    const setMessage = (text: string, state: string) => {
       if (!(message instanceof HTMLElement)) return;
       message.textContent = text;
       message.dataset.state = state;

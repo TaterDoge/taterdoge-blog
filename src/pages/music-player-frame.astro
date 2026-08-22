@@ -7,8 +7,7 @@ const hasPlaylist = Boolean(music.playlistId && !music.playlistId.startsWith("YO
 const playlistUrl = music.metingApi
   .replace(":server", "tencent")
   .replace(":type", "playlist")
-  .replace(":id", encodeURIComponent(music.playlistId))
-  .replace(":r", String(Date.now()));
+  .replace(":id", encodeURIComponent(music.playlistId));
 ---
 
 <!doctype html>
@@ -43,7 +42,7 @@ const playlistUrl = music.metingApi
         const playerHost = document.querySelector("#player");
         if (!playerHost) return;
 
-        const normalizeAudio = (items) => {
+        const normalizeAudio = (items: any[]) => {
           if (!Array.isArray(items)) return [];
           return items
             .map((item) => ({
