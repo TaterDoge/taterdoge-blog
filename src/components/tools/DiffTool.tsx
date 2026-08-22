@@ -30,15 +30,68 @@ function buildDiffCodeParts(
 	changed: boolean,
 ): DiffCharPart[] {
 	if (!changed || pairText === null) return [{ value: text || " " }];
-	const parts = diffChars(side === "left" ? text : pairText, side === "left" ? pairText : text);
+	const parts = diffChars(
+		side === "left" ? text : pairText,
+		side === "left" ? pairText : text,
+	);
 	const result: DiffCharPart[] = [];
 	for (const part of parts) {
 		if (side === "left" && part.added) continue;
 		if (side === "right" && part.removed) continue;
 		result.push({ value: part.value, added: part.added, removed: part.removed });
 	}
-	if (result.length === 0 || !result.some((p) => p.value)) return [{ value: " " }];
+	if (result.length === 0 || !result.some((p) => p.value))
+		return [{ value: " " }];
 	return result;
+}
+
+function DiffPane(props: {
+	kind: "removed" | "added";
+	label: string;
+	count: () => number;
+	lines: () => DiffLine[];
+}) {
+	return (
+		<section class={`diff-pane ${props.kind}`}>
+			<div class="diff-pane-head">
+				<strong>{props.label}</strong>
+				<span>{props.count()} 行</span>
+			</div>
+			<div class="diff-pane-body">
+				<For each={props.lines()}>
+					{(line) => (
+						<div class={`diff-line diff-${line.type}`}>
+							<span class="diff-line-number">{line.number}</span>
+							<span class="diff-code">
+								<For
+									each={buildDiffCodeParts(
+										line.text,
+										line.pairText,
+										line.side,
+										line.changed,
+									)}
+								>
+									{(part) => (
+										<span
+											class={
+												part.removed
+													? "diff-char-remove"
+													: part.added
+														? "diff-char-add"
+														: ""
+											}
+										>
+											{part.value}
+										</span>
+									)}
+								</For>
+							</span>
+						</div>
+					)}
+				</For>
+			</div>
+		</section>
+	);
 }
 
 export default function DiffTool() {
@@ -159,54 +212,13 @@ export default function DiffTool() {
 				</div>
 			</div>
 			<div class="diff-output wide">
-				<section class="diff-pane removed">
-					<div class="diff-pane-head">
-						<strong>删除</strong>
-						<span>{removedCount()} 行</span>
-					</div>
-					<div class="diff-pane-body">
-						<For each={leftLines()}>
-							{(line) => (
-								<div class={`diff-line diff-${line.type}`}>
-									<span class="diff-line-number">{line.number}</span>
-									<span class="diff-code">
-										<For each={buildDiffCodeParts(line.text, line.pairText, line.side, line.changed)}>
-											{(part) => (
-												<span class={part.removed ? "diff-char-remove" : part.added ? "diff-char-add" : ""}>
-													{part.value}
-												</span>
-											)}
-										</For>
-									</span>
-								</div>
-							)}
-						</For>
-					</div>
-				</section>
-				<section class="diff-pane added">
-					<div class="diff-pane-head">
-						<strong>添加</strong>
-						<span>{addedCount()} 行</span>
-					</div>
-					<div class="diff-pane-body">
-						<For each={rightLines()}>
-							{(line) => (
-								<div class={`diff-line diff-${line.type}`}>
-									<span class="diff-line-number">{line.number}</span>
-									<span class="diff-code">
-										<For each={buildDiffCodeParts(line.text, line.pairText, line.side, line.changed)}>
-											{(part) => (
-												<span class={part.removed ? "diff-char-remove" : part.added ? "diff-char-add" : ""}>
-													{part.value}
-												</span>
-											)}
-										</For>
-									</span>
-								</div>
-							)}
-						</For>
-					</div>
-				</section>
+				<DiffPane
+					kind="removed"
+					label="删除"
+					count={removedCount}
+					lines={leftLines}
+				/>
+				<DiffPane kind="added" label="添加" count={addedCount} lines={rightLines} />
 			</div>
 		</div>
 	);
