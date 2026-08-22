@@ -1,23 +1,17 @@
 ---
 import Icon from "@/components/Icon.astro";
+import type { ProjectItem } from "@/data/projects";
 
 interface Props {
-  project: {
-    name: string;
-    description: string;
-    techStack: string[];
-    cover: string;
-    github: string;
-    demo: string;
-    status: string;
-  };
+  project: Partial<ProjectItem>;
   variant?: "home" | "page";
 }
 
 const { project, variant = "home" } = Astro.props;
-const hasDemo = Boolean(project.demo && project.demo !== "#");
-const hasGithub = Boolean(project.github && project.github !== "#");
-const targetHref = hasDemo ? project.demo : hasGithub ? project.github : "/projects";
+const { name = "", description = "", cover = "", github = "", demo = "", status = "", techStack = [] as string[] } = project;
+const hasDemo = Boolean(demo && demo !== "#");
+const hasGithub = Boolean(github && github !== "#");
+const targetHref = hasDemo ? demo : hasGithub ? github : "/projects";
 const isExternal = (href: string) => href.startsWith("http");
 ---
 
@@ -33,7 +27,7 @@ const isExternal = (href: string) => href.startsWith("http");
     href={targetHref}
     target={isExternal(targetHref) ? "_blank" : undefined}
     rel={isExternal(targetHref) ? "noreferrer" : undefined}
-    aria-label={`打开项目：${project.name}`}
+    aria-label={`打开项目：${name}`}
   ></a>
 
   <a
@@ -41,30 +35,30 @@ const isExternal = (href: string) => href.startsWith("http");
     href={targetHref}
     target={isExternal(targetHref) ? "_blank" : undefined}
     rel={isExternal(targetHref) ? "noreferrer" : undefined}
-    aria-label={`查看项目：${project.name}`}
+    aria-label={`查看项目：${name}`}
     tabindex="-1"
   >
     <img
       class="aspect-square h-auto w-full rounded-md border border-border object-cover bg-paper-soft"
       src="/images/image-placeholder.svg"
-      data-media-src={project.cover}
-      alt={`${project.name} 项目截图`}
+      data-media-src={cover}
+      alt={`${name} 项目截图`}
       loading="lazy"
     />
   </a>
 
   <div class="block min-w-0">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <span class="text-xs font-black text-orange">{project.status}</span>
+      <span class="text-xs font-black text-orange">{status}</span>
       <span class="relative z-20 flex flex-wrap items-center gap-2">
         {
           hasDemo && (
             <a
               class="icon-link"
-              href={project.demo}
-              target={isExternal(project.demo) ? "_blank" : undefined}
-              rel={isExternal(project.demo) ? "noreferrer" : undefined}
-              aria-label={`${project.name} 演示地址`}
+              href={demo}
+              target={isExternal(demo) ? "_blank" : undefined}
+              rel={isExternal(demo) ? "noreferrer" : undefined}
+              aria-label={`${name} 演示地址`}
             >
               <Icon name="ExternalLink" size={16} />
             </a>
@@ -74,10 +68,10 @@ const isExternal = (href: string) => href.startsWith("http");
           hasGithub && (
             <a
               class="icon-link"
-              href={project.github}
+              href={github}
               target="_blank"
               rel="noreferrer"
-              aria-label={`${project.name} GitHub 仓库`}
+              aria-label={`${name} GitHub 仓库`}
             >
               <Icon name="Github" size={16} />
             </a>
@@ -94,13 +88,13 @@ const isExternal = (href: string) => href.startsWith("http");
         rel={isExternal(targetHref) ? "noreferrer" : undefined}
         tabindex="-1"
       >
-        {project.name}
+        {name}
       </a>
     </h3>
-    <p class="m-0 line-clamp-2 text-sm leading-relaxed text-muted">{project.description}</p>
+    <p class="m-0 line-clamp-2 text-sm leading-relaxed text-muted">{description}</p>
     <span class="mt-3 flex flex-wrap items-center gap-2">
       {
-        project.techStack.map((item) => (
+        techStack.map((item) => (
           <span class="rounded-md border border-tag-border bg-note-blue-bg px-2 py-0.5 text-2xs font-extrabold text-tag-text">
             {item}
           </span>

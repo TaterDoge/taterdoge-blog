@@ -254,7 +254,7 @@ export default function PublishApp(props: PublishAppProps) {
 						<span class="text-sm">封面 URL</span>
 						<input
 							name="cover"
-							placeholder="可选，文章卡片封面"
+							placeholder="本地路径如 ./cover.png，需与正文一起放文章目录"
 							disabled={INPUT_DISABLED(isBlog)}
 						/>
 					</label>
@@ -307,10 +307,7 @@ export default function PublishApp(props: PublishAppProps) {
 				</div>
 
 				{/* body textarea */}
-				<label
-					class="grid min-w-0 gap-2 font-black text-ink"
-					hidden={!isContent()}
-				>
+				<label class="grid min-w-0 gap-2 font-black text-ink" hidden={!isContent()}>
 					<span class="text-sm">正文 Markdown</span>
 					<textarea
 						name="body"

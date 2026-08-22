@@ -2,6 +2,7 @@ import { createStore, produce } from "solid-js/store";
 import { createSignal, createMemo, For, Show, createEffect } from "solid-js";
 import { useDragSort } from "./useDragSort";
 import { lucideIconClass } from "@/lib/icons";
+import type { ProjectItem } from "@/data/projects";
 
 type TabKind = "projects" | "tools" | "favorites";
 type StatusState = "idle" | "loading" | "ok" | "error";
@@ -25,14 +26,6 @@ interface ToolItem {
 	icon: string;
 	featured?: boolean;
 	internal?: boolean;
-	status?: string;
-	[key: string]: unknown;
-}
-
-interface ProjectItem {
-	name: string;
-	description: string;
-	category?: string;
 	status?: string;
 	[key: string]: unknown;
 }
@@ -146,10 +139,7 @@ export default function ManageApp(props: ManageAppProps) {
 	const [state, setState] = createStore({
 		projects: clone(props.initialProjects).map(
 			(item: ProjectItem) =>
-				assignManageKey(
-					item as Record<string, unknown>,
-					"project",
-				) as ProjectItem,
+				assignManageKey(item as Record<string, unknown>, "project") as ProjectItem,
 		),
 		tools: clone(props.initialTools).map(
 			(item: ToolItem) =>
@@ -209,9 +199,7 @@ export default function ManageApp(props: ManageAppProps) {
 		}
 		if (lastIndex >= 0) return lastIndex + 1;
 		const categoryPosition = state.favoriteCategories.indexOf(category);
-		for (const nextCat of state.favoriteCategories.slice(
-			categoryPosition + 1,
-		)) {
+		for (const nextCat of state.favoriteCategories.slice(categoryPosition + 1)) {
 			const firstIndex = items.findIndex((item) => item.category === nextCat);
 			if (firstIndex >= 0) return firstIndex;
 		}
@@ -282,8 +270,7 @@ export default function ManageApp(props: ManageAppProps) {
 		(elements.namedItem("index") as HTMLInputElement).value = String(index);
 		if (index >= 0) {
 			const item = state.favorites[index];
-			(elements.namedItem("title") as HTMLInputElement).value =
-				item.title ?? "";
+			(elements.namedItem("title") as HTMLInputElement).value = item.title ?? "";
 			(elements.namedItem("description") as HTMLInputElement).value =
 				item.description ?? "";
 			(elements.namedItem("url") as HTMLInputElement).value = item.url ?? "";
@@ -308,9 +295,7 @@ export default function ManageApp(props: ManageAppProps) {
 			title: String(data.get("title") || "").trim(),
 			description: String(data.get("description") || "").trim(),
 			url: String(data.get("url") || "").trim(),
-			category: ensureFavoriteCategory(
-				String(data.get("category") || "").trim(),
-			),
+			category: ensureFavoriteCategory(String(data.get("category") || "").trim()),
 			icon: String(data.get("icon") || "Bookmark").trim() || "Bookmark",
 			featured: data.get("featured") === "on",
 		};
@@ -375,16 +360,11 @@ export default function ManageApp(props: ManageAppProps) {
 			if (!response.ok || !result?.ok)
 				throw new Error(result?.error || "保存失败");
 			updateStatus(
-				result.local
-					? `已保存到本地：${result.path}`
-					: `已提交：${result.path}`,
+				result.local ? `已保存到本地：${result.path}` : `已提交：${result.path}`,
 				"ok",
 			);
 		} catch (error) {
-			updateStatus(
-				error instanceof Error ? error.message : "保存失败",
-				"error",
-			);
+			updateStatus(error instanceof Error ? error.message : "保存失败", "error");
 		} finally {
 			setSaving("");
 		}
@@ -486,9 +466,7 @@ export default function ManageApp(props: ManageAppProps) {
 			</div>
 			<div
 				class="grid gap-2.5"
-				onDragOver={(e) =>
-					drag.overListEnd(kind, (state as any)[kind].length, e)
-				}
+				onDragOver={(e) => drag.overListEnd(kind, (state as any)[kind].length, e)}
 				onDrop={(e) => {
 					e.preventDefault();
 					drag.commitDrop();
@@ -543,9 +521,7 @@ export default function ManageApp(props: ManageAppProps) {
 					<em class={ITEM_DESC}>{item.description}</em>
 				</span>
 				<span class="inline-flex items-center justify-end gap-1.5 max-md:col-start-2 max-md:justify-start">
-					<Show
-						when={shouldShowHomeBadge("favorites", item as any, globalIndex())}
-					>
+					<Show when={shouldShowHomeBadge("favorites", item as any, globalIndex())}>
 						<Badge text="首页" home />
 					</Show>
 					<button
@@ -613,12 +589,7 @@ export default function ManageApp(props: ManageAppProps) {
 				onDragLeave={() => drag.leaveGroup()}
 				onDragOver={(e) => {
 					if (listRef)
-						drag.overGroupEnd(
-							category,
-							listRef,
-							favoriteInsertIndex(category),
-							e,
-						);
+						drag.overGroupEnd(category, listRef, favoriteInsertIndex(category), e);
 				}}
 				onDrop={(e) => {
 					e.preventDefault();
