@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-export type DragKind = "projects" | "tools" | "favorites";
+type DragKind = "projects" | "tools" | "favorites";
 
 interface DragStateValue {
 	kind: DragKind;
@@ -108,10 +108,7 @@ export function useDragSort(opts: UseDragSortOptions) {
 	) => {
 		event.preventDefault();
 		if (!dragState || dragState.kind !== kind) return;
-		if (
-			event.target instanceof Element &&
-			event.target.closest(".sortable-row")
-		)
+		if (event.target instanceof Element && event.target.closest(".sortable-row"))
 			return;
 		if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
 		const list = event.currentTarget as HTMLElement;
@@ -129,10 +126,7 @@ export function useDragSort(opts: UseDragSortOptions) {
 	) => {
 		event.preventDefault();
 		if (!dragState || dragState.kind !== "favorites") return;
-		if (
-			event.target instanceof Element &&
-			event.target.closest(".sortable-row")
-		)
+		if (event.target instanceof Element && event.target.closest(".sortable-row"))
 			return;
 		if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
 		positionDropMarker(list, list.getBoundingClientRect().bottom);
@@ -148,11 +142,7 @@ export function useDragSort(opts: UseDragSortOptions) {
 		}
 		let changed = false;
 		if (dragState.kind === "projects" || dragState.kind === "tools") {
-			changed = opts.onMoveItem(
-				dragState.kind,
-				dragState.index,
-				dropTarget.index,
-			);
+			changed = opts.onMoveItem(dragState.kind, dragState.index, dropTarget.index);
 		} else if (dragState.kind === "favorites") {
 			changed = opts.onMoveFavorite(
 				dragState.index,

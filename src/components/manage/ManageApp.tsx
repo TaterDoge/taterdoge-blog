@@ -1,5 +1,6 @@
 import { createStore, produce } from "solid-js/store";
 import { createSignal, createMemo, For, Show, createEffect } from "solid-js";
+import type { JSX } from "solid-js";
 import { useDragSort } from "./useDragSort";
 import { lucideIconClass } from "@/lib/icons";
 import type { ProjectItem } from "@/data/projects";
@@ -58,15 +59,10 @@ function assignManageKey<T extends Record<string, unknown>>(
 	return item;
 }
 
-function shouldShowHomeBadge(
-	kind: TabKind,
-	item: Record<string, unknown>,
-	index: number,
-): boolean {
+function shouldShowHomeBadge(kind: TabKind, index: number): boolean {
 	if (kind === "projects") return index < 3;
 	if (kind === "tools") return index < 3;
-	if (kind === "favorites") return index < 4;
-	return Boolean(item?.featured);
+	return index < 4; // favorites
 }
 
 function getKey(item: Record<string, unknown>): string {
@@ -130,6 +126,43 @@ function Badge(props: { text: string; home?: boolean }) {
 		>
 			{props.text}
 		</span>
+	);
+}
+
+/* ---- sortable row 壳：拖动状态 + 事件绑定为 projects/tools/favorites 共用 ---- */
+
+function RowShell(props: {
+	dragging: () => boolean;
+	dropTarget: () => boolean;
+	category?: string;
+	onDragStart: (event: DragEvent) => void;
+	onDragEnd: () => void;
+	onDragOver: (event: DragEvent) => void;
+	onDrop: (event: DragEvent) => void;
+	children: JSX.Element;
+}) {
+	return (
+		<div
+			class={SORTABLE_ROW_BASE}
+			classList={{
+				"is-dragging": props.dragging(),
+				"is-drop-target": props.dropTarget(),
+				"cursor-grab": !props.dragging(),
+				"cursor-grabbing": props.dragging(),
+				[DRAGGING_EXTRA]: props.dragging(),
+				[DROPTARGET_EXTRA]: props.dropTarget(),
+			}}
+			draggable={true}
+			aria-label="拖动调整顺序"
+			data-category={props.category}
+			onDragStart={props.onDragStart}
+			onDragEnd={props.onDragEnd}
+			onDragOver={props.onDragOver}
+			onDrop={props.onDrop}
+		>
+			<span class="drag-handle" aria-hidden="true" />
+			{props.children}
+		</div>
 	);
 }
 
@@ -407,18 +440,9 @@ export default function ManageApp(props: ManageAppProps) {
 		const isDragging = () => drag.draggingKey() === key;
 		const isDropTarget = () => drag.dropTargetKey() === key;
 		return (
-			<div
-				class={SORTABLE_ROW_BASE}
-				classList={{
-					"is-dragging": isDragging(),
-					"is-drop-target": isDropTarget(),
-					"cursor-grab": !isDragging(),
-					"cursor-grabbing": isDragging(),
-					[DRAGGING_EXTRA]: isDragging(),
-					[DROPTARGET_EXTRA]: isDropTarget(),
-				}}
-				draggable={true}
-				aria-label="拖动调整顺序"
+			<RowShell
+				dragging={isDragging}
+				dropTarget={isDropTarget}
 				onDragStart={(e) => drag.startDrag(kind, idx(), key, "", e)}
 				onDragEnd={() => drag.endDrag()}
 				onDragOver={(e) => {
@@ -432,7 +456,6 @@ export default function ManageApp(props: ManageAppProps) {
 					drag.commitDrop();
 				}}
 			>
-				<span class="drag-handle" aria-hidden="true" />
 				<span class="block min-w-0">
 					<strong class={ITEM_TITLE}>{item.name as string}</strong>
 					<em class={ITEM_DESC}>{item.description as string}</em>
@@ -442,11 +465,11 @@ export default function ManageApp(props: ManageAppProps) {
 					<Show when={item.status}>
 						<Badge text={item.status as string} />
 					</Show>
-					<Show when={shouldShowHomeBadge(kind, item, idx())}>
+					<Show when={shouldShowHomeBadge(kind, idx())}>
 						<Badge text="首页" home />
 					</Show>
 				</span>
-			</div>
+			</RowShell>
 		);
 	};
 
@@ -487,19 +510,10 @@ export default function ManageApp(props: ManageAppProps) {
 		const isDragging = () => drag.draggingKey() === key;
 		const isDropTarget = () => drag.dropTargetKey() === key;
 		return (
-			<div
-				class={SORTABLE_ROW_BASE}
-				classList={{
-					"is-dragging": isDragging(),
-					"is-drop-target": isDropTarget(),
-					"cursor-grab": !isDragging(),
-					"cursor-grabbing": isDragging(),
-					[DRAGGING_EXTRA]: isDragging(),
-					[DROPTARGET_EXTRA]: isDropTarget(),
-				}}
-				draggable={true}
-				aria-label="拖动调整顺序"
-				data-category={category}
+			<RowShell
+				dragging={isDragging}
+				dropTarget={isDropTarget}
+				category={category}
 				onDragStart={(e) =>
 					drag.startDrag("favorites", globalIndex(), key, category, e)
 				}
@@ -515,13 +529,12 @@ export default function ManageApp(props: ManageAppProps) {
 					drag.commitDrop();
 				}}
 			>
-				<span class="drag-handle" aria-hidden="true" />
 				<span class="block min-w-0">
 					<strong class={ITEM_TITLE}>{item.title}</strong>
 					<em class={ITEM_DESC}>{item.description}</em>
 				</span>
 				<span class="inline-flex items-center justify-end gap-1.5 max-md:col-start-2 max-md:justify-start">
-					<Show when={shouldShowHomeBadge("favorites", item as any, globalIndex())}>
+					<Show when={shouldShowHomeBadge("favorites", globalIndex())}>
 						<Badge text="首页" home />
 					</Show>
 					<button
@@ -532,7 +545,7 @@ export default function ManageApp(props: ManageAppProps) {
 						编辑
 					</button>
 				</span>
-			</div>
+			</RowShell>
 		);
 	};
 
